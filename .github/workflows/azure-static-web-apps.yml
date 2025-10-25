@@ -3,130 +3,77 @@ name: Azure Static Web Apps CI/CD
 on:
   push:
     branches:
-      - main
-      - develop
-      - qa       
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
       - develop
       - qa
+      - main
 
 permissions:
   contents: read
-  pull-requests: write   
+  pull-requests: write
 
 jobs:
-  build_and_deploy:
-    environment: development
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  #########################
+  # Deploy Development
+  #########################
+  deploy_dev:
     runs-on: ubuntu-latest
+    if: github.ref_name == 'develop'
+    environment: development
 
     steps:
-      #  Descargar el código del repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      #  Configurar Node.js con caché para acelerar builds
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.14.0'   # Angular 19 requiere Node 20.x o superior
-          cache: 'npm'
-
-      # Limpiar cache de npm antes de instalar dependencias
-      - name: Clean npm cache
-        run: |
-          npm cache clean --force
-          npx clear-npx-cache
-
-      #  Instalar dependencias
-      - name: Install dependencies
-        run: npm install
-
-      #  Compilar el proyecto Angular en modo development
-      - name: Build Angular app
-        run: npm run build:dev
-
-      # Copiar archivo de configuración SWA al build
-      - name: Copy staticwebapp.config.json
-        run: cp staticwebapp.config.json dist/portal-integral/browser/
-
-      - name: Remove host remoteEntry.json
-        run: rm -f dist/portal-integral/browser/remoteEntry.json
-
-      # Guardar el build como artefacto en GitHub Actions
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: angular-build
-          path: dist/portal-integral/browser
-
-      #  Desplegar en Azure Static Web Apps
-      - name: Deploy to Azure Static Web Apps
+      - name: Deploy to Azure Static Web Apps (Dev)
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DEV }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/"                     # Raíz del proyecto
-          output_location: "dist/portal-integral/browser"  # Carpeta de salida de Angular
+          app_location: "/"
+          output_location: "dist/portal-integral/browser"
           app_build_command: "npm run build:dev"
 
-  build_and_deploy_qa:
-    environment: qa
-    needs: build_and_deploy
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  #########################
+  # Deploy QA
+  #########################
+  deploy_qa:
     runs-on: ubuntu-latest
+    if: github.ref_name == 'qa'
+    environment: qa
 
     steps:
-      #  Descargar el código del repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      #  Configurar Node.js con caché para acelerar builds
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.14.0'   # Angular 19 requiere Node 20.x o superior
-          cache: 'npm'
-
-      # Limpiar cache de npm antes de instalar dependencias
-      - name: Clean npm cache
-        run: |
-          npm cache clean --force
-          npx clear-npx-cache
-
-      #  Instalar dependencias
-      - name: Install dependencies
-        run: npm install
-
-      #  Compilar el proyecto Angular en modo QA
-      - name: Build Angular app for QA
-        run: npm run build:qa
-
-      # Copiar archivo de configuración SWA al build
-      - name: Copy staticwebapp.config.json
-        run: cp staticwebapp.config.json dist/portal-integral/browser/
-
-      - name: Remove host remoteEntry.json
-        run: rm -f dist/portal-integral/browser/remoteEntry.json
-
-      # Guardar el build como artefacto en GitHub Actions
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: angular-build-qa
-          path: dist/portal-integral/browser
-
-      #  Desplegar en Azure Static Web Apps (QA)
       - name: Deploy to Azure Static Web Apps (QA)
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_QA }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/"                     # Raíz del proyecto
-          output_location: "dist/portal-integral/browser"  # Carpeta de salida de Angular
+          app_location: "/"
+          output_location: "dist/portal-integral/browser"
           app_build_command: "npm run build:qa"
+
+  #########################
+  # Deploy Production
+  #########################
+  deploy_prod:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'main'
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Azure Static Web Apps (Prod)
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PROD }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"
+          output_location: "dist/portal-integral/browser"
+          app_build_command: "npm run build"

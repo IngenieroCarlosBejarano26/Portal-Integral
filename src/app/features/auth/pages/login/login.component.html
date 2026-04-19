@@ -1,0 +1,117 @@
+<div class="login-page">
+  <!-- Panel Izquierdo - Branding -->
+  <aside class="brand-panel">
+    <div class="brand-content">
+      <div class="brand-logo">
+        <span class="logo-mark">PI</span>
+      </div>
+      <h1 class="brand-title">Portal Integral</h1>
+      <p class="brand-tagline">
+        Sistema de gestión integral para tu organización
+      </p>
+
+      <ul class="brand-features">
+        <li>
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          <span>Gestión centralizada de clientes y empresas</span>
+        </li>
+        <li>
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          <span>Control completo de valeras y consumos</span>
+        </li>
+        <li>
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          <span>Reportes y métricas en tiempo real</span>
+        </li>
+      </ul>
+    </div>
+
+    <p class="brand-footer">© 2026 Portal Integral · Todos los derechos reservados</p>
+  </aside>
+
+  <!-- Panel Derecho - Formulario -->
+  <main class="form-panel">
+    <div class="form-wrapper">
+      <header class="form-header">
+        <h2>Bienvenido de vuelta</h2>
+        <p>Ingresa tus credenciales para acceder al sistema</p>
+      </header>
+
+      <form
+        nz-form
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        class="login-form"
+        nzLayout="vertical">
+
+        <!-- Usuario -->
+        <nz-form-item>
+          <nz-form-label nzFor="usuario" nzNoColon>Usuario</nz-form-label>
+          <nz-form-control nzErrorTip="Por favor ingresa tu usuario">
+            <nz-input-group nzSize="large" [nzPrefix]="userIcon">
+              <input
+                id="usuario"
+                nz-input
+                formControlName="nombreUsuario"
+                placeholder="Ingresa tu usuario"
+                autocomplete="username" />
+            </nz-input-group>
+            <ng-template #userIcon>
+              <i nz-icon nzType="user" nzTheme="outline"></i>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Contraseña -->
+        <nz-form-item>
+          <nz-form-label nzFor="password" nzNoColon>Contraseña</nz-form-label>
+          <nz-form-control nzErrorTip="Por favor ingresa tu contraseña">
+            <nz-input-group nzSize="large" [nzPrefix]="lockIcon" [nzSuffix]="suffixIcon">
+              <input
+                id="password"
+                nz-input
+                [type]="passwordVisible() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password" />
+            </nz-input-group>
+            <ng-template #lockIcon>
+              <i nz-icon nzType="lock" nzTheme="outline"></i>
+            </ng-template>
+            <ng-template #suffixIcon>
+              <i
+                nz-icon
+                [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+                nzTheme="outline"
+                class="toggle-password"
+                (click)="togglePassword()"></i>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Opciones -->
+        <div class="form-options">
+          <label nz-checkbox formControlName="recordar">Recordarme</label>
+          <a class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Submit -->
+        <button
+          nz-button
+          nzType="primary"
+          nzBlock
+          nzSize="large"
+          type="submit"
+          [nzLoading]="loading()"
+          class="submit-btn">
+          <span *ngIf="!loading()">Iniciar Sesión</span>
+          <span *ngIf="loading()">Verificando...</span>
+        </button>
+
+        <p class="form-help">
+          ¿Necesitas ayuda? <a>Contacta al administrador</a>
+        </p>
+      </form>
+    </div>
+  </main>
+</div>

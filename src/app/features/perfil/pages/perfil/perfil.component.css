@@ -1,0 +1,267 @@
+/* ============================================
+   PERFIL - Diseño futurista minimalista (indigo)
+   ============================================ */
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.perfil-page {
+  overflow-y: auto;
+}
+
+.perfil-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ============================================
+   USER CARD - Tarjeta principal
+   ============================================ */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border, #eef0f5);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(15, 23, 42, 0.05));
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary, #6366f1) 0%, #818cf8 100%);
+}
+
+.user-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--primary, #6366f1) 0%, #818cf8 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.45);
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-info h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text, #1a1a2e);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.user-email {
+  font-size: 13px;
+  color: var(--text-muted, #6c757d);
+  margin: 4px 0 10px;
+}
+
+.user-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 14px;
+  background: var(--primary-soft, #eef2ff);
+  color: var(--primary, #6366f1);
+  letter-spacing: 0.2px;
+}
+
+.user-tag .anticon {
+  font-size: 12px;
+}
+
+.logout-btn {
+  height: 38px;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   INFO GRID
+   ============================================ */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.info-card {
+  background: #ffffff;
+  border: 1px solid var(--border, #eef0f5);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(15, 23, 42, 0.05));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.22s ease;
+}
+
+.info-card:hover {
+  border-color: var(--primary, #6366f1);
+  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(99, 102, 241, 0.15));
+  transform: translateY(-2px);
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border, #eef0f5);
+}
+
+.info-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary-soft, #eef2ff);
+  color: var(--primary, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.info-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #1a1a2e);
+  margin: 0;
+}
+
+.info-subtitle {
+  font-size: 11px;
+  color: var(--text-subtle, #9aa0a6);
+  margin: 2px 0 0;
+}
+
+.info-rows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--primary-softer, #f5f7ff);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+  min-width: 0;
+}
+
+.info-row:hover {
+  background: #ffffff;
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+
+.row-icon {
+  font-size: 13px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--primary, #6366f1);
+  border: 1px solid var(--border, #eef0f5);
+  flex-shrink: 0;
+}
+
+.info-row > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.row-label {
+  font-size: 9px;
+  color: var(--text-subtle, #9aa0a6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.row-value {
+  font-size: 12px;
+  color: var(--text, #1a1a2e);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-value.mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted, #6c757d);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  .info-rows {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .user-card {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .logout-btn {
+    align-self: stretch;
+  }
+}

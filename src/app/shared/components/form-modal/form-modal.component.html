@@ -1,0 +1,101 @@
+<form nz-form [formGroup]="form" (ngSubmit)="submit()" nzLayout="vertical" class="form-modal">
+  <ng-container *ngFor="let row of fieldRows; let i = index; trackBy: trackByRow">
+    <div class="form-row">
+      <nz-form-item
+        *ngFor="let field of row; trackBy: trackByField"
+        class="form-col"
+        [style.flex]="field.span === 12 ? '1 1 calc(50% - 8px)' : '1 1 100%'">
+        <nz-form-label [nzRequired]="field.required" nzNoColon>{{ field.label }}</nz-form-label>
+        <nz-form-control>
+
+          <!-- Text / Email / Password -->
+          <input
+            *ngIf="field.type === 'text' || field.type === 'email' || field.type === 'password'"
+            nz-input
+            [type]="field.type"
+            [formControlName]="field.key"
+            [placeholder]="field.placeholder || ''" />
+
+          <!-- Number -->
+          <nz-input-number
+            *ngIf="field.type === 'number'"
+            [formControlName]="field.key"
+            [nzPlaceHolder]="field.placeholder || ''"
+            style="width: 100%">
+          </nz-input-number>
+
+          <!-- Currency (COP) -->
+          <nz-input-number
+            *ngIf="field.type === 'currency'"
+            [formControlName]="field.key"
+            [nzPlaceHolder]="field.placeholder || '$ 0'"
+            [nzMin]="0"
+            [nzStep]="100"
+            [nzFormatter]="currencyFormatter"
+            [nzParser]="currencyParser"
+            style="width: 100%">
+          </nz-input-number>
+
+          <!-- Textarea -->
+          <textarea
+            *ngIf="field.type === 'textarea'"
+            nz-input
+            rows="3"
+            [formControlName]="field.key"
+            [placeholder]="field.placeholder || ''">
+          </textarea>
+
+          <!-- Select -->
+          <nz-select
+            *ngIf="field.type === 'select'"
+            [formControlName]="field.key"
+            [nzPlaceHolder]="field.placeholder || 'Selecciona...'"
+            nzShowSearch
+            nzAllowClear
+            [nzServerSearch]="false"
+            [nzNotFoundContent]="'Sin resultados'">
+            <nz-option
+              *ngFor="let opt of field.options"
+              [nzValue]="opt.value"
+              [nzLabel]="opt.label">
+            </nz-option>
+          </nz-select>
+
+          <!-- Switch -->
+          <nz-switch
+            *ngIf="field.type === 'switch'"
+            [formControlName]="field.key">
+          </nz-switch>
+
+          <!-- Date -->
+          <nz-date-picker
+            *ngIf="field.type === 'date'"
+            [formControlName]="field.key"
+            [nzPlaceHolder]="field.placeholder || 'Selecciona una fecha'"
+            nzFormat="yyyy-MM-dd"
+            style="width: 100%">
+          </nz-date-picker>
+
+          <!-- DateTime -->
+          <nz-date-picker
+            *ngIf="field.type === 'datetime'"
+            [formControlName]="field.key"
+            [nzPlaceHolder]="field.placeholder || 'Selecciona fecha y hora'"
+            [nzShowTime]="{ nzFormat: 'HH:mm' }"
+            nzFormat="yyyy-MM-dd HH:mm"
+            style="width: 100%">
+          </nz-date-picker>
+
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </ng-container>
+
+  <div class="form-footer">
+    <button type="button" nz-button (click)="cancel()">Cancelar</button>
+    <button type="submit" nz-button nzType="primary" [nzLoading]="loading">
+      <i nz-icon [nzType]="data.mode === 'edit' ? 'save' : 'plus'" nzTheme="outline"></i>
+      {{ data.mode === 'edit' ? 'Guardar cambios' : 'Crear' }}
+    </button>
+  </div>
+</form>

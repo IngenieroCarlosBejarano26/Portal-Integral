@@ -1,0 +1,44 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1>Tenants</h1>
+      <p class="subtitle">Administra los tenants del sistema</p>
+    </div>
+    <div class="page-header-actions">
+      <button nz-button (click)="onReload()">
+        <i nz-icon nzType="reload" nzTheme="outline"></i>
+        Actualizar
+      </button>
+      <button nz-button nzType="primary" (click)="openForm()">
+        <i nz-icon nzType="plus" nzTheme="outline"></i>
+        Nuevo Tenant
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar-card">
+    <div class="toolbar-search">
+      <nz-input-group [nzPrefix]="searchIcon">
+        <input
+          nz-input
+          placeholder="Buscar tenant..."
+          [(ngModel)]="searchValue"
+          (input)="onSearch($any($event.target).value)" />
+      </nz-input-group>
+      <ng-template #searchIcon>
+        <i nz-icon nzType="search" nzTheme="outline"></i>
+      </ng-template>
+    </div>
+    <span class="toolbar-meta">{{ filteredTenants.length }} resultado(s)</span>
+  </div>
+
+  <div class="cards-wrapper">
+    <app-card-grid
+      [items]="filteredTenants"
+      [config]="cardConfig"
+      [actions]="cardActions"
+      [loading]="loading"
+      emptyText="No hay tenants registrados">
+    </app-card-grid>
+  </div>
+</div>

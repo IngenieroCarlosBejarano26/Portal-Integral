@@ -1,7 +1,11 @@
-export const environment = {
+import { Environment } from './environment.interface';
+
+export const environment: Environment = {
   production: false,
   environment: 'local',
-  remoteUrls: {
-    'factura-pendiente': 'http://localhost:4202/remoteEntry.json', 
+  api: {
+    baseUrl: 'https://localhost:7206',
+    apiKey: 'V4l3r4s-4p1K3y-S3cur3-2024!'
   },
 };
+

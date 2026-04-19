@@ -1,0 +1,69 @@
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.form-col {
+  flex: 1 1 100%;
+  margin-bottom: 0 !important;
+}
+
+:host ::ng-deep .ant-form-item-label {
+  padding-bottom: 4px !important;
+}
+
+:host ::ng-deep .ant-form-item-label > label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  height: auto;
+}
+
+:host ::ng-deep .ant-input,
+:host ::ng-deep .ant-input-number,
+:host ::ng-deep .ant-select-selector,
+:host ::ng-deep .ant-picker {
+  height: 38px !important;
+  border-radius: 8px !important;
+  font-size: 13px;
+  width: 100%;
+}
+
+:host ::ng-deep .ant-input-number-input,
+:host ::ng-deep .ant-select-selection-item,
+:host ::ng-deep .ant-picker-input > input {
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 13px;
+}
+
+:host ::ng-deep textarea.ant-input {
+  height: auto !important;
+  min-height: 80px;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #eef0f5;
+}
+
+.form-footer button {
+  min-width: 110px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}

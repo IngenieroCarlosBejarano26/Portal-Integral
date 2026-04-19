@@ -1,0 +1,136 @@
+<div class="page-container perfil-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1>Mi Perfil</h1>
+      <p class="subtitle">Información de tu cuenta y sesión</p>
+    </div>
+    <div class="page-header-actions">
+      <button nz-button (click)="changePassword()">
+        <i nz-icon nzType="key" nzTheme="outline"></i>
+        Cambiar contraseña
+      </button>
+      <button nz-button nzType="primary" (click)="editProfile()">
+        <i nz-icon nzType="edit" nzTheme="outline"></i>
+        Editar perfil
+      </button>
+    </div>
+  </div>
+
+  <div class="perfil-content">
+    <!-- Tarjeta principal del usuario -->
+    <div class="user-card">
+      <div class="user-avatar">{{ initials }}</div>
+      <div class="user-info">
+        <h2>{{ user?.nombreUsuario || 'Usuario' }}</h2>
+        <p class="user-email">{{ user?.email || 'Sin correo asignado' }}</p>
+        <div class="user-tags">
+          <span class="user-tag rol">
+            <i nz-icon nzType="safety" nzTheme="outline"></i>
+            {{ rolNombre }}
+          </span>
+          <span class="user-tag tenant">
+            <i nz-icon nzType="bank" nzTheme="outline"></i>
+            {{ tenantName }}
+          </span>
+        </div>
+      </div>
+
+      <button nz-button nzDanger (click)="logout()" class="logout-btn">
+        <i nz-icon nzType="logout" nzTheme="outline"></i>
+        Cerrar sesión
+      </button>
+    </div>
+
+    <!-- Grid de info -->
+    <div class="info-grid">
+      <!-- Datos de la cuenta -->
+      <div class="info-card">
+        <div class="info-header">
+          <div class="info-icon-wrap">
+            <i nz-icon nzType="user" nzTheme="outline"></i>
+          </div>
+          <div>
+            <h3>Información de cuenta</h3>
+            <p class="info-subtitle">Detalles del usuario autenticado</p>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row">
+            <i nz-icon nzType="user" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Usuario</span>
+              <span class="row-value">{{ user?.nombreUsuario || '—' }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i nz-icon nzType="mail" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Email</span>
+              <span class="row-value">{{ user?.email || '—' }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i nz-icon nzType="safety" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Rol</span>
+              <span class="row-value">{{ rolNombre }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i nz-icon nzType="key" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Usuario ID</span>
+              <span class="row-value mono">{{ user?.usuarioId || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos de la sesión -->
+      <div class="info-card">
+        <div class="info-header">
+          <div class="info-icon-wrap">
+            <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
+          </div>
+          <div>
+            <h3>Sesión y Tenant</h3>
+            <p class="info-subtitle">Información de la sesión actual</p>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row">
+            <i nz-icon nzType="bank" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Tenant</span>
+              <span class="row-value">{{ tenantName }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i nz-icon nzType="key" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Tenant ID</span>
+              <span class="row-value mono">{{ tenantId }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i nz-icon nzType="clock-circle" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Inicio sesión</span>
+              <span class="row-value">{{ sessionStart }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i nz-icon nzType="calendar" nzTheme="outline" class="row-icon"></i>
+            <div>
+              <span class="row-label">Token expira</span>
+              <span class="row-value">{{ tokenExpires }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

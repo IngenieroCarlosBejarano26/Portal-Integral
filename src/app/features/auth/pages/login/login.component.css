@@ -1,0 +1,349 @@
+/* ============================================
+   LOGIN PAGE - Diseño minimalista de 2 paneles
+   ============================================ */
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================================
+   PANEL IZQUIERDO - Branding
+   ============================================ */
+.brand-panel {
+  flex: 1;
+  background: #fafbfc;
+  border-right: 1px solid #f0f0f0;
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-panel::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.brand-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.brand-content {
+  position: relative;
+  z-index: 1;
+  max-width: 440px;
+}
+
+.brand-logo {
+  margin-bottom: 32px;
+}
+
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: #667eea;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+}
+
+.brand-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 12px;
+  letter-spacing: -0.5px;
+}
+
+.brand-tagline {
+  font-size: 15px;
+  color: #6c757d;
+  line-height: 1.6;
+  margin: 0 0 40px;
+}
+
+.brand-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brand-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #495057;
+}
+
+.brand-features li i {
+  color: #667eea;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.brand-footer {
+  font-size: 12px;
+  color: #adb5bd;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   PANEL DERECHO - Formulario
+   ============================================ */
+.form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 40px;
+  background: #ffffff;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-header {
+  margin-bottom: 36px;
+  text-align: left;
+}
+
+.form-header h2 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+
+.form-header p {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* ============================================
+   FORMULARIO
+   ============================================ */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form ::ng-deep .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.login-form ::ng-deep .ant-form-item-label {
+  padding-bottom: 6px;
+}
+
+.login-form ::ng-deep .ant-form-item-label > label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #495057;
+  height: auto;
+}
+
+.login-form ::ng-deep .ant-input-affix-wrapper {
+  border-radius: 8px;
+  border: 1px solid #e0e4ec;
+  padding: 0 14px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  background: #fafbfc;
+}
+
+.login-form ::ng-deep .ant-input-affix-wrapper:hover {
+  border-color: #c5cdde;
+  background: #ffffff;
+}
+
+.login-form ::ng-deep .ant-input-affix-wrapper-focused,
+.login-form ::ng-deep .ant-input-affix-wrapper:focus-within {
+  border-color: #667eea;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+}
+
+.login-form ::ng-deep .ant-input {
+  background: transparent !important;
+  font-size: 14px;
+  height: 100%;
+  line-height: 1.5;
+}
+
+.login-form ::ng-deep .ant-input-prefix {
+  color: #adb5bd;
+  margin-right: 10px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.login-form ::ng-deep .ant-input-suffix {
+  color: #adb5bd;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  cursor: pointer;
+  color: #adb5bd;
+  font-size: 16px;
+  transition: color 0.2s ease;
+  padding: 4px;
+}
+
+.toggle-password:hover {
+  color: #667eea;
+}
+
+/* ============================================
+   OPCIONES (Recordar / Olvidaste)
+   ============================================ */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+
+.form-options ::ng-deep .ant-checkbox-wrapper {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.form-options ::ng-deep .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #667eea;
+  border-color: #667eea;
+}
+
+.form-options ::ng-deep .ant-checkbox-wrapper:hover .ant-checkbox-inner {
+  border-color: #667eea;
+}
+
+.forgot-link {
+  color: #667eea;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #5568d3;
+  text-decoration: underline;
+}
+
+/* ============================================
+   BOTÓN SUBMIT
+   ============================================ */
+.submit-btn {
+  height: 46px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: #667eea;
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
+}
+
+.submit-btn:hover:not([disabled]),
+.submit-btn:focus:not([disabled]) {
+  background: #5568d3 !important;
+  border-color: #5568d3 !important;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+  transform: translateY(-1px);
+}
+
+.submit-btn:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+/* ============================================
+   AYUDA
+   ============================================ */
+.form-help {
+  text-align: center;
+  font-size: 13px;
+  color: #6c757d;
+  margin: 24px 0 0;
+}
+
+.form-help a {
+  color: #667eea;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.form-help a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 992px) {
+  .brand-panel {
+    display: none;
+  }
+
+  .form-panel {
+    padding: 40px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-panel {
+    padding: 32px 20px;
+  }
+
+  .form-header h2 {
+    font-size: 22px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

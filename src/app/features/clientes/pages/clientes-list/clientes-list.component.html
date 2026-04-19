@@ -1,0 +1,47 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1>Clientes</h1>
+      <p class="subtitle">Administra todos los clientes del sistema</p>
+    </div>
+    <div class="page-header-actions">
+      <button nz-button (click)="onReload()">
+        <i nz-icon nzType="reload" nzTheme="outline"></i>
+        Actualizar
+      </button>
+      <button nz-button nzType="primary" (click)="openForm()">
+        <i nz-icon nzType="plus" nzTheme="outline"></i>
+        Nuevo Cliente
+      </button>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar-card">
+    <div class="toolbar-search">
+      <nz-input-group [nzPrefix]="searchIcon">
+        <input
+          nz-input
+          placeholder="Buscar por nombre, email o teléfono..."
+          [(ngModel)]="searchValue"
+          (input)="onSearch($any($event.target).value)" />
+      </nz-input-group>
+      <ng-template #searchIcon>
+        <i nz-icon nzType="search" nzTheme="outline"></i>
+      </ng-template>
+    </div>
+    <span class="toolbar-meta">{{ filteredClientes.length }} resultado(s)</span>
+  </div>
+
+  <!-- Table -->
+  <div class="cards-wrapper">
+    <app-card-grid
+      [items]="filteredClientes"
+      [config]="cardConfig"
+      [actions]="cardActions"
+      [loading]="loading"
+      emptyText="No hay clientes registrados">
+    </app-card-grid>
+  </div>
+</div>

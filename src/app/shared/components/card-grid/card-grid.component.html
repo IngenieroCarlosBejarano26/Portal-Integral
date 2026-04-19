@@ -1,0 +1,63 @@
+<div class="card-grid-container">
+  <!-- Empty state -->
+  <div *ngIf="!loading && items.length === 0" class="empty-state">
+    <nz-empty [nzNotFoundContent]="emptyText"></nz-empty>
+  </div>
+
+  <!-- Cards Grid -->
+  <div *ngIf="items.length > 0" class="card-grid">
+    <div
+      *ngFor="let item of items; trackBy: trackByFn"
+      class="entity-card"
+      (click)="cardClick.emit(item)">
+
+      <!-- Header -->
+      <div class="card-header">
+        <div class="card-avatar">
+          <i *ngIf="config.iconType" nz-icon [nzType]="config.iconType" nzTheme="outline"></i>
+          <span *ngIf="!config.iconType">{{ getInitial(item) }}</span>
+        </div>
+        <div class="card-titles">
+          <h3 class="card-title">{{ getValue(item, config.titleKey) }}</h3>
+          <p *ngIf="config.subtitleKey" class="card-subtitle">{{ getValue(item, config.subtitleKey) }}</p>
+        </div>
+        <span
+          *ngIf="config.statusKey"
+          class="card-status"
+          [class.active]="getStatus(item).active"
+          [class.inactive]="!getStatus(item).active">
+          {{ getStatus(item).label }}
+        </span>
+      </div>
+
+      <!-- Body / Fields -->
+      <div class="card-body" *ngIf="config.fields.length">
+        <div class="card-field" *ngFor="let field of config.fields">
+          <i *ngIf="field.icon" nz-icon [nzType]="field.icon" nzTheme="outline" class="field-icon"></i>
+          <div class="field-content">
+            <span class="field-label">{{ field.label }}</span>
+            <span class="field-value" [title]="formatField(item, field)">{{ formatField(item, field) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions" *ngIf="actions.length" (click)="$event.stopPropagation()">
+        <button
+          *ngFor="let action of actions"
+          nz-button
+          nzSize="small"
+          class="action-btn"
+          [class.danger]="action.color === 'danger'"
+          [class.primary]="action.color === 'primary'"
+          [hidden]="action.visible && !action.visible(item)"
+          nz-tooltip
+          [nzTooltipTitle]="action.label"
+          (click)="action.action(item)">
+          <i nz-icon [nzType]="action.icon" nzTheme="outline"></i>
+          <span class="btn-label">{{ action.label }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

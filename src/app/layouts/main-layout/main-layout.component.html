@@ -1,0 +1,70 @@
+<nz-layout class="main-layout">
+  <!-- Sidebar -->
+  <nz-sider
+    class="sidebar"
+    [nzCollapsible]="true"
+    [nzCollapsed]="isCollapsed"
+    [nzWidth]="240"
+    [nzCollapsedWidth]="72"
+    [nzTrigger]="null">
+
+    <!-- Brand -->
+    <div class="brand">
+      <ng-container *ngIf="!isCollapsed">
+        <span class="brand-label">ORGANIZACIÓN</span>
+        <h2 class="brand-name">{{ organizationName }}</h2>
+      </ng-container>
+      <div class="brand-icon" *ngIf="isCollapsed">{{ organizationName.charAt(0) }}</div>
+    </div>
+
+    <!-- User Info -->
+    <div class="user-info" *ngIf="currentUser">
+      <div class="user-avatar">{{ getUserInitial() }}</div>
+      <div class="user-details" *ngIf="!isCollapsed">
+        <p class="user-name">{{ currentUser.nombreUsuario }}</p>
+        <p class="user-role">Admin</p>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <ul nz-menu class="menu" nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+      <li
+        *ngFor="let item of menuItems"
+        nz-menu-item
+        [nzSelected]="isActive(item.path)"
+        (click)="item.path && navigateTo(item.path)">
+        <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
+        <span>{{ item.label }}</span>
+      </li>
+    </ul>
+
+    <!-- Footer Sidebar -->
+    <div class="sidebar-footer">
+      <button
+        class="logout-btn"
+        nz-button
+        nzType="text"
+        (click)="logout()">
+        <i nz-icon nzType="poweroff" nzTheme="outline"></i>
+        <span *ngIf="!isCollapsed">Cerrar sesión</span>
+      </button>
+    </div>
+  </nz-sider>
+
+  <!-- Toggle Button (flotante - fuera del sider para evitar recorte) -->
+  <button
+    type="button"
+    class="sidebar-trigger"
+    [class.collapsed]="isCollapsed"
+    (click)="toggleSidebar()"
+    [attr.aria-label]="isCollapsed ? 'Expandir menú' : 'Colapsar menú'">
+    <i nz-icon [nzType]="isCollapsed ? 'right' : 'left'" nzTheme="outline"></i>
+  </button>
+
+  <!-- Content -->
+  <nz-layout class="content-layout" [class.collapsed]="isCollapsed">
+    <nz-content class="content">
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

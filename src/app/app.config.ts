@@ -16,6 +16,7 @@ import { registerSpanishLocale } from './core/config/locale.config';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { authInterceptor } from './core/interceptors/auth.Interceptor';
 import { errorInterceptor } from './core/interceptors/error.Interceptor';
+import { authGuard } from './core/guards/auth.guard';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,7 +29,6 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(es_ES),
     importProvidersFrom(FormsModule, NzModalModule),
     provideAnimationsAsync(),
-    provideHttpClient(),
   ],
 };
 

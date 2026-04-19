@@ -11,58 +11,12 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-architects/native-federation:build",
-          "options": {},
-          "configurations": {
-            "production": {
-              "target": "portal-integral:esbuild:production"
-            },
-            "development": {
-              "target": "portal-integral:esbuild:development"
-            },
-            "qa": {
-              "target": "portal-integral:esbuild:qa"
-            },
-            "local": {
-              "target": "portal-integral:esbuild:local",
-              "dev": true
-            }
-          }
-        },
-        "serve": {
-          "builder": "@angular-architects/native-federation:build",
-          "options": {
-            "target": "portal-integral:serve-original:local",
-            "rebuildDelay": 0,
-            "dev": true,
-            "port": 0
-          }
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
-            "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": ["src/styles.css"],
-            "scripts": []
-          }
-        },
-        "esbuild": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/portal-integral",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js", "es-module-shims"],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -93,6 +47,7 @@
                 }
               ],
               "outputHashing": "all",
+              "optimization": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.local.ts",
@@ -101,10 +56,9 @@
               ]
             },
             "development": {
-              "optimization": true,
+              "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.local.ts",
@@ -123,37 +77,58 @@
                   "with": "src/environments/environment.qa.ts"
                 }
               ]
-            },
-            "local": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "watch": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
-        "serve-original": {
+        "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "portal-integral:esbuild:production"
+              "buildTarget": "portal-integral:build:production"
             },
             "development": {
-              "buildTarget": "portal-integral:esbuild:development"
+              "buildTarget": "portal-integral:build:development"
             },
             "qa": {
-              "buildTarget": "portal-integral:esbuild:qa"
-            },
-            "local": {
-              "buildTarget": "portal-integral:esbuild:local"
+              "buildTarget": "portal-integral:build:qa"
             }
           },
-          "defaultConfiguration": "local",
+          "defaultConfiguration": "development",
           "options": {
             "port": 4200
           }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "portal-integral:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": ["src/styles.css"],
+            "scripts": []
+          }
         }
       }
+    }
+  },
+  "cli": {
+    "analytics": false,
+    "packageManager": "npm",
+    "strict": true,
+    "warnings": {
+      "versionMismatch": true
     }
   }
 }

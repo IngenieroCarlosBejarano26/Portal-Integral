@@ -1,7 +1,6 @@
-import { initFederation } from '@angular-architects/native-federation';
-import { environment } from './environments/environment.local';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/shared/components/layout/app.component';
 
-initFederation(environment.remoteUrls)
-  .catch((err) => console.error(err))
-  .then(() => import('./bootstrap'))
+bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));

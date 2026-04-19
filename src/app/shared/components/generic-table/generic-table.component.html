@@ -1,0 +1,67 @@
+<div class="generic-table-container">
+  <nz-table
+    #table
+    [nzData]="displayedData"
+    [nzBordered]="false"
+    [nzSize]="$any(size)"
+    [nzShowPagination]="paginated && total > pageSize"
+    [nzPageIndex]="pageIndex + 1"
+    [nzPageSize]="pageSize"
+    [nzTotal]="total"
+    [nzFrontPagination]="false"
+    (nzPageIndexChange)="onPageChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)">
+
+    <!-- Headers -->
+    <thead>
+      <tr>
+        <th *ngFor="let column of columns" [style.width]="column.width">{{ column.title }}</th>
+        <th *ngIf="actions && actions.length > 0" class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+
+    <!-- Data -->
+    <tbody>
+      <tr *ngFor="let item of displayedData; trackBy: trackByFn">
+        <td *ngFor="let column of columns" [style.width]="column.width">
+          <ng-container [ngSwitch]="column.type">
+            <ng-container *ngSwitchCase="'text'">{{ formatValue(item, column) }}</ng-container>
+
+            <ng-container *ngSwitchCase="'badge'">
+              <nz-tag [nzColor]="getColumnValue(item, column.key) === true || getColumnValue(item, column.key) === 'Activo' ? 'green' : 'red'">
+                {{ getColumnValue(item, column.key) === true || getColumnValue(item, column.key) === 'Activo' ? 'Activo' : 'Inactivo' }}
+              </nz-tag>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'date'">{{ formatValue(item, column) }}</ng-container>
+            <ng-container *ngSwitchCase="'currency'">{{ formatValue(item, column) }}</ng-container>
+            <ng-container *ngSwitchDefault>{{ formatValue(item, column) }}</ng-container>
+          </ng-container>
+        </td>
+
+        <td *ngIf="actions && actions.length > 0" class="actions-column">
+          <div class="action-buttons">
+            <button
+              *ngFor="let action of actions"
+              nz-button
+              nzSize="small"
+              [nzType]="action.type"
+              [nzDanger]="action.color === 'danger'"
+              (click)="executeAction(action, item)"
+              [attr.title]="action.label"
+              nz-tooltip
+              class="action-btn">
+              <i nz-icon [nzType]="action.icon" nzTheme="outline"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <tr *ngIf="displayedData.length === 0 && !loading">
+        <td [attr.colspan]="columns.length + (actions && actions.length ? 1 : 0)" class="empty-cell">
+          <nz-empty [nzNotFoundContent]="'No hay datos disponibles'"></nz-empty>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>

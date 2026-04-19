@@ -1,0 +1,99 @@
+<div class="dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Dashboard</h1>
+    <button class="refresh-btn" nz-button (click)="onRefresh()">
+      <i nz-icon nzType="reload" nzTheme="outline"></i>
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Indicadores -->
+  <div class="section">
+    <span class="section-label">INDICADORES</span>
+
+    <div class="indicators-grid">
+      <div
+        class="indicator-card"
+        *ngFor="let module of modules"
+        [style.--accent]="module.color">
+        <div class="indicator-header">
+          <span class="indicator-label">{{ module.label }}</span>
+          <div class="indicator-icon-wrap">
+            <i nz-icon [nzType]="module.icon" nzTheme="outline" class="indicator-icon"></i>
+          </div>
+        </div>
+        <div class="indicator-body">
+          <span class="indicator-value">{{ module.value }}</span>
+          <span class="indicator-meta">registros</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sesión y Sincronización -->
+  <div class="info-grid">
+    <!-- Sesión Actual -->
+    <div class="info-card info-card--success">
+      <div class="info-header">
+        <div class="info-icon-wrap success">
+          <i nz-icon nzType="check-circle" nzTheme="outline"></i>
+        </div>
+        <div>
+          <h3>Sesión actual</h3>
+          <p class="info-subtitle">Datos de acceso y tenant</p>
+        </div>
+      </div>
+
+      <div class="info-rows">
+        <div class="info-row">
+          <i nz-icon nzType="user" nzTheme="outline" class="row-icon indigo"></i>
+          <div>
+            <span class="row-label">Usuario</span>
+            <span class="row-value">{{ currentUser?.nombreUsuario || '—' }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <i nz-icon nzType="safety" nzTheme="outline" class="row-icon emerald"></i>
+          <div>
+            <span class="row-label">Rol</span>
+            <span class="row-value">{{ rolNombre }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <i nz-icon nzType="bank" nzTheme="outline" class="row-icon orange"></i>
+          <div>
+            <span class="row-label">Tenant</span>
+            <span class="row-value">{{ tenantName }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <i nz-icon nzType="key" nzTheme="outline" class="row-icon violet"></i>
+          <div>
+            <span class="row-label">ID tenant</span>
+            <span class="row-value mono">{{ tenantId }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Última Sincronización -->
+    <div class="info-card info-card--info">
+      <div class="info-header">
+        <div class="info-icon-wrap info">
+          <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
+        </div>
+        <div>
+          <h3>Última sincronización</h3>
+          <p class="info-subtitle">Datos recargados desde la API</p>
+        </div>
+      </div>
+
+      <div class="sync-time">
+        {{ lastSync }}
+      </div>
+    </div>
+  </div>
+</div>
+
+

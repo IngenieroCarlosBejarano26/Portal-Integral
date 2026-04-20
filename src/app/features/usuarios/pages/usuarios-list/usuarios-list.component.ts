@@ -95,7 +95,6 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       placeholder: 'jperez',
       minLength: 3, maxLength: 50,
       pattern: /^[a-zA-Z0-9._-]+$/,
-      hint: 'Letras, números, puntos, guiones y guiones bajos.',
       errorMessages: {
         required: 'El nombre de usuario es obligatorio.',
         minlength: 'Mínimo 3 caracteres.',
@@ -110,17 +109,19 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       errorMessages: {
         required: 'El email es obligatorio.',
         email: 'Formato de email no válido.',
-        maxlength: 'Máximo 254 caracteres.'
+        maxlength: 'Máximo 254 caracteres.',
+        pattern: 'El email debe ser una dirección válida (ej: usuario@dominio.com).'
       }
     },
     {
       key: 'password', label: 'Contraseña', type: 'password', required: true, span: 12,
       placeholder: '••••••••', mode: 'create',
       minLength: 8, maxLength: 100,
-      hint: 'Mínimo 8 caracteres con mayúsculas, minúsculas, números y un símbolo.',
+      // hint: 'Mínimo 8 caracteres con mayúsculas, minúsculas, números y un símbolo.',
       errorMessages: {
         required: 'La contraseña es obligatoria.',
-        minlength: 'Mínimo 8 caracteres.'
+        minlength: 'Mínimo 8 caracteres.',
+        pattern: 'La contraseña debe tener mayúsculas, minúsculas, números y símbolos.'
       }
     },
     {

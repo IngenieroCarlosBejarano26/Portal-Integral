@@ -1,5 +1,7 @@
-:host {
-  display: block;
-  height: 100vh;
-  overflow: hidden;
+
+.toolbar-meta {
+  font-size: 12px;
+  color: var(--text-subtle, #9aa0a6);
+  font-weight: 500;
+  white-space: nowrap;
 }

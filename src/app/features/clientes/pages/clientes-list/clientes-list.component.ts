@@ -100,7 +100,6 @@ private empresaField: FormField = {
       key: 'documento', label: 'Documento', type: 'text', required: true, span: 12,
       minLength: 3, maxLength: 50,
       pattern: /^[a-zA-Z0-9\-]+$/,
-      hint: 'Cédula, NIT o pasaporte (sin espacios).',
       errorMessages: {
         required: 'El documento es obligatorio.',
         pattern: 'Solo letras, dígitos y guiones (sin espacios).'

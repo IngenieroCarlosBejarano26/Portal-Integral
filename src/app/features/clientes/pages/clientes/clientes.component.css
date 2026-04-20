@@ -1,0 +1,13 @@
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+a {
+  cursor: pointer;
+  color: #1890ff;
+}
+a:hover {
+  color: #40a9ff;
+}

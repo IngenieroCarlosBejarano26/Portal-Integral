@@ -1,11 +1,6 @@
 /* ============================================
    PERFIL - Diseño futurista minimalista (indigo)
    ============================================ */
-:host {
-  display: block;
-  height: 100vh;
-  overflow: hidden;
-}
 
 .perfil-page {
   overflow-y: auto;

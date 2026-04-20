@@ -1,0 +1,241 @@
+/* =========================================================================
+   Configuración Email — Layout compacto sin scroll.
+   Filosofía: 2 columnas, cards pequeñas, sin desperdicio vertical.
+   ========================================================================= */
+
+.ce-page {
+  /* Hereda .page-container (height:100vh, overflow:hidden, padding 28px 32px) */
+  gap: 12px;
+}
+
+/* Spin debe llenar el espacio restante para centrar el spinner correctamente */
+.ce-spin {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ce-spin :deep(.ant-spin-container),
+.ce-spin ::ng-deep .ant-spin-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Banner de estado de 1 línea ────────────────────────────────────── */
+.ce-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  letter-spacing: -0.005em;
+}
+
+.ce-status-banner i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.ce-status-banner.is-empty {
+  background: #FEF3C7;
+  border-color: #FDE68A;
+  color: #92400E;
+}
+
+.ce-status-banner.is-active {
+  background: var(--accent-softer);
+  border-color: var(--accent-soft);
+  color: #065F46;
+}
+
+.ce-status-banner.is-active i { color: var(--accent); }
+
+.ce-status-banner.is-inactive {
+  background: var(--bg-subtle);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+/* ── Form & grid de 2 columnas ──────────────────────────────────────── */
+.ce-form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+.ce-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+.ce-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ── Cards compactas ─────────────────────────────────────────────────── */
+.ce-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow var(--duration-fast) var(--ease);
+}
+
+.ce-card:focus-within {
+  box-shadow: var(--shadow-sm);
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--border));
+}
+
+.ce-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.ce-card-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.ce-card-head i {
+  color: var(--primary);
+  font-size: 14px;
+}
+
+/* ── Form items compactos ────────────────────────────────────────────── */
+.ce-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;   /* compacto: el margin del nz-form-item ya da aire */
+}
+
+/* Tightening de los nz-form-item para evitar scroll */
+.ce-fi.ce-fi,
+.ce-page ::ng-deep .ce-fi {
+  margin-bottom: 6px !important;
+}
+
+.ce-page ::ng-deep .ce-fi .ant-form-item-label {
+  padding-bottom: 2px !important;
+  line-height: 1.3 !important;
+}
+
+.ce-page ::ng-deep .ce-fi .ant-form-item-label > label {
+  height: 22px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--text-strong) !important;
+  letter-spacing: -0.005em;
+}
+
+.ce-page ::ng-deep .ce-fi .ant-form-item-explain {
+  min-height: 18px !important;
+  font-size: 11px !important;
+}
+
+/* Inputs y selects un poco más bajos para densidad */
+.ce-page ::ng-deep .ce-fi .ant-input,
+.ce-page ::ng-deep .ce-fi .ant-input-affix-wrapper,
+.ce-page ::ng-deep .ce-fi .ant-select-selector {
+  height: 34px !important;
+  font-size: 13px !important;
+}
+
+.ce-page ::ng-deep .ce-fi .ant-select-selection-item,
+.ce-page ::ng-deep .ce-fi .ant-select-selection-placeholder {
+  line-height: 32px !important;
+}
+
+/* Toggle inline (label + switch en la misma línea) */
+.ce-fi--inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  margin-top: 4px !important;
+  margin-bottom: 0 !important;
+}
+
+.ce-page ::ng-deep .ce-fi--inline .ant-form-item-label {
+  padding: 0 !important;
+  flex: 1;
+}
+
+.ce-page ::ng-deep .ce-fi--inline .ant-form-item-control {
+  flex: 0 0 auto;
+  width: auto !important;
+}
+
+/* ── Tip card ────────────────────────────────────────────────────────── */
+.ce-tip {
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--primary-softer);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ce-tip i {
+  color: var(--primary);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ce-tip strong {
+  display: block;
+  color: var(--primary-active);
+  font-weight: 700;
+  margin-bottom: 2px;
+  font-size: 12.5px;
+  letter-spacing: -0.005em;
+}
+
+.ce-tip p {
+  margin: 0;
+  color: var(--text-strong);
+}
+
+.ce-tip code {
+  background: rgba(91, 91, 214, 0.10);
+  color: var(--primary-active);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+/* ── Responsive: pantallas estrechas → 1 columna ────────────────────── */
+@media (max-width: 960px) {
+  .ce-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Pantallas muy bajas: aún más compacto ──────────────────────────── */
+@media (max-height: 720px) {
+  .ce-card { padding: 10px 14px; }
+  .ce-card-head { margin-bottom: 6px; padding-bottom: 6px; }
+  .ce-page ::ng-deep .ce-fi { margin-bottom: 4px !important; }
+  .ce-page ::ng-deep .ce-fi .ant-input,
+  .ce-page ::ng-deep .ce-fi .ant-select-selector { height: 32px !important; }
+}

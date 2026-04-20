@@ -13,6 +13,8 @@ import { FormModalComponent, FormField } from '../../../../shared/components/for
 import { RolService, Rol } from '../../services/rol.service';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
+import { AuthService } from '../../../../core/services/auth/authService';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-roles-list',
@@ -23,7 +25,8 @@ import { RealtimeEvents } from '../../../../core/services/realtime/realtime-even
     NzButtonModule,
     NzIconModule,
     NzInputModule,
-    CardGridComponent
+    CardGridComponent,
+    HasPermissionDirective
   ],
   templateUrl: './roles-list.component.html',
   styleUrl: './roles-list.component.css'
@@ -33,6 +36,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
   private modal = inject(NzModalService);
   private notification = inject(NzNotificationService);
   private realtime = inject(RealtimeService);
+  private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
   roles: Rol[] = [];
@@ -50,13 +54,41 @@ export class RolesListComponent implements OnInit, OnDestroy {
   };
 
   cardActions: CardAction[] = [
-    { label: 'Editar', icon: 'edit', action: (item) => this.openForm(item) },
-    { label: 'Eliminar', icon: 'delete', color: 'danger', action: (item) => this.deleteRol(item) }
+    {
+      label: 'Editar', icon: 'edit',
+      visible: () => this.authService.hasPermission('roles:update'),
+      action: (item) => this.openForm(item)
+    },
+    {
+      label: 'Eliminar', icon: 'delete', color: 'danger',
+      visible: () => this.authService.hasPermission('roles:delete'),
+      action: (item) => this.deleteRol(item)
+    }
   ];
 
   fields: FormField[] = [
-    { key: 'nombre', label: 'Nombre del Rol', type: 'text', required: true, placeholder: 'Ej. Administrador' },
-    { key: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: 'Describe los permisos del rol' }
+    {
+      key: 'nombre', label: 'Nombre del Rol', type: 'text', required: true,
+      placeholder: 'Ej. Administrador',
+      minLength: 3, maxLength: 100,
+      pattern: /^[\p{L}\s.,'\-]+$/u,
+      errorMessages: {
+        required: 'El nombre del rol es obligatorio.',
+        minlength: 'Mínimo 3 caracteres.',
+        maxlength: 'Máximo 100 caracteres.',
+        pattern: 'Solo letras, espacios, puntos, comas, apóstrofes y guiones.'
+      }
+    },
+    {
+      key: 'descripcion', label: 'Descripción', type: 'textarea',
+      placeholder: 'Describe los permisos del rol',
+      maxLength: 300,
+      pattern: /^[^<>{}]*$/,
+      errorMessages: {
+        maxlength: 'Máximo 300 caracteres.',
+        pattern: 'No puede contener <, > o llaves de script.'
+      }
+    }
   ];
 
   ngOnInit(): void {

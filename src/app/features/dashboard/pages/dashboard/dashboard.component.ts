@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
@@ -21,6 +22,7 @@ interface ModuleStat {
   value: number;
   icon: string;
   color: string;
+  path: string;
 }
 
 @Component({
@@ -32,6 +34,7 @@ interface ModuleStat {
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 private authService = inject(AuthService);
+private router = inject(Router);
 private clienteService = inject(ClienteService);
 private empresaService = inject(EmpresaService);
 private consumoService = inject(ConsumoService);
@@ -50,14 +53,33 @@ private destroy$ = new Subject<void>();
   loading = false;
 
   modules: ModuleStat[] = [
-    { id: 'clientes', label: 'Clientes', value: 0, icon: 'usergroup-add', color: '#6366f1' },
-    { id: 'empresas', label: 'Empresas', value: 0, icon: 'shop', color: '#0ea5e9' },
-    { id: 'consumos', label: 'Consumos', value: 0, icon: 'bar-chart', color: '#10b981' },
-    { id: 'valeras', label: 'Valeras', value: 0, icon: 'gift', color: '#f59e0b' },
-    { id: 'roles', label: 'Roles', value: 0, icon: 'safety', color: '#ec4899' },
-    { id: 'tenants', label: 'Tenants', value: 0, icon: 'bank', color: '#8b5cf6' },
-    { id: 'usuarios', label: 'Usuarios', value: 0, icon: 'user', color: '#14b8a6' }
+    { id: 'clientes', label: 'Clientes', value: 0, icon: 'usergroup-add', color: '#6366f1', path: '/clientes' },
+    { id: 'empresas', label: 'Empresas', value: 0, icon: 'shop',          color: '#0ea5e9', path: '/empresas' },
+    { id: 'consumos', label: 'Consumos', value: 0, icon: 'bar-chart',     color: '#10b981', path: '/consumos' },
+    { id: 'valeras',  label: 'Valeras',  value: 0, icon: 'gift',          color: '#f59e0b', path: '/valeras' },
+    { id: 'roles',    label: 'Roles',    value: 0, icon: 'safety',        color: '#ec4899', path: '/roles' },
+    { id: 'tenants',  label: 'Tenants',  value: 0, icon: 'bank',          color: '#8b5cf6', path: '/tenants' },
+    { id: 'usuarios', label: 'Usuarios', value: 0, icon: 'team',          color: '#14b8a6', path: '/usuarios' }
   ];
+
+  /** Saludo según la hora del día. */
+  get greeting(): string {
+    const h = new Date().getHours();
+    if (h < 12) return 'Buenos días';
+    if (h < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+
+  /** Fecha actual formateada para el hero del dashboard. */
+  get todayFormatted(): string {
+    return new Date().toLocaleDateString('es-CO', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+
+  goToModule(path: string): void {
+    this.router.navigate([path]);
+  }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();

@@ -9,7 +9,7 @@
         <i nz-icon nzType="reload" nzTheme="outline"></i>
         Actualizar
       </button>
-      <button nz-button nzType="primary" (click)="openForm()">
+      <button nz-button nzType="primary" (click)="openForm()" *appHasPermission="'roles:create'">
         <i nz-icon nzType="plus" nzTheme="outline"></i>
         Nuevo Rol
       </button>
@@ -29,7 +29,7 @@
         <i nz-icon nzType="search" nzTheme="outline"></i>
       </ng-template>
     </div>
-    <span class="toolbar-meta">{{ filteredRoles.length }} resultado(s)</span>
+    <span class="toolbar-meta">{{ filteredRoles.length }} rol(s)</span>
   </div>
 
   <div class="cards-wrapper">

@@ -6,7 +6,7 @@
         class="form-col"
         [style.flex]="field.span === 12 ? '1 1 calc(50% - 8px)' : '1 1 100%'">
         <nz-form-label [nzRequired]="field.required" nzNoColon>{{ field.label }}</nz-form-label>
-        <nz-form-control>
+        <nz-form-control [nzErrorTip]="getError(field) || ''" [nzExtra]="field.hint || ''">
 
           <!-- Text / Email / Password -->
           <input
@@ -14,13 +14,16 @@
             nz-input
             [type]="field.type"
             [formControlName]="field.key"
-            [placeholder]="field.placeholder || ''" />
+            [placeholder]="field.placeholder || ''"
+            [attr.maxlength]="field.maxLength || null" />
 
           <!-- Number -->
           <nz-input-number
             *ngIf="field.type === 'number'"
             [formControlName]="field.key"
             [nzPlaceHolder]="field.placeholder || ''"
+            [nzMin]="field.min ?? null"
+            [nzMax]="field.max ?? null"
             style="width: 100%">
           </nz-input-number>
 
@@ -29,7 +32,8 @@
             *ngIf="field.type === 'currency'"
             [formControlName]="field.key"
             [nzPlaceHolder]="field.placeholder || '$ 0'"
-            [nzMin]="0"
+            [nzMin]="field.min ?? 0"
+            [nzMax]="field.max ?? null"
             [nzStep]="100"
             [nzFormatter]="currencyFormatter"
             [nzParser]="currencyParser"
@@ -42,7 +46,8 @@
             nz-input
             rows="3"
             [formControlName]="field.key"
-            [placeholder]="field.placeholder || ''">
+            [placeholder]="field.placeholder || ''"
+            [attr.maxlength]="field.maxLength || null">
           </textarea>
 
           <!-- Select -->

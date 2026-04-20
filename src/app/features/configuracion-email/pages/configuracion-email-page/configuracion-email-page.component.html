@@ -1,0 +1,191 @@
+<div class="page-container ce-page">
+  <!-- Header compacto con acción incluida -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1>Configuración de correo</h1>
+      <p class="subtitle">Servidor SMTP usado para enviar QR de valeras a tus clientes.</p>
+    </div>
+    <div class="page-header-actions">
+      <button
+        nz-button
+        nzType="primary"
+        type="button"
+        [nzLoading]="saving"
+        [disabled]="!canSave() || loading"
+        (click)="guardar()"
+        *appHasPermission="['configuracion-email:create','configuracion-email:update']">
+        <i nz-icon nzType="save" *ngIf="!saving"></i>
+        Guardar configuración
+      </button>
+    </div>
+  </div>
+
+  <!-- Banner de estado compacto (1 línea) -->
+  <div
+    *ngIf="!loading"
+    class="ce-status-banner"
+    [class.is-empty]="!configuracionId"
+    [class.is-active]="configuracionId && form.controls.activo.value"
+    [class.is-inactive]="configuracionId && !form.controls.activo.value">
+    <i nz-icon [nzType]="
+      !configuracionId ? 'info-circle'
+      : (form.controls.activo.value ? 'check-circle' : 'pause-circle')
+    "></i>
+    <span *ngIf="!configuracionId">No has configurado un servidor SMTP — los clientes no recibirán su QR.</span>
+    <span *ngIf="configuracionId && form.controls.activo.value">
+      Envío activo desde <strong>{{ form.controls.fromEmail.value }}</strong>
+    </span>
+    <span *ngIf="configuracionId && !form.controls.activo.value">
+      Envío deshabilitado. Activa el toggle para reanudar el envío.
+    </span>
+  </div>
+
+  <!-- Form: 2 columnas en pantalla amplia, 1 en móvil -->
+  <nz-spin [nzSpinning]="loading" class="ce-spin">
+    <form nz-form [formGroup]="form" nzLayout="vertical" class="ce-form">
+
+      <div class="ce-grid">
+        <!-- ── Columna izquierda ─────────────────────────────────── -->
+        <div class="ce-col">
+
+          <section class="ce-card">
+            <header class="ce-card-head">
+              <i nz-icon nzType="cloud-server"></i>
+              <h3>Servidor SMTP</h3>
+            </header>
+            <div class="ce-fields">
+              <nz-form-item class="ce-fi">
+                <nz-form-label nzRequired>Host</nz-form-label>
+                <nz-form-control [nzErrorTip]="hostErr">
+                  <input nz-input formControlName="smtpHost" placeholder="smtp.gmail.com" />
+                  <ng-template #hostErr let-c>
+                    <ng-container *ngIf="c.hasError('required')">El host es obligatorio.</ng-container>
+                    <ng-container *ngIf="c.hasError('pattern')">Solo letras, números, puntos y guiones.</ng-container>
+                    <ng-container *ngIf="c.hasError('maxlength')">Máximo 200 caracteres.</ng-container>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item class="ce-fi">
+                <nz-form-label nzRequired>Puerto</nz-form-label>
+                <nz-form-control [nzErrorTip]="portErr">
+                  <nz-select formControlName="smtpPort" nzShowSearch>
+                    <nz-option *ngFor="let p of puertosComunes" [nzValue]="p.value" [nzLabel]="p.label"></nz-option>
+                  </nz-select>
+                  <ng-template #portErr let-c>
+                    <ng-container *ngIf="c.hasError('required')">Puerto requerido.</ng-container>
+                    <ng-container *ngIf="c.hasError('min') || c.hasError('max')">Entre 1 y 65535.</ng-container>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item class="ce-fi ce-fi--inline">
+                <nz-form-label>Conexión segura (SSL/TLS)</nz-form-label>
+                <nz-form-control>
+                  <nz-switch formControlName="enableSsl"></nz-switch>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </section>
+
+          <section class="ce-card">
+            <header class="ce-card-head">
+              <i nz-icon nzType="lock"></i>
+              <h3>Credenciales</h3>
+            </header>
+            <div class="ce-fields">
+              <nz-form-item class="ce-fi">
+                <nz-form-label nzRequired>Usuario SMTP</nz-form-label>
+                <nz-form-control [nzErrorTip]="userErr">
+                  <input nz-input formControlName="smtpUsername" placeholder="usuario@gmail.com" autocomplete="off" />
+                  <ng-template #userErr let-c>
+                    <ng-container *ngIf="c.hasError('required')">Usuario requerido.</ng-container>
+                    <ng-container *ngIf="c.hasError('maxlength')">Máximo 200 caracteres.</ng-container>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item class="ce-fi">
+                <nz-form-label [nzRequired]="!tienePassword">Contraseña</nz-form-label>
+                <nz-form-control
+                  [nzErrorTip]="pwdErr"
+                  [nzExtra]="tienePassword ? 'Vacío = conservar la actual.' : 'Gmail: usa una App Password.'">
+                  <nz-input-group [nzSuffix]="pwdToggle">
+                    <input
+                      nz-input
+                      [type]="showPassword ? 'text' : 'password'"
+                      formControlName="smtpPassword"
+                      [placeholder]="tienePassword ? '•••••••• (sin cambios)' : 'Tu contraseña'"
+                      autocomplete="new-password" />
+                  </nz-input-group>
+                  <ng-template #pwdToggle>
+                    <i
+                      nz-icon
+                      [nzType]="showPassword ? 'eye-invisible' : 'eye'"
+                      style="cursor:pointer;color:var(--text-subtle);"
+                      (click)="showPassword = !showPassword"></i>
+                  </ng-template>
+                  <ng-template #pwdErr let-c>
+                    <ng-container *ngIf="c.hasError('required')">Contraseña requerida.</ng-container>
+                    <ng-container *ngIf="c.hasError('maxlength')">Máximo 200 caracteres.</ng-container>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </section>
+        </div>
+
+        <!-- ── Columna derecha ───────────────────────────────────── -->
+        <div class="ce-col">
+
+          <section class="ce-card">
+            <header class="ce-card-head">
+              <i nz-icon nzType="mail"></i>
+              <h3>Remitente</h3>
+            </header>
+            <div class="ce-fields">
+              <nz-form-item class="ce-fi">
+                <nz-form-label nzRequired>Email "From"</nz-form-label>
+                <nz-form-control [nzErrorTip]="fromEmailErr">
+                  <input nz-input formControlName="fromEmail" placeholder="no-reply@miempresa.com" />
+                  <ng-template #fromEmailErr let-c>
+                    <ng-container *ngIf="c.hasError('required')">Email requerido.</ng-container>
+                    <ng-container *ngIf="c.hasError('email')">Email no válido.</ng-container>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item class="ce-fi">
+                <nz-form-label nzRequired>Nombre del remitente</nz-form-label>
+                <nz-form-control [nzErrorTip]="fromNameErr">
+                  <input nz-input formControlName="fromName" placeholder="Restaurante Ancestrales" />
+                  <ng-template #fromNameErr let-c>
+                    <ng-container *ngIf="c.hasError('required')">Nombre requerido.</ng-container>
+                    <ng-container *ngIf="c.hasError('pattern')">Caracteres no válidos.</ng-container>
+                    <ng-container *ngIf="c.hasError('maxlength')">Máximo 200 caracteres.</ng-container>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item class="ce-fi ce-fi--inline">
+                <nz-form-label>Configuración activa</nz-form-label>
+                <nz-form-control>
+                  <nz-switch formControlName="activo"></nz-switch>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </section>
+
+          <!-- Tip card — sustituye los nzExtra dispersos, optimiza espacio -->
+          <section class="ce-tip">
+            <i nz-icon nzType="bulb"></i>
+            <div>
+              <strong>Tip rápido</strong>
+              <p>Para Gmail genera una <em>App Password</em> en <code>myaccount.google.com → Security</code>. Puerto <code>587</code> con SSL es lo recomendado.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </form>
+  </nz-spin>
+</div>

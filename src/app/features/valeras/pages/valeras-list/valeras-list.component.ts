@@ -15,6 +15,8 @@ import { ClienteService, Cliente } from '../../../clientes/services/cliente.serv
 import { ConsumoService } from '../../../consumos/services/consumo.service';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
+import { AuthService } from '../../../../core/services/auth/authService';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-valeras-list',
@@ -25,7 +27,8 @@ import { RealtimeEvents } from '../../../../core/services/realtime/realtime-even
     NzButtonModule,
     NzIconModule,
     NzInputModule,
-    CardGridComponent
+    CardGridComponent,
+    HasPermissionDirective
   ],
   templateUrl: './valeras-list.component.html',
   styleUrl: './valeras-list.component.css'
@@ -37,6 +40,7 @@ export class ValerasListComponent implements OnInit, OnDestroy {
   private modal = inject(NzModalService);
   private notification = inject(NzNotificationService);
   private realtime = inject(RealtimeService);
+  private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
   valeras: Valera[] = [];
@@ -70,22 +74,54 @@ export class ValerasListComponent implements OnInit, OnDestroy {
 
   cardActions: CardAction[] = [
     {
-      label: 'Consumir almuerzo',
+      label: 'Consumir',
       icon: 'thunderbolt',
       color: 'primary',
       action: (item) => this.consumirAlmuerzo(item),
-      visible: (item) => this.puedeConsumir(item)
+      visible: (item) => this.authService.hasPermission('valeras:execute') && this.puedeConsumir(item)
     },
-    { label: 'Editar', icon: 'edit', action: (item) => this.openForm(item) },
-    { label: 'Eliminar', icon: 'delete', color: 'danger', action: (item) => this.deleteValera(item) }
+    {
+      label: 'Editar', icon: 'edit',
+      visible: () => this.authService.hasPermission('valeras:update'),
+      action: (item) => this.openForm(item)
+    },
+    {
+      label: 'Eliminar', icon: 'delete', color: 'danger',
+      visible: () => this.authService.hasPermission('valeras:delete'),
+      action: (item) => this.deleteValera(item)
+    }
   ];
 
   fields: FormField[] = [
     this.clienteField,
-    { key: 'fechaCompra', label: 'Fecha Compra', type: 'date', required: true, span: 12 },
-    { key: 'fechaVencimiento', label: 'Fecha Vencimiento', type: 'date', required: true, span: 12 },
-    { key: 'totalAlmuerzos', label: 'Total Almuerzos', type: 'number', required: true, span: 12 },
-    { key: 'precioPagado', label: 'Precio Pagado', type: 'currency', required: true, span: 12 },
+    {
+      key: 'fechaCompra', label: 'Fecha Compra', type: 'date', required: true, span: 12,
+      errorMessages: { required: 'La fecha de compra es obligatoria.' }
+    },
+    {
+      key: 'fechaVencimiento', label: 'Fecha Vencimiento', type: 'date', required: true, span: 12,
+      errorMessages: { required: 'La fecha de vencimiento es obligatoria.' }
+    },
+    {
+      key: 'totalAlmuerzos', label: 'Total Almuerzos', type: 'number', required: true, span: 12,
+      min: 1, max: 1000,
+      hint: 'Entre 1 y 1.000.',
+      errorMessages: {
+        required: 'El total de almuerzos es obligatorio.',
+        min: 'Debe ser al menos 1.',
+        max: 'No puede superar 1.000.'
+      }
+    },
+    {
+      key: 'precioPagado', label: 'Precio Pagado', type: 'currency', required: true, span: 12,
+      min: 1, max: 100_000_000,
+      hint: 'Máximo 100 millones.',
+      errorMessages: {
+        required: 'El precio pagado es obligatorio.',
+        min: 'Debe ser mayor a 0.',
+        max: 'No puede superar 100 millones.'
+      }
+    },
     { key: 'estado', label: 'Activo', type: 'switch', span: 12, mode: 'edit' }
   ];
 
@@ -98,6 +134,9 @@ export class ValerasListComponent implements OnInit, OnDestroy {
     this.realtime.on(RealtimeEvents.Valera.Deleted).pipe(takeUntil(this.destroy$)).subscribe(reloadAll);
     this.realtime.on(RealtimeEvents.Cliente.Created).pipe(takeUntil(this.destroy$)).subscribe(reloadAll);
     this.realtime.on(RealtimeEvents.Cliente.Updated).pipe(takeUntil(this.destroy$)).subscribe(reloadAll);
+    // Un consumo cambia los almuerzos disponibles → hay que refrescar valeras también.
+    this.realtime.on(RealtimeEvents.Consumo.Created).pipe(takeUntil(this.destroy$)).subscribe(reloadAll);
+    this.realtime.on(RealtimeEvents.Consumo.Deleted).pipe(takeUntil(this.destroy$)).subscribe(reloadAll);
   }
 
   ngOnDestroy(): void {
@@ -142,6 +181,26 @@ export class ValerasListComponent implements OnInit, OnDestroy {
       clienteNombre: c ? `${c.nombre ?? ''} ${c.apellido ?? ''}`.trim() : 'Cliente desconocido',
       clienteDocumento: c?.documento ?? '—'
     };
+  }
+
+  /**
+   * Incrementa localmente el contador de almuerzos consumidos de una valera
+   * para dar feedback visual inmediato tras registrar un consumo, sin esperar
+   * al round-trip del refetch ni al evento SignalR.
+   */
+  private applyOptimisticConsumo(valeraID: string): void {
+    const idx = this.valeras.findIndex(v => v.valeraID === valeraID);
+    if (idx === -1) return;
+    const v = this.valeras[idx];
+    const nuevos = (v.almuerzosConsumidos ?? 0) + 1;
+    const total = v.totalAlmuerzos ?? 0;
+    this.valeras[idx] = {
+      ...v,
+      almuerzosConsumidos: nuevos,
+      // Si llegó al tope, se desactiva visualmente igual que en el backend.
+      estado: v.estado && nuevos < total
+    };
+    this.applyFilter();
   }
 
   onSearch(value: string): void {
@@ -189,12 +248,30 @@ export class ValerasListComponent implements OnInit, OnDestroy {
           observaciones: ''
         }).subscribe({
           next: () => {
+            // 1) Optimistic update local: incrementa el contador inmediatamente
+            //    para feedback visual instantáneo (no esperamos al refetch).
+            this.applyOptimisticConsumo(valera.valeraID!);
+
             this.notification.success('Consumo registrado',
               `${restantes - 1} almuerzo(s) restantes`);
+
+            // 2) Refetch defensivo: garantiza datos frescos del servidor
+            //    aunque SignalR no llegue (red intermitente, fallback a long polling, etc.).
+            //    El evento realtime también disparará loadAll — es idempotente.
+            this.loadAll();
+
             resolve();
           },
           error: (e) => {
-            this.notification.error('Error', e?.error?.message ?? 'No se pudo registrar el consumo');
+            // 409 Conflict → la valera no permite el consumo (vencida, sin cupo, inactiva).
+            // Mostramos un warning con el mensaje del backend en lugar de un error genérico.
+            const isConflict = e?.status === 409;
+            const msg = e?.error?.message ?? 'No se pudo registrar el consumo';
+            if (isConflict) {
+              this.notification.warning('Consumo no permitido', msg);
+            } else {
+              this.notification.error('Error', msg);
+            }
             resolve();
           }
         });

@@ -1,0 +1,171 @@
+<div class="page-container">
+  <!-- Header estándar (mismo diseño que el resto de módulos) -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1>Permisos</h1>
+      <p class="subtitle">Define qué puede hacer cada rol dentro del sistema</p>
+    </div>
+    <div class="page-header-actions">
+      <button nz-button (click)="onReload()">
+        <i nz-icon nzType="reload" nzTheme="outline"></i>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Toolbar estándar -->
+  <div class="toolbar-card">
+    <div class="toolbar-search">
+      <nz-input-group [nzPrefix]="searchIcon">
+        <input
+          nz-input
+          placeholder="Buscar rol por nombre o descripción..."
+          [(ngModel)]="searchValue"
+          (input)="onSearch($any($event.target).value)" />
+      </nz-input-group>
+      <ng-template #searchIcon>
+        <i nz-icon nzType="search" nzTheme="outline"></i>
+      </ng-template>
+    </div>
+    <span class="toolbar-meta">{{ filteredRoles.length }} rol(es)</span>
+  </div>
+
+  <!-- Grid estándar (idéntico look & feel que clientes/empresas/roles) -->
+  <div class="cards-wrapper">
+    <app-card-grid
+      [items]="filteredRoles"
+      [config]="cardConfig"
+      [actions]="cardActions"
+      [loading]="loading"
+      emptyText="No hay roles registrados">
+    </app-card-grid>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Selección granular permiso por permiso
+     ============================================================ -->
+<nz-modal
+[nzVisible]="!!selectedRol"
+[nzTitle]="modalTitle"
+[nzFooter]="modalFooter"
+nzWidth="720"
+nzCentered
+(nzOnCancel)="closeRolPermisos()">
+
+  <ng-template #modalTitle>
+    <div class="modal-title">
+      <i nz-icon nzType="safety-certificate" nzTheme="outline"></i>
+      <div>
+        <span class="modal-title-main">Permisos del rol "{{ selectedRol?.nombre }}"</span>
+        <span class="modal-title-sub">
+          <strong>{{ totalSelected }}</strong> de {{ allPermisos.length }} permisos asignados
+        </span>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-container *nzModalContent>
+
+    <!-- Toolbar: búsqueda + filtros + acciones masivas -->
+    <div class="modal-toolbar">
+      <nz-input-group [nzPrefix]="searchIcon" class="modal-search">
+        <input nz-input
+          placeholder="Buscar por nombre, código o descripción..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onFiltersChanged()" />
+      </nz-input-group>
+      <ng-template #searchIcon>
+        <i nz-icon nzType="search" nzTheme="outline"></i>
+      </ng-template>
+
+      <div class="action-chips">
+        <button
+          type="button"
+          class="action-chip"
+          *ngFor="let a of actionTypes"
+          [class.active]="actionFilter === a.key"
+          [attr.data-action]="a.key"
+          (click)="actionFilter = a.key; onFiltersChanged()">
+          {{ a.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Acciones masivas + control del acordeón -->
+    <div class="bulk-bar" *ngIf="visibleGroups.length">
+      <div class="bulk-actions-left">
+        <button nz-button nzSize="small" nzType="text" (click)="expandAll()">
+          <i nz-icon nzType="plus-square" nzTheme="outline"></i> Expandir todo
+        </button>
+        <button nz-button nzSize="small" nzType="text" (click)="collapseAll()">
+          <i nz-icon nzType="minus-square" nzTheme="outline"></i> Colapsar todo
+        </button>
+      </div>
+      <div class="bulk-actions">
+        <button nz-button nzSize="small" (click)="toggleAllVisible(true)">
+          <i nz-icon nzType="check" nzTheme="outline"></i> Activar visibles
+        </button>
+        <button nz-button nzSize="small" (click)="toggleAllVisible(false)">
+          <i nz-icon nzType="close" nzTheme="outline"></i> Desactivar visibles
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de módulos con sus permisos -->
+    <div class="modulo-list">
+      <div class="modulo-block" *ngFor="let group of visibleGroups; trackBy: trackByGroup"
+           [class.expanded]="group.expanded">
+        <button type="button" class="modulo-header" (click)="toggleGroup(group)">
+          <i nz-icon nzType="right" nzTheme="outline" class="chevron"></i>
+          <div class="modulo-title">
+            <span class="modulo-name">{{ group.modulo }}</span>
+          </div>
+          <span class="modulo-badge"
+            [class.partial]="selectedCountInGroup(group) > 0 && selectedCountInGroup(group) < filteredPermisos(group).length"
+            [class.full]="selectedCountInGroup(group) === filteredPermisos(group).length && filteredPermisos(group).length > 0">
+            {{ selectedCountInGroup(group) }}/{{ filteredPermisos(group).length }}
+          </span>
+        </button>
+
+        <div class="permiso-list" *ngIf="group.expanded">
+          <div
+            *ngFor="let p of filteredPermisos(group); trackBy: trackByPermiso"
+            class="permiso-row"
+            [class.selected]="p.selected"
+            (click)="p.selected = !p.selected">
+
+            <span class="action-badge" [attr.data-action]="p.accion">
+              {{ p.accion }}
+            </span>
+
+            <div class="permiso-meta">
+              <span class="permiso-name">{{ p.nombre }}</span>
+              <span class="permiso-codigo">{{ p.codigo }}</span>
+            </div>
+
+            <nz-switch
+              [(ngModel)]="p.selected"
+              nzSize="small"
+              (click)="$event.stopPropagation()">
+            </nz-switch>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!visibleGroups.length" class="no-results">
+        <i nz-icon nzType="filter" nzTheme="outline"></i>
+        <p>No hay permisos que coincidan con los filtros aplicados.</p>
+        <button nz-button nzType="link" (click)="clearFilters()">Limpiar filtros</button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #modalFooter>
+    <button nz-button nzType="default" (click)="closeRolPermisos()">Cancelar</button>
+    <button nz-button nzType="primary" [nzLoading]="saving" (click)="save()">
+      <i nz-icon nzType="save" nzTheme="outline"></i>
+      Guardar {{ totalSelected }} permiso(s)
+    </button>
+  </ng-template>
+</nz-modal>

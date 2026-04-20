@@ -14,6 +14,8 @@ import { ClienteService, Cliente } from '../../services/cliente.service';
 import { EmpresaService, Empresa } from '../../../empresas/services/empresa.service';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
+import { AuthService } from '../../../../core/services/auth/authService';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-clientes-list',
@@ -24,7 +26,8 @@ import { RealtimeEvents } from '../../../../core/services/realtime/realtime-even
     NzButtonModule,
     NzIconModule,
     NzInputModule,
-    CardGridComponent
+    CardGridComponent,
+    HasPermissionDirective
   ],
   templateUrl: './clientes-list.component.html',
   styleUrl: './clientes-list.component.css'
@@ -35,6 +38,7 @@ private empresaService = inject(EmpresaService);
 private notification = inject(NzNotificationService);
 private modal = inject(NzModalService);
 private realtime = inject(RealtimeService);
+private authService = inject(AuthService);
 private destroy$ = new Subject<void>();
 
 clientes: Cliente[] = [];
@@ -57,16 +61,69 @@ private empresaField: FormField = {
   };
 
   cardActions: CardAction[] = [
-    { label: 'Editar', icon: 'edit', action: (item) => this.openForm(item) },
-    { label: 'Eliminar', icon: 'delete', color: 'danger', action: (item) => this.deleteCliente(item) }
+    {
+      label: 'Editar', icon: 'edit',
+      visible: () => this.authService.hasPermission('clientes:update'),
+      action: (item) => this.openForm(item)
+    },
+    {
+      label: 'Eliminar', icon: 'delete', color: 'danger',
+      visible: () => this.authService.hasPermission('clientes:delete'),
+      action: (item) => this.deleteCliente(item)
+    }
   ];
 
   fields: FormField[] = [
-    { key: 'nombre', label: 'Nombre', type: 'text', required: true, span: 12 },
-    { key: 'apellido', label: 'Apellido', type: 'text', required: true, span: 12 },
-    { key: 'documento', label: 'Documento', type: 'text', required: true, span: 12 },
-    { key: 'telefono', label: 'Teléfono', type: 'text', required: true, span: 12 },
-    { key: 'email', label: 'Email', type: 'email', required: true, span: 12 },
+    {
+      key: 'nombre', label: 'Nombre', type: 'text', required: true, span: 12,
+      minLength: 3, maxLength: 100,
+      pattern: /^[\p{L}\s.,'\-]+$/u,
+      errorMessages: {
+        required: 'El nombre es obligatorio.',
+        minlength: 'Mínimo 3 caracteres.',
+        maxlength: 'Máximo 100 caracteres.',
+        pattern: 'Solo letras, espacios, puntos, comas, apóstrofes y guiones.'
+      }
+    },
+    {
+      key: 'apellido', label: 'Apellido', type: 'text', required: true, span: 12,
+      minLength: 3, maxLength: 100,
+      pattern: /^[\p{L}\s.,'\-]+$/u,
+      errorMessages: {
+        required: 'El apellido es obligatorio.',
+        minlength: 'Mínimo 3 caracteres.',
+        maxlength: 'Máximo 100 caracteres.',
+        pattern: 'Solo letras, espacios, puntos, comas, apóstrofes y guiones.'
+      }
+    },
+    {
+      key: 'documento', label: 'Documento', type: 'text', required: true, span: 12,
+      minLength: 3, maxLength: 50,
+      pattern: /^[a-zA-Z0-9\-]+$/,
+      hint: 'Cédula, NIT o pasaporte (sin espacios).',
+      errorMessages: {
+        required: 'El documento es obligatorio.',
+        pattern: 'Solo letras, dígitos y guiones (sin espacios).'
+      }
+    },
+    {
+      key: 'telefono', label: 'Teléfono', type: 'text', required: true, span: 12,
+      maxLength: 20,
+      pattern: /^[\d\s+\-()]+$/,
+      placeholder: '+57 300 1234567',
+      errorMessages: {
+        required: 'El teléfono es obligatorio.',
+        pattern: 'Solo dígitos, espacios, +, -, y paréntesis.'
+      }
+    },
+    {
+      key: 'email', label: 'Email', type: 'email', required: true, span: 12,
+      maxLength: 254,
+      errorMessages: {
+        required: 'El email es obligatorio.',
+        email: 'Formato de email no válido.'
+      }
+    },
     this.empresaField
   ];
 

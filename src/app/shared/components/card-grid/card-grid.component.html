@@ -33,9 +33,11 @@
       <!-- Body / Fields -->
       <div class="card-body" *ngIf="config.fields.length">
         <div class="card-field" *ngFor="let field of config.fields">
-          <i *ngIf="field.icon" nz-icon [nzType]="field.icon" nzTheme="outline" class="field-icon"></i>
           <div class="field-content">
-            <span class="field-label">{{ field.label }}</span>
+            <span class="field-label">
+              <i *ngIf="field.icon" nz-icon [nzType]="field.icon" nzTheme="outline" class="field-icon-inline"></i>
+              {{ field.label }}
+            </span>
             <span class="field-value" [title]="formatField(item, field)">{{ formatField(item, field) }}</span>
           </div>
         </div>

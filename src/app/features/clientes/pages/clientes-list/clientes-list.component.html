@@ -10,7 +10,7 @@
         <i nz-icon nzType="reload" nzTheme="outline"></i>
         Actualizar
       </button>
-      <button nz-button nzType="primary" (click)="openForm()">
+      <button nz-button nzType="primary" (click)="openForm()" *appHasPermission="'clientes:create'">
         <i nz-icon nzType="plus" nzTheme="outline"></i>
         Nuevo Cliente
       </button>
@@ -31,7 +31,7 @@
         <i nz-icon nzType="search" nzTheme="outline"></i>
       </ng-template>
     </div>
-    <span class="toolbar-meta">{{ filteredClientes.length }} resultado(s)</span>
+    <span class="toolbar-meta">{{ filteredClientes.length }} cliente(s)</span>
   </div>
 
   <!-- Table -->

@@ -1,18 +1,17 @@
-<div class="valeras-container">
 <div class="page-container">
   <div class="page-header">
     <div class="page-header-content">
-      <h1>Valeras</h1>
-      <p class="subtitle">Gestiona las valeras del sistema</p>
+      <h1>Usuarios</h1>
+      <p class="subtitle">Gestiona los usuarios del tenant actual</p>
     </div>
     <div class="page-header-actions">
       <button nz-button (click)="onReload()">
         <i nz-icon nzType="reload" nzTheme="outline"></i>
         Actualizar
       </button>
-      <button nz-button nzType="primary" (click)="openForm()" *appHasPermission="'valeras:create'">
+      <button nz-button nzType="primary" (click)="openForm()" *appHasPermission="'usuarios:create'">
         <i nz-icon nzType="plus" nzTheme="outline"></i>
-        Nueva Valera
+        Nuevo Usuario
       </button>
     </div>
   </div>
@@ -22,7 +21,7 @@
       <nz-input-group [nzPrefix]="searchIcon">
         <input
           nz-input
-          placeholder="Buscar valera..."
+          placeholder="Buscar por nombre, email o rol..."
           [(ngModel)]="searchValue"
           (input)="onSearch($any($event.target).value)" />
       </nz-input-group>
@@ -30,16 +29,16 @@
         <i nz-icon nzType="search" nzTheme="outline"></i>
       </ng-template>
     </div>
-    <span class="toolbar-meta">{{ filteredValeras.length }} valera(s)</span>
+    <span class="toolbar-meta">{{ filteredUsuarios.length }} usuario(s)</span>
   </div>
 
   <div class="cards-wrapper">
     <app-card-grid
-      [items]="filteredValeras"
+      [items]="filteredUsuarios"
       [config]="cardConfig"
       [actions]="cardActions"
       [loading]="loading"
-      emptyText="No hay valeras registradas">
+      emptyText="No hay usuarios registrados">
     </app-card-grid>
   </div>
 </div>

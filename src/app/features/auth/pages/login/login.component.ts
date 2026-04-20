@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -29,6 +30,8 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private notification = inject(NzNotificationService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loading = signal(false);
   passwordVisible = signal(false);
@@ -60,6 +63,9 @@ export class LoginComponent {
         this.loading.set(false);
         if (success) {
           this.notification.success('Bienvenido', 'Sesión iniciada correctamente');
+          // Si veniamos de un deep-link (?returnUrl=/v/xxx), volvemos allí.
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          this.router.navigateByUrl(returnUrl && returnUrl.startsWith('/') ? returnUrl : '/dashboard');
         }
       },
       error: () => {

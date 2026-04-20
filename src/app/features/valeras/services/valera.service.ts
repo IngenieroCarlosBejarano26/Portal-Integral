@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BaseApiService } from '../../../core/services/base-api.service';
+import { BaseApiService, ApiResponse } from '../../../core/services/base-api.service';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 export interface Valera {
   valeraID?: string;
@@ -65,5 +65,15 @@ export class ValeraService extends BaseApiService<Valera> {
         this.valerasSubject.next(currentValeras);
       })
     );
+  }
+
+  /**
+   * Resuelve una valera por su código QR escaneado.
+   * Devuelve `null` si no existe (404 controlado).
+   */
+  getByCodigoQR(codigoQR: string): Observable<Valera | null> {
+    return this.http
+      .get<ApiResponse<Valera>>(`${this.endpoint}/by-qr/${codigoQR}`)
+      .pipe(map(res => res?.data ?? null));
   }
 }

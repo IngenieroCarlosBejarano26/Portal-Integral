@@ -656,6 +656,16 @@ nz-header.header {
     --sidebar-width: 72px;
   }
 
+  /* Liberamos el viewport-locking del desktop para que el body pueda scrollear.
+     En móvil aparece la barra de URL del navegador dinámicamente, lo que con
+     `height: 100vh; overflow: hidden` deja contenido inalcanzable. */
+  .content-layout,
+  .content {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
+
   .content {
     padding: 16px;
   }

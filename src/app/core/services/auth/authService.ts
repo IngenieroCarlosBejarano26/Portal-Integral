@@ -78,7 +78,7 @@ export class AuthService {
         this.currentUserSubject.next(user);
         return true;
       }),
-      tap(ok => { if (ok) this.router.navigate(['/dashboard']); }),
+      // La navegación post-login la hace el LoginComponent (necesita leer returnUrl).
       catchError((error) => {
         console.error('Login failed:', error);
         return throwError(() => error);

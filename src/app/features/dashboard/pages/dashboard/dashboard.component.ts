@@ -23,6 +23,8 @@ interface ModuleStat {
   icon: string;
   color: string;
   path: string;
+  /** Permiso requerido para ver la card. Si no se tiene, la card se oculta. */
+  permission: string;
 }
 
 @Component({
@@ -53,14 +55,19 @@ private destroy$ = new Subject<void>();
   loading = false;
 
   modules: ModuleStat[] = [
-    { id: 'clientes', label: 'Clientes', value: 0, icon: 'usergroup-add', color: '#6366f1', path: '/clientes' },
-    { id: 'empresas', label: 'Empresas', value: 0, icon: 'shop',          color: '#0ea5e9', path: '/empresas' },
-    { id: 'consumos', label: 'Consumos', value: 0, icon: 'bar-chart',     color: '#10b981', path: '/consumos' },
-    { id: 'valeras',  label: 'Valeras',  value: 0, icon: 'gift',          color: '#f59e0b', path: '/valeras' },
-    { id: 'roles',    label: 'Roles',    value: 0, icon: 'safety',        color: '#ec4899', path: '/roles' },
-    { id: 'tenants',  label: 'Tenants',  value: 0, icon: 'bank',          color: '#8b5cf6', path: '/tenants' },
-    { id: 'usuarios', label: 'Usuarios', value: 0, icon: 'team',          color: '#14b8a6', path: '/usuarios' }
+    { id: 'clientes', label: 'Clientes', value: 0, icon: 'usergroup-add', color: '#6366f1', path: '/clientes', permission: 'clientes:view' },
+    { id: 'empresas', label: 'Empresas', value: 0, icon: 'shop',          color: '#0ea5e9', path: '/empresas', permission: 'empresas:view' },
+    { id: 'consumos', label: 'Consumos', value: 0, icon: 'bar-chart',     color: '#10b981', path: '/consumos', permission: 'consumos:view' },
+    { id: 'valeras',  label: 'Valeras',  value: 0, icon: 'gift',          color: '#f59e0b', path: '/valeras',  permission: 'valeras:view' },
+    { id: 'roles',    label: 'Roles',    value: 0, icon: 'safety',        color: '#ec4899', path: '/roles',    permission: 'roles:view' },
+    { id: 'tenants',  label: 'Tenants',  value: 0, icon: 'bank',          color: '#8b5cf6', path: '/tenants',  permission: 'tenants:view' },
+    { id: 'usuarios', label: 'Usuarios', value: 0, icon: 'team',          color: '#14b8a6', path: '/usuarios', permission: 'usuarios:view' }
   ];
+
+  /** Cards filtradas por permiso del usuario — oculta las que no puede ver. */
+  get visibleModules(): ModuleStat[] {
+    return this.modules.filter(m => this.authService.hasPermission(m.permission));
+  }
 
   /** Saludo según la hora del día. */
   get greeting(): string {
@@ -188,14 +195,20 @@ private destroy$ = new Subject<void>();
 
   loadStats(): void {
     this.loading = true;
+    // Solo cargamos contadores de los módulos que el usuario puede ver —
+    // evita disparar requests que el backend rechazará con 403.
+    const visibleIds = new Set(this.visibleModules.map(m => m.id));
+    const safeCount = (id: ModuleStat['id']) =>
+      visibleIds.has(id) ? this.getModuleCountSource(id).pipe(catchError(() => of(0))) : of(0);
+
     forkJoin({
-      clientes: this.clienteService.getCount().pipe(catchError(() => of(0))),
-      empresas: this.empresaService.getCount().pipe(catchError(() => of(0))),
-      consumos: this.consumoService.getCount().pipe(catchError(() => of(0))),
-      valeras: this.valeraService.getCount().pipe(catchError(() => of(0))),
-      roles: this.rolService.getCount().pipe(catchError(() => of(0))),
-      tenants: this.tenantService.getCount().pipe(catchError(() => of(0))),
-      usuarios: this.authService.getUsuariosCountByTenant().pipe(catchError(() => of(0)))
+      clientes: safeCount('clientes'),
+      empresas: safeCount('empresas'),
+      consumos: safeCount('consumos'),
+      valeras:  safeCount('valeras'),
+      roles:    safeCount('roles'),
+      tenants:  safeCount('tenants'),
+      usuarios: safeCount('usuarios')
     }).subscribe({
       next: (data) => {
         this.setModuleValue('clientes', data.clientes);

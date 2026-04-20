@@ -69,7 +69,7 @@
       <button
         type="button"
         class="metric-card"
-        *ngFor="let module of modules; let i = index"
+        *ngFor="let module of visibleModules; let i = index"
         [style.--accent]="module.color"
         [style.animation-delay]="(i * 40) + 'ms'"
         (click)="goToModule(module.path)">

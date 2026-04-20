@@ -14,7 +14,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   localStorage.removeItem('auth_token');
   localStorage.removeItem('current_user');
 
-  router.navigate(['/login']);
+  // Conservamos la URL solicitada para redirigir tras el login.
+  // Útil para deep-links como /v/:codigo (escaneo de QR).
+  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
   return false;
 };
 

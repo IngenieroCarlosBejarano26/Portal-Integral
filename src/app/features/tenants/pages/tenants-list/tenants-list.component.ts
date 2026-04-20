@@ -13,6 +13,8 @@ import { FormModalComponent, FormField } from '../../../../shared/components/for
 import { TenantService, Tenant } from '../../services/tenant.service';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
+import { AuthService } from '../../../../core/services/auth/authService';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-tenants-list',
@@ -23,7 +25,8 @@ import { RealtimeEvents } from '../../../../core/services/realtime/realtime-even
     NzButtonModule,
     NzIconModule,
     NzInputModule,
-    CardGridComponent
+    CardGridComponent,
+    HasPermissionDirective
   ],
   templateUrl: './tenants-list.component.html',
   styleUrl: './tenants-list.component.css'
@@ -33,6 +36,7 @@ export class TenantsListComponent implements OnInit, OnDestroy {
   private modal = inject(NzModalService);
   private notification = inject(NzNotificationService);
   private realtime = inject(RealtimeService);
+  private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
   tenants: Tenant[] = [];
@@ -51,14 +55,44 @@ export class TenantsListComponent implements OnInit, OnDestroy {
   };
 
   cardActions: CardAction[] = [
-    { label: 'Editar', icon: 'edit', action: (item) => this.openForm(item) },
-    { label: 'Eliminar', icon: 'delete', color: 'danger', action: (item) => this.deleteTenant(item) }
+    {
+      label: 'Editar', icon: 'edit',
+      visible: () => this.authService.hasPermission('tenants:update'),
+      action: (item) => this.openForm(item)
+    },
+    {
+      label: 'Eliminar', icon: 'delete', color: 'danger',
+      visible: () => this.authService.hasPermission('tenants:delete'),
+      action: (item) => this.deleteTenant(item)
+    }
   ];
 
   fields: FormField[] = [
-    { key: 'nombre', label: 'Nombre', type: 'text', required: true, span: 12, placeholder: 'Nombre del tenant' },
+    {
+      key: 'nombre', label: 'Nombre', type: 'text', required: true, span: 12,
+      placeholder: 'Nombre del tenant',
+      minLength: 3, maxLength: 100,
+      pattern: /^[\p{L}\s.,'\-]+$/u,
+      errorMessages: {
+        required: 'El nombre es obligatorio.',
+        minlength: 'Mínimo 3 caracteres.',
+        maxlength: 'Máximo 100 caracteres.',
+        pattern: 'Solo letras, espacios, puntos, comas, apóstrofes y guiones.'
+      }
+    },
     { key: 'activo', label: 'Activo', type: 'switch', span: 12 },
-    { key: 'connectionString', label: 'Connection String', type: 'textarea', required: true, placeholder: 'Server=...;Database=...' }
+    {
+      key: 'connectionString', label: 'Connection String', type: 'textarea', required: true,
+      placeholder: 'Server=...;Database=...',
+      maxLength: 500,
+      pattern: /^.*Server\s*=.*Database\s*=.*$/i,
+      hint: 'Debe contener Server= y Database=. Máximo 500 caracteres.',
+      errorMessages: {
+        required: 'El connection string es obligatorio.',
+        maxlength: 'Máximo 500 caracteres.',
+        pattern: 'Debe contener al menos Server= y Database=.'
+      }
+    }
   ];
 
   ngOnInit(): void {

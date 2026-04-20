@@ -10,6 +10,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       const status = error?.status;
       const backendMessage = error?.error?.message;
+
+      // 409 Conflict: regla de negocio que el caller SIEMPRE maneja localmente
+      // (p. ej. valera vencida, sin almuerzos). No mostramos notificación global
+      // para evitar duplicados con el manejo específico de cada componente.
+      if (status === 409) {
+        return throwError(() => error);
+      }
+
       let userMessage = 'Ha ocurrido un error inesperado.';
 
       switch (status) {

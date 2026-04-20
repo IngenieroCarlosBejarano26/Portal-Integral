@@ -10,7 +10,7 @@
         <i nz-icon nzType="reload" nzTheme="outline"></i>
         Actualizar
       </button>
-      <button nz-button nzType="primary" (click)="openForm()">
+      <button nz-button nzType="primary" (click)="openForm()" *appHasPermission="'valeras:create'">
         <i nz-icon nzType="plus" nzTheme="outline"></i>
         Nueva Valera
       </button>
@@ -30,7 +30,7 @@
         <i nz-icon nzType="search" nzTheme="outline"></i>
       </ng-template>
     </div>
-    <span class="toolbar-meta">{{ filteredValeras.length }} resultado(s)</span>
+    <span class="toolbar-meta">{{ filteredValeras.length }} valera(s)</span>
   </div>
 
   <div class="cards-wrapper">

@@ -36,6 +36,9 @@ export const RealtimeEvents = {
   Usuario: {
     Created: 'usuario:created',
     Updated: 'usuario:updated'
+  },
+  Permiso: {
+    Updated: 'permiso:updated'
   }
 } as const;
 
@@ -47,4 +50,5 @@ export type RealtimeEventName =
   | typeof RealtimeEvents.Consumo[keyof typeof RealtimeEvents.Consumo]
   | typeof RealtimeEvents.Rol[keyof typeof RealtimeEvents.Rol]
   | typeof RealtimeEvents.Tenant[keyof typeof RealtimeEvents.Tenant]
-  | typeof RealtimeEvents.Usuario[keyof typeof RealtimeEvents.Usuario];
+  | typeof RealtimeEvents.Usuario[keyof typeof RealtimeEvents.Usuario]
+  | typeof RealtimeEvents.Permiso[keyof typeof RealtimeEvents.Permiso];

@@ -1,1 +1,79 @@
-<p>clientes works!</p>
+  <nz-card nzTitle="Gestión de Clientes" class="clientes-card">
+      <div class="table-header">
+        <h3>Lista de Clientes</h3>
+        <button nz-button nzType="primary" (click)="showCreateModal()" nzIcon="plus">
+          Nuevo Cliente
+        </button>
+      </div>
+      
+      <nz-table #basicTable [nzData]="clientes()" [nzFrontPagination]="false" [nzShowPagination]="true" [nzPageSize]="10">
+        <thead>
+          <tr>
+            <th>Nombres</th>
+            <th>Documento</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data">
+            <td>{{data.nombreCompleto}}</td>
+            <td>{{data.documento}}</td>
+            <td>{{data.telefono}}</td>
+            <td>{{data.email}}</td>
+            <td>
+              <a (click)="showEditModal(data)" style="margin-right: 8px"><i nz-icon nzType="edit"></i></a>
+              <a nz-popconfirm nzPopconfirmTitle="¿Está seguro?" nzOkText="Sí" nzCancelText="No" (nzOnConfirm)="deleteCliente(data.clienteID)">
+                <i nz-icon nzType="delete"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <nz-modal [(nzVisible)]="isModalVisible" [nzTitle]="modalTitle" (nzOnCancel)="handleCancel()">
+        <form nz-form [formGroup]="formGroup">
+          <nz-form-item>
+            <nz-form-label nzRequired>Nombres</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="nombre" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>Apellidos</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="apellido" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>Documento</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="documento" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Teléfono</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="telefono" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Email</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="email" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Empresa ID</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="empresaId" />
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+        <div nz-modal-footer>
+          <button nz-button nzType="default" (click)="handleCancel()">Cancelar</button>
+          <button nz-button nzType="primary" (click)="handleOk()" [disabled]="formGroup.invalid">Guardar</button>
+        </div>
+      </nz-modal>
+    </nz-card>

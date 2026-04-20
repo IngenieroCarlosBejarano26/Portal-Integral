@@ -1,4 +1,4 @@
-<nz-layout class="main-layout">
+<nz-layout class="main-layout" [class.is-collapsed]="isCollapsed">
   <!-- Sidebar -->
   <nz-sider
     class="sidebar"
@@ -9,29 +9,80 @@
     [nzTrigger]="null">
 
     <!-- Brand -->
-    <div class="brand">
-      <ng-container *ngIf="!isCollapsed">
-        <span class="brand-label">ORGANIZACIÓN</span>
+    <div class="brand" [class.brand--collapsed]="isCollapsed">
+      <div class="brand-logo">
+        <div class="brand-logo-shape">
+          <span class="brand-logo-letter">{{ organizationName.charAt(0) }}</span>
+          <span class="brand-logo-glow"></span>
+        </div>
+      </div>
+      <div class="brand-text" *ngIf="!isCollapsed">
+        <span class="brand-label">
+          <i nz-icon nzType="bank" nzTheme="outline"></i>
+          Organización
+        </span>
         <h2 class="brand-name">{{ organizationName }}</h2>
-      </ng-container>
-      <div class="brand-icon" *ngIf="isCollapsed">{{ organizationName.charAt(0) }}</div>
-    </div>
-
-    <!-- User Info -->
-    <div class="user-info" *ngIf="currentUser">
-      <div class="user-avatar">{{ getUserInitial() }}</div>
-      <div class="user-details" *ngIf="!isCollapsed">
-        <p class="user-name">{{ currentUser.nombreUsuario }}</p>
-        <p class="user-role">Admin</p>
+        <span class="brand-status">
+          <span class="brand-status-dot"></span>
+          Sistema activo
+        </span>
       </div>
     </div>
 
+    <!-- User Info — click abre dropdown con perfil y cerrar sesión -->
+    <div
+      class="user-info"
+      *ngIf="currentUser"
+      [class.user-info--collapsed]="isCollapsed"
+      nz-dropdown
+      nzTrigger="click"
+      [nzDropdownMenu]="userMenu"
+      nzPlacement="bottomLeft">
+      <div class="user-avatar">
+        <span class="user-avatar-letter">{{ getUserInitial() }}</span>
+        <span class="user-status-pill"></span>
+      </div>
+      <div class="user-details" *ngIf="!isCollapsed">
+        <p class="user-name">{{ currentUser.nombreUsuario }}</p>
+        <p class="user-role">
+          <i nz-icon nzType="safety" nzTheme="outline"></i>
+          {{ currentUser.rol }}
+        </p>
+      </div>
+      <i
+        *ngIf="!isCollapsed"
+        nz-icon
+        nzType="down"
+        nzTheme="outline"
+        class="user-caret"></i>
+    </div>
+
+    <!-- Dropdown del usuario -->
+    <nz-dropdown-menu #userMenu="nzDropdownMenu">
+      <ul nz-menu class="user-dropdown-menu">
+        <li nz-menu-item (click)="navigateTo('/perfil')">
+          <i nz-icon nzType="user" nzTheme="outline"></i>
+          <span> Mi perfil</span>
+        </li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item class="logout-item" (click)="logout()">
+          <i nz-icon nzType="poweroff" nzTheme="outline"></i>
+          <span> Cerrar sesión</span>
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+
     <!-- Menu -->
+    <div class="menu-section" *ngIf="!isCollapsed">
+      <span class="menu-section-label">Navegación</span>
+    </div>
+
     <ul nz-menu class="menu" nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li
         *ngFor="let item of menuItems"
         nz-menu-item
         [nzSelected]="isActive(item.path)"
+        [nzMatchRouter]="false"
         (click)="item.path && navigateTo(item.path)">
         <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
         <span>{{ item.label }}</span>
@@ -40,14 +91,11 @@
 
     <!-- Footer Sidebar -->
     <div class="sidebar-footer">
-      <button
-        class="logout-btn"
-        nz-button
-        nzType="text"
-        (click)="logout()">
-        <i nz-icon nzType="poweroff" nzTheme="outline"></i>
-        <span *ngIf="!isCollapsed">Cerrar sesión</span>
-      </button>
+      <div class="footer-divider"></div>
+      <div class="app-version" *ngIf="!isCollapsed">
+        <span>Portal Valeras</span>
+        <span class="app-version-tag">v1.0</span>
+      </div>
     </div>
   </nz-sider>
 

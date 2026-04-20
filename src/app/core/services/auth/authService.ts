@@ -78,7 +78,7 @@ export class AuthService {
         this.currentUserSubject.next(user);
         return true;
       }),
-      tap(ok => { if (ok) this.router.navigate(['/dashboard']); }),
+      // La navegación post-login la hace el LoginComponent (necesita leer returnUrl).
       catchError((error) => {
         console.error('Login failed:', error);
         return throwError(() => error);
@@ -99,6 +99,33 @@ export class AuthService {
 
   getCurrentUser(): CurrentUser | null {
     return this.currentUserSubject.value;
+  }
+
+  /**
+   * Devuelve la lista de códigos de permisos del usuario actual,
+   * extraídos del claim `permisos` del JWT.
+   */
+  getPermissions(): string[] {
+    const token = this.getToken();
+    if (!token) return [];
+    const claims = this.decodeJwt(token);
+    const raw = claims?.permisos;
+    if (!raw || typeof raw !== 'string') return [];
+    return raw.split(/\s+/).filter((p: string) => !!p);
+  }
+
+  /**
+   * Comprueba si el usuario tiene un permiso (o cualquiera de una lista).
+   * Admin (rol === 'Admin') tiene acceso total como fallback.
+   */
+  hasPermission(code: string | string[]): boolean {
+    const role = this.getCurrentUser()?.rol;
+    if (role && role.toLowerCase() === 'admin') return true;
+
+    const granted = this.getPermissions();
+    if (!granted.length) return false;
+    const codes = Array.isArray(code) ? code : [code];
+    return codes.some(c => granted.includes(c));
   }
 
   /** Recupera el usuario almacenado al recargar la página (rehidratación). */

@@ -29,6 +29,29 @@ export interface FormField {
    * - 'both' (por defecto) → siempre visible.
    */
   mode?: 'create' | 'edit' | 'both';
+
+  // ====== Validadores adicionales (opcional) ======
+  /** Longitud mínima (texto). */
+  minLength?: number;
+  /** Longitud máxima (texto). Mapea a `Validators.maxLength` y a `maxlength` HTML. */
+  maxLength?: number;
+  /** Valor mínimo (número/currency). */
+  min?: number;
+  /** Valor máximo (número/currency). */
+  max?: number;
+  /** Patrón regex (texto). */
+  pattern?: string | RegExp;
+  /**
+   * Mensajes de error personalizados por tipo de validador.
+   * Si no se especifica, se usa un mensaje genérico.
+   * Ej: { required: 'El nombre es obligatorio', pattern: 'Solo letras y espacios' }
+   */
+  errorMessages?: Partial<Record<
+    'required' | 'email' | 'minlength' | 'maxlength' | 'min' | 'max' | 'pattern',
+    string
+  >>;
+  /** Texto de ayuda mostrado bajo el campo (no es un error, es una pista). */
+  hint?: string;
 }
 
 export interface FormModalData {
@@ -71,8 +94,18 @@ export class FormModalComponent implements OnInit {
     const controls: Record<string, any> = {};
 
     for (const field of this.visibleFields) {
-      const validators = field.required ? [Validators.required] : [];
+      const validators = [];
+
+      if (field.required) validators.push(Validators.required);
       if (field.type === 'email') validators.push(Validators.email);
+      if (field.minLength != null) validators.push(Validators.minLength(field.minLength));
+      if (field.maxLength != null) validators.push(Validators.maxLength(field.maxLength));
+      if (field.min != null) validators.push(Validators.min(field.min));
+      if (field.max != null) validators.push(Validators.max(field.max));
+      if (field.pattern != null) {
+        const p = field.pattern instanceof RegExp ? field.pattern : new RegExp(field.pattern);
+        validators.push(Validators.pattern(p));
+      }
 
       const rawInitial = this.data.initialValue?.[field.key];
       let initial: any;
@@ -91,6 +124,29 @@ export class FormModalComponent implements OnInit {
 
     this.form = this.fb.group(controls);
     this.fieldRows = this.computeFieldRows();
+  }
+
+  /**
+   * Devuelve el primer mensaje de error visible para un campo, o null si no hay.
+   * Usa errorMessages personalizados del field o un mensaje genérico.
+   */
+  getError(field: FormField): string | null {
+    const ctrl = this.form?.get(field.key);
+    if (!ctrl || !ctrl.errors || (!ctrl.dirty && !ctrl.touched)) return null;
+
+    const errors = ctrl.errors;
+    const msgs = field.errorMessages ?? {};
+
+    if (errors['required']) return msgs.required ?? `${field.label} es obligatorio.`;
+    if (errors['email'])    return msgs.email    ?? 'Formato de email no válido.';
+    if (errors['minlength']) return msgs.minlength
+      ?? `Debe tener al menos ${errors['minlength'].requiredLength} caracteres.`;
+    if (errors['maxlength']) return msgs.maxlength
+      ?? `No puede superar ${errors['maxlength'].requiredLength} caracteres.`;
+    if (errors['min']) return msgs.min ?? `El valor mínimo es ${errors['min'].min}.`;
+    if (errors['max']) return msgs.max ?? `El valor máximo es ${errors['max'].max}.`;
+    if (errors['pattern']) return msgs.pattern ?? 'El formato no es válido.';
+    return 'Valor inválido.';
   }
 
   /** Filtra los campos según el modo del modal (create/edit). 'both' siempre se incluye. */

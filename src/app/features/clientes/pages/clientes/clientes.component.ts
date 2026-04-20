@@ -8,7 +8,12 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ClienteService } from '../../services/cliente.service';
 import { Cliente } from '../../models/cliente.model';
 
@@ -34,109 +39,16 @@ interface TableData {
     NzDividerModule,
     NzCardModule,
     NzIconModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
-  template: `
-    <nz-card nzTitle="Gestión de Clientes" class="clientes-card">
-      <div class="table-header">
-        <h3>Lista de Clientes</h3>
-        <button nz-button nzType="primary" (click)="showCreateModal()" nzIcon="plus">
-          Nuevo Cliente
-        </button>
-      </div>
-      
-      <nz-table #basicTable [nzData]="clientes()" [nzFrontPagination]="false" [nzShowPagination]="true" [nzPageSize]="10">
-        <thead>
-          <tr>
-            <th>Nombres</th>
-            <th>Documento</th>
-            <th>Teléfono</th>
-            <th>Email</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let data of basicTable.data">
-            <td>{{data.nombreCompleto}}</td>
-            <td>{{data.documento}}</td>
-            <td>{{data.telefono}}</td>
-            <td>{{data.email}}</td>
-            <td>
-              <a (click)="showEditModal(data)" style="margin-right: 8px"><i nz-icon nzType="edit"></i></a>
-              <a nz-popconfirm nzPopconfirmTitle="¿Está seguro?" nzOkText="Sí" nzCancelText="No" (nzOnConfirm)="deleteCliente(data.clienteID)">
-                <i nz-icon nzType="delete"></i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </nz-table>
-
-      <nz-modal [(nzVisible)]="isModalVisible" [nzTitle]="modalTitle" (nzOnCancel)="handleCancel()">
-        <form nz-form [formGroup]="formGroup">
-          <nz-form-item>
-            <nz-form-label nzRequired>Nombres</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="nombre" />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label nzRequired>Apellidos</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="apellido" />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label nzRequired>Documento</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="documento" />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Teléfono</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="telefono" />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Email</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="email" />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Empresa ID</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="empresaId" />
-            </nz-form-control>
-          </nz-form-item>
-        </form>
-        <div nz-modal-footer>
-          <button nz-button nzType="default" (click)="handleCancel()">Cancelar</button>
-          <button nz-button nzType="primary" (click)="handleOk()" [disabled]="formGroup.invalid">Guardar</button>
-        </div>
-      </nz-modal>
-    </nz-card>
-  `,
-  styles: [`
-    .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    a {
-      cursor: pointer;
-      color: #1890ff;
-    }
-    a:hover {
-      color: #40a9ff;
-    }
-  `]
+  templateUrl: './clientes.component.html',
+  styleUrl: './clientes.component.css'
 })
+
 export class ClientesComponent implements OnInit {
   clienteService = inject(ClienteService);
   fb = inject(FormBuilder);
-  
+
   clientes = signal<TableData[]>([]);
   isModalVisible = false;
   modalTitle = '';
@@ -152,20 +64,22 @@ export class ClientesComponent implements OnInit {
     this.loading = true;
     this.clienteService.getAll().subscribe({
       next: (clientes: Cliente[]) => {
-        this.clientes.set(clientes.map(c => ({
-          clienteID: c.clienteID,
-          nombreCompleto: c.nombre + ' ' + c.apellido,
-          documento: c.documento,
-          telefono: c.telefono,
-          email: c.email,
-          empresaId: c.empresaId
-        })));
+        this.clientes.set(
+          clientes.map((c) => ({
+            clienteID: c.clienteID,
+            nombreCompleto: c.nombre + ' ' + c.apellido,
+            documento: c.documento,
+            telefono: c.telefono,
+            email: c.email,
+            empresaId: c.empresaId,
+          })),
+        );
         this.loading = false;
       },
       error: () => {
         console.error('Error loading clientes');
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -178,7 +92,7 @@ export class ClientesComponent implements OnInit {
       documento: ['', Validators.required],
       telefono: [''],
       email: [''],
-      empresaId: ['']
+      empresaId: [''],
     });
     this.isModalVisible = true;
   }
@@ -193,7 +107,7 @@ export class ClientesComponent implements OnInit {
       documento: [cliente.documento, Validators.required],
       telefono: [cliente.telefono],
       email: [cliente.email],
-      empresaId: [cliente.empresaId]
+      empresaId: [cliente.empresaId],
     });
     this.isModalVisible = true;
   }
@@ -207,27 +121,29 @@ export class ClientesComponent implements OnInit {
         documento: formValue.documento,
         telefono: formValue.telefono,
         email: formValue.email,
-        empresaId: formValue.empresaId
+        empresaId: formValue.empresaId,
       };
 
       if (this.editingCliente) {
-        this.clienteService.update({
-          clienteID: this.editingCliente.clienteID,
-          ...clienteData
-        }).subscribe({
-          next: () => {
-            this.loadClientes();
-            this.handleCancel();
-          },
-          error: () => {}
-        });
+        this.clienteService
+          .update({
+            clienteID: this.editingCliente.clienteID,
+            ...clienteData,
+          })
+          .subscribe({
+            next: () => {
+              this.loadClientes();
+              this.handleCancel();
+            },
+            error: () => {},
+          });
       } else {
         this.clienteService.create(clienteData).subscribe({
           next: () => {
             this.loadClientes();
             this.handleCancel();
           },
-          error: () => {}
+          error: () => {},
         });
       }
     }
@@ -236,7 +152,7 @@ export class ClientesComponent implements OnInit {
   deleteCliente(id: string): void {
     this.clienteService.delete(id).subscribe({
       next: () => this.loadClientes(),
-      error: () => {}
+      error: () => {},
     });
   }
 
@@ -245,4 +161,3 @@ export class ClientesComponent implements OnInit {
     this.formGroup.reset();
   }
 }
-

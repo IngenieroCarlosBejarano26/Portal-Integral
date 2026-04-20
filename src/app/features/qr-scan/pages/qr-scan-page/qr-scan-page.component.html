@@ -1,0 +1,95 @@
+<!--
+  Pantalla del escaneo de QR.
+  Diseño centrado y mobile-first: el usuario llegará casi siempre desde un teléfono.
+-->
+<div class="qr-page">
+  <nz-spin [nzSpinning]="loading()" nzTip="Cargando valera...">
+    <div class="qr-card">
+
+      <!-- Estado: error / no encontrada -->
+      <ng-container *ngIf="!loading() && errorMsg() as msg">
+        <div class="qr-state qr-state--error">
+          <i nz-icon nzType="warning" nzTheme="outline" class="qr-state-icon"></i>
+          <h2>No se pudo abrir la valera</h2>
+          <p>{{ msg }}</p>
+          <button nz-button nzType="primary" nzSize="large" (click)="irADetalle()">
+            <i nz-icon nzType="home"></i> Ir al inicio
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Estado: valera cargada -->
+      <ng-container *ngIf="!loading() && valera() as v">
+
+        <header class="qr-header" [class.qr-header--ok]="puedeConsumir" [class.qr-header--ko]="!puedeConsumir">
+          <i
+            nz-icon
+            [nzType]="puedeConsumir ? 'qrcode' : (vencida || sinCupo || inactiva ? 'stop' : 'lock')"
+            class="qr-header-icon"></i>
+          <h1>Valera escaneada</h1>
+          <p>{{ puedeConsumir ? 'Lista para consumir un almuerzo' : 'No es posible consumir' }}</p>
+        </header>
+
+        <!-- Cliente -->
+        <section class="qr-section">
+          <span class="qr-label">Cliente</span>
+          <div class="qr-client">
+            <div class="qr-avatar">{{ clienteNombreCompleto.charAt(0) | uppercase }}</div>
+            <div>
+              <strong>{{ clienteNombreCompleto }}</strong>
+              <small *ngIf="cliente()?.documento">Doc. {{ cliente()!.documento }}</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- Almuerzos: indicador grande -->
+        <section class="qr-section qr-stat">
+          <div class="qr-stat-block">
+            <span class="qr-stat-value">{{ almuerzosRestantes }}</span>
+            <span class="qr-stat-label">Restantes</span>
+          </div>
+          <div class="qr-stat-divider"></div>
+          <div class="qr-stat-block qr-stat-block--muted">
+            <span class="qr-stat-value">{{ v.totalAlmuerzos ?? 0 }}</span>
+            <span class="qr-stat-label">Total</span>
+          </div>
+        </section>
+
+        <!-- Vencimiento -->
+        <section class="qr-section qr-meta">
+          <i nz-icon nzType="calendar" nzTheme="outline"></i>
+          <div>
+            <span class="qr-label">Vence</span>
+            <strong [class.qr-vencida]="vencida">
+              {{ v.fechaVencimiento | date:'dd/MM/yyyy' }}
+            </strong>
+          </div>
+        </section>
+
+        <!-- Razón si no puede consumir -->
+        <div *ngIf="!puedeConsumir && razonNoConsumir" class="qr-warning">
+          <i nz-icon nzType="info-circle"></i>
+          <span>{{ razonNoConsumir }}</span>
+        </div>
+
+        <!-- Acciones -->
+        <div class="qr-actions">
+          <button
+            *ngIf="puedeConsumir"
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            class="qr-cta"
+            [nzLoading]="consuming()"
+            (click)="consumir()">
+            <i nz-icon nzType="thunderbolt"></i>
+            Consumir 1 almuerzo
+          </button>
+          <button nz-button nzSize="large" class="qr-secondary" (click)="irADetalle()">
+            <i nz-icon nzType="home"></i> Ir al inicio
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </nz-spin>
+</div>

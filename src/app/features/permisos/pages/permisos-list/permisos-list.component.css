@@ -1,0 +1,347 @@
+
+/* ============================================
+   MODAL — Header refinado
+   ============================================ */
+.modal-title { display: flex; align-items: center; gap: 10px; }
+.modal-title .anticon {
+  font-size: 18px;
+  color: var(--primary);
+  width: 30px;
+  height: 30px;
+  background: var(--primary-soft);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-title-main {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.modal-title-sub {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+.modal-title-sub strong { color: var(--primary); font-weight: 700; }
+
+/* ============================================
+   MODAL — Toolbar de búsqueda y filtros
+   ============================================ */
+.modal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--border, #eef0f5);
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.modal-search { flex: 1; min-width: 200px; }
+
+.modal-search ::ng-deep .ant-input-affix-wrapper {
+  height: 32px !important;
+  border-radius: 7px !important;
+  font-size: 12.5px;
+}
+
+.action-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg, #f8f9fc);
+  border: 1px solid var(--border, #eef0f5);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.action-chip {
+  background: transparent;
+  border: none;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted, #6b7280);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.action-chip:hover { color: var(--text, #1a1a2e); }
+
+.action-chip.active {
+  background: #ffffff;
+  color: var(--text, #1a1a2e);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.action-chip.active[data-action="view"]    { color: #2563eb; }
+.action-chip.active[data-action="create"]  { color: #059669; }
+.action-chip.active[data-action="update"]  { color: #d97706; }
+.action-chip.active[data-action="delete"]  { color: #dc2626; }
+.action-chip.active[data-action="execute"] { color: #7c3aed; }
+
+/* ============================================
+   MODAL — Bulk actions bar
+   ============================================ */
+.bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--primary-softer, #f5f7ff);
+  border: 1px solid color-mix(in srgb, var(--primary, #6366f1) 18%, var(--border, #eef0f5));
+  border-radius: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.bulk-actions-left,
+.bulk-actions {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   MODAL — Lista de módulos
+   El nz-modal-body ya hace scroll — NO ponemos max-height aquí
+   para evitar recortes verticales de los módulos.
+   ============================================ */
+.modulo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+}
+
+/* ============================================
+   MODULO BLOCK — Acordeón
+   ============================================ */
+.modulo-block {
+  border: 1px solid var(--border, #eef0f5);
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.modulo-block.expanded {
+  border-color: color-mix(in srgb, var(--primary, #6366f1) 25%, var(--border, #eef0f5));
+  box-shadow: 0 4px 14px -8px rgba(99, 102, 241, 0.18);
+}
+
+/* Header como botón clickable */
+.modulo-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg, #f8f9fc);
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.modulo-header:hover {
+  background: color-mix(in srgb, var(--primary-softer, #f5f7ff) 80%, var(--bg, #f8f9fc));
+}
+
+.modulo-block.expanded .modulo-header {
+  border-bottom-color: var(--border, #eef0f5);
+  background: var(--bg, #f8f9fc);
+}
+
+/* Chevron animado */
+.modulo-header .chevron {
+  font-size: 10px;
+  color: var(--text-muted, #6b7280);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.modulo-block.expanded .modulo-header .chevron {
+  transform: rotate(90deg);
+  color: var(--primary, #6366f1);
+}
+
+.modulo-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.modulo-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text, #1a1a2e);
+  letter-spacing: -0.1px;
+}
+
+/* Badge contador X/Y con estado visual */
+.modulo-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--bg, #f1f3f9);
+  color: var(--text-subtle, #9aa0a6);
+  border: 1px solid var(--border, #eef0f5);
+}
+
+.modulo-badge.partial {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.modulo-badge.full {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+/* ============================================
+   PERMISO ROW — Granular, con badge y switch
+   ============================================ */
+.permiso-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.permiso-row {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border, #eef0f5);
+  cursor: pointer;
+  transition: background 0.14s ease;
+  user-select: none;
+  background: #ffffff;
+  list-style: none;
+  box-sizing: border-box;
+}
+
+.permiso-row:last-child { border-bottom: none; }
+
+.permiso-row:hover { background: var(--primary-softer, #f5f7ff); }
+
+.permiso-row.selected {
+  background: color-mix(in srgb, var(--primary-softer, #f5f7ff) 70%, white);
+}
+
+.permiso-row.selected .permiso-name {
+  color: var(--text, #1a1a2e);
+}
+
+/* Badge coloreado por tipo de acción */
+.action-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+.action-badge[data-action="view"]    { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+.action-badge[data-action="create"]  { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+.action-badge[data-action="update"]  { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.action-badge[data-action="delete"]  { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+.action-badge[data-action="execute"] { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+
+.permiso-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.permiso-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text, #1a1a2e);
+  line-height: 1.25;
+}
+
+.permiso-codigo {
+  font-size: 9.5px;
+  color: var(--text-subtle, #9aa0a6);
+  font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+/* ============================================
+   Modal body scroll handling
+   Reservamos espacio para header (~62px), footer (~64px) y margenes (~80px).
+   ============================================ */
+:host ::ng-deep .ant-modal {
+  max-height: 90vh;
+}
+
+:host ::ng-deep .ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+:host ::ng-deep .ant-modal-body {
+  max-height: calc(90vh - 130px);
+  overflow-y: auto;
+  padding: 16px 20px !important;
+}
+
+/* ============================================
+   Empty state cuando no hay matches
+   ============================================ */
+.no-results {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.no-results .anticon {
+  font-size: 32px;
+  color: var(--text-subtle);
+  margin-bottom: 12px;
+}
+
+.no-results p {
+  margin: 0 0 8px;
+  font-size: 13px;
+}

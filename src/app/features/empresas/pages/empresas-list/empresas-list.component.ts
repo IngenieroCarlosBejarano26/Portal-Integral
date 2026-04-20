@@ -13,6 +13,8 @@ import { FormModalComponent, FormField } from '../../../../shared/components/for
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
 import { EmpresaService, Empresa } from '../../services/empresa.service';
+import { AuthService } from '../../../../core/services/auth/authService';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-empresas-list',
@@ -23,7 +25,8 @@ import { EmpresaService, Empresa } from '../../services/empresa.service';
     NzButtonModule,
     NzIconModule,
     NzInputModule,
-    CardGridComponent
+    CardGridComponent,
+    HasPermissionDirective
   ],
   templateUrl: './empresas-list.component.html',
   styleUrl: './empresas-list.component.css'
@@ -33,6 +36,7 @@ export class EmpresasListComponent implements OnInit, OnDestroy {
   private notification = inject(NzNotificationService);
   private modal = inject(NzModalService);
   private realtime = inject(RealtimeService);
+  private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
   empresas: Empresa[] = [];
@@ -49,12 +53,31 @@ export class EmpresasListComponent implements OnInit, OnDestroy {
   };
 
   cardActions: CardAction[] = [
-    { label: 'Editar', icon: 'edit', action: (item) => this.openForm(item) },
-    { label: 'Eliminar', icon: 'delete', color: 'danger', action: (item) => this.deleteEmpresa(item) }
+    {
+      label: 'Editar', icon: 'edit',
+      visible: () => this.authService.hasPermission('empresas:update'),
+      action: (item) => this.openForm(item)
+    },
+    {
+      label: 'Eliminar', icon: 'delete', color: 'danger',
+      visible: () => this.authService.hasPermission('empresas:delete'),
+      action: (item) => this.deleteEmpresa(item)
+    }
   ];
 
   fields: FormField[] = [
-    { key: 'nombre', label: 'Nombre de la Empresa', type: 'text', required: true, placeholder: 'Ej. Ancestrales SAS' }
+    {
+      key: 'nombre', label: 'Nombre de la Empresa', type: 'text', required: true,
+      placeholder: 'Ej. Ancestrales SAS',
+      minLength: 3, maxLength: 50,
+      pattern: /^[\p{L}\s.,'\-]+$/u,
+      errorMessages: {
+        required: 'El nombre de la empresa es obligatorio.',
+        minlength: 'Mínimo 3 caracteres.',
+        maxlength: 'Máximo 50 caracteres.',
+        pattern: 'Solo letras, espacios, puntos, comas, apóstrofes y guiones.'
+      }
+    }
   ];
 
   ngOnInit(): void {

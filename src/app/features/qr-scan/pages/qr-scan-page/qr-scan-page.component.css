@@ -1,0 +1,242 @@
+/* =========================================================================
+   QR Scan Page — diseño centrado, mobile-first.
+   Casi siempre se abrirá desde un teléfono (escaneo en cámara).
+   ========================================================================= */
+
+.qr-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(160deg, #F1F5F9 0%, #E0E7FF 100%);
+  box-sizing: border-box;
+}
+
+.qr-card {
+  width: 100%;
+  max-width: 460px;
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+/* ── Header con identidad visual fuerte ──────────────────────────────── */
+.qr-header {
+  text-align: center;
+  padding: 32px 24px 24px;
+  color: #fff;
+}
+
+.qr-header--ok { background: linear-gradient(135deg, #5B5BD6, #4338CA); }
+.qr-header--ko { background: linear-gradient(135deg, #94A3B8, #64748B); }
+
+.qr-header-icon {
+  font-size: 52px;
+  display: block;
+  margin: 0 auto 10px;
+  opacity: 0.95;
+}
+
+.qr-header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.qr-header p {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  opacity: 0.9;
+}
+
+/* ── Sections ────────────────────────────────────────────────────────── */
+.qr-section {
+  padding: 18px 24px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.qr-section:last-of-type { border-bottom: none; }
+
+.qr-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94A3B8;
+  margin-bottom: 6px;
+}
+
+/* Cliente */
+.qr-client {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.qr-client strong {
+  display: block;
+  font-size: 16px;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+}
+
+.qr-client small {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.qr-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5B5BD6, #818CF8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Stats almuerzos — número grande, hero del feature */
+.qr-stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  background: linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);
+}
+
+.qr-stat-block { text-align: center; }
+
+.qr-stat-value {
+  display: block;
+  font-size: 44px;
+  font-weight: 800;
+  color: #5B5BD6;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.qr-stat-block--muted .qr-stat-value { color: #94A3B8; }
+
+.qr-stat-label {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+}
+
+.qr-stat-divider {
+  width: 1px;
+  height: 44px;
+  background: #E2E8F0;
+}
+
+/* Meta (vencimiento) */
+.qr-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qr-meta i {
+  font-size: 18px;
+  color: #5B5BD6;
+}
+
+.qr-meta strong {
+  display: block;
+  color: #0F172A;
+  font-size: 14px;
+}
+
+.qr-vencida { color: #DC2626 !important; }
+
+/* Warning si no se puede consumir */
+.qr-warning {
+  margin: 0 24px 16px;
+  padding: 12px 14px;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #92400E;
+}
+
+.qr-warning i { color: #B45309; font-size: 16px; }
+
+/* ── Acciones ────────────────────────────────────────────────────────── */
+.qr-actions {
+  padding: 8px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qr-cta {
+  width: 100%;
+  height: 52px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #5B5BD6, #4338CA) !important;
+  border: none !important;
+  box-shadow: 0 8px 20px -8px rgba(91, 91, 214, 0.5) !important;
+}
+
+.qr-cta:hover { box-shadow: 0 10px 24px -6px rgba(91, 91, 214, 0.55) !important; }
+
+.qr-secondary {
+  width: 100%;
+  height: 44px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* ── Estado: error ───────────────────────────────────────────────────── */
+.qr-state {
+  text-align: center;
+  padding: 48px 28px 36px;
+}
+
+.qr-state-icon {
+  font-size: 56px;
+  margin-bottom: 18px;
+}
+
+.qr-state--error .qr-state-icon { color: #F59E0B; }
+
+.qr-state h2 {
+  margin: 0 0 8px;
+  color: #0F172A;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.qr-state p {
+  margin: 0 0 24px;
+  color: #64748B;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Responsive: pantallas mini ──────────────────────────────────────── */
+@media (max-width: 380px) {
+  .qr-stat-value { font-size: 36px; }
+  .qr-header h1 { font-size: 19px; }
+}

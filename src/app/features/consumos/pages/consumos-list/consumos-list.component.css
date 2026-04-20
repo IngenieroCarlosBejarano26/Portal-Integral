@@ -1,8 +1,4 @@
-:host {
-  display: block;
-  height: 100vh;
-  overflow: hidden;
-}
+
 
 .toolbar-meta {
   font-size: 12px;

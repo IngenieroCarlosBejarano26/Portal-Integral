@@ -5,6 +5,8 @@ import { tap } from 'rxjs/operators';
 
 export interface Rol {
   rolId?: string;
+  /** Tenant al que pertenece el rol (cada tenant tiene su propio catálogo). */
+  tenantId?: string;
   nombre?: string;
   descripcion?: string;
   fechaCreacion?: string;

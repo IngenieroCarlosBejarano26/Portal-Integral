@@ -11,9 +11,11 @@ import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { AuthService } from '../../core/services/auth/authService';
 import { ScreenInfoService } from '../../core/services/screen/screen-info.service';
 import { RealtimeService } from '../../core/services/realtime/realtime.service';
+import { RealtimeEvents } from '../../core/services/realtime/realtime-events';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 interface MenuItem {
   label: string;
@@ -49,6 +51,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   public screenInfoService = inject(ScreenInfoService);
   private destroy$ = new Subject<void>();
   private modal = inject(NzModalService);
+  private notification = inject(NzNotificationService);
 
   isCollapsed = false;
   currentUser: any;
@@ -60,6 +63,87 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.loadOrganizationName();
     this.initializeMenuItems();
     this.realtime.connect();
+    this.subscribeToPermissionChanges();
+    this.subscribeToOwnRolChange();
+    this.subscribeToOwnDeactivation();
+  }
+
+  /**
+   * Si un admin desactiva/elimina al usuario actual, lo deslogeamos al instante
+   * con un mensaje claro. Cualquier request posterior daría 401 anyway, mejor
+   * cerrar la sesión con UX limpia.
+   */
+  private subscribeToOwnDeactivation(): void {
+    this.realtime.on(RealtimeEvents.Usuario.Deactivated)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((payload: any) => {
+        const myUsuarioId = this.authService.getCurrentUser()?.usuarioId;
+        if (!myUsuarioId || payload?.usuarioId !== myUsuarioId) return;  // No soy yo
+
+        this.notification.warning(
+          'Sesión cerrada',
+          'Tu cuenta fue desactivada por un administrador.',
+          { nzDuration: 5000 }
+        );
+        // Pequeño delay para que el usuario alcance a leer el mensaje antes
+        // de que la pantalla cambie a /login.
+        setTimeout(() => this.authService.logout(), 1500);
+      });
+  }
+
+  /**
+   * Si un admin le cambia el rol al usuario actual (pasa de Cajero a Supervisor),
+   * sus permisos efectivos cambian completamente. Solo este usuario debe refrescar.
+   */
+  private subscribeToOwnRolChange(): void {
+    this.realtime.on(RealtimeEvents.Usuario.RolChanged)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((payload: any) => {
+        const myUsuarioId = this.authService.getCurrentUser()?.usuarioId;
+        if (!myUsuarioId || payload?.usuarioId !== myUsuarioId) return;  // No soy yo
+        this.refreshAndReload('Tu rol fue actualizado. Aplicando nuevos permisos…');
+      });
+  }
+
+  /**
+   * Helper compartido: refresca el JWT, muestra notificación y fuerza re-render
+   * de guards/componentes/menú. Lo usan ambos listeners (rol-changed y permissions-changed).
+   */
+  private refreshAndReload(message: string): void {
+    this.authService.refreshToken().subscribe((ok) => {
+      if (!ok) return;
+      this.notification.info('Permisos actualizados', message, { nzDuration: 2500 });
+      const url = this.router.url;
+      this.router.navigateByUrl('/dashboard', { skipLocationChange: true })
+        .then(() => this.router.navigateByUrl(url));
+      this.initializeMenuItems();
+    });
+  }
+
+  /**
+   * Si un admin cambia los permisos de un rol, el backend emite el evento
+   * `rol:permissions-changed`. Cualquier cliente del tenant lo recibe y refresca
+   * su JWT para que los permisos efectivos se actualicen sin re-login.
+   *
+   * Tras el refresh recargamos la ruta actual para que menu / cards / guards
+   * re-evaluen `hasPermission()` con los permisos nuevos.
+   */
+  private subscribeToPermissionChanges(): void {
+    this.realtime.on(RealtimeEvents.Permiso.RolPermissionsChanged)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((payload: any) => {
+        // Filtramos por rolId: solo refrescamos si el evento afecta al rol del
+        // usuario actual. Si el JWT no tiene rolId (token viejo previo al deploy)
+        // o el payload no trae rolId, refrescamos por defecto para no quedar
+        // con permisos obsoletos.
+        const myRolId = this.authService.getCurrentUser()?.rolId;
+        const affectedRolId = payload?.rolId;
+        if (myRolId && affectedRolId && myRolId !== affectedRolId) {
+          return;  // No me afecta
+        }
+
+        this.refreshAndReload('Tus permisos fueron modificados. Aplicando cambios…');
+      });
   }
 
   ngOnDestroy(): void {

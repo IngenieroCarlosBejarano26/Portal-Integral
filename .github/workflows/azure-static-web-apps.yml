@@ -3,9 +3,6 @@ name: Deploy Frontend to Azure Static Web Apps
 on:
   push:
     branches: [main]
-    paths:
-      - 'Portal-Integral/**'
-      - '.github/workflows/azure-static-web-apps.yml'
   workflow_dispatch:
 
 jobs:
@@ -21,15 +18,12 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: Portal-Integral/package-lock.json
 
       - name: Install dependencies
-        working-directory: Portal-Integral
         run: npm ci
 
       - name: Build (production)
-        working-directory: Portal-Integral
-        # Usa el environment.prod.ts (configuration: production)
+        # Usa environment.prod.ts (configuration: production)
         run: npm run build -- --configuration production
 
       - name: Deploy to Azure Static Web Apps
@@ -38,6 +32,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: 'upload'
-          app_location: 'Portal-Integral'
-          output_location: 'dist/portal-integral/browser'   # Ajusta seg�n tu angular.json
-          skip_app_build: true        # Ya construimos arriba con configuration prod
+          app_location: '/'
+          output_location: 'dist/portal-integral/browser'
+          skip_app_build: true
+

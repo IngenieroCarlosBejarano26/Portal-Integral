@@ -163,7 +163,8 @@ nzCentered
 
   <ng-template #modalFooter>
     <button nz-button nzType="default" (click)="closeRolPermisos()">Cancelar</button>
-    <button nz-button nzType="primary" [nzLoading]="saving" (click)="save()">
+    <button nz-button nzType="primary" [nzLoading]="saving" (click)="save()"
+            *appHasPermission="'permisos:assign'">
       <i nz-icon nzType="save" nzTheme="outline"></i>
       Guardar {{ totalSelected }} permiso(s)
     </button>

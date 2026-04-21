@@ -17,6 +17,8 @@ import { RealtimeEvents } from '../../../../core/services/realtime/realtime-even
 import { RolService, Rol } from '../../../roles/services/rol.service';
 import { Permiso, PermisoService } from '../../services/permiso.service';
 import { CardGridComponent, CardConfig, CardAction } from '../../../../shared/components/card-grid/card-grid.component';
+import { AuthService } from '../../../../core/services/auth/authService';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 interface PermisoModuloGroup {
   modulo: string;
@@ -42,7 +44,8 @@ interface RolCardItem extends Rol {
     NzButtonModule, NzIconModule, NzCheckboxModule,
     NzSwitchModule, NzInputModule,
     NzModalModule, NzSpinModule, NzEmptyModule,
-    CardGridComponent
+    CardGridComponent,
+    HasPermissionDirective
   ],
   templateUrl: './permisos-list.component.html',
   styleUrl: './permisos-list.component.css'
@@ -53,6 +56,7 @@ export class PermisosListComponent implements OnInit, OnDestroy {
   private notification = inject(NotificationService);
   private realtime = inject(RealtimeService);
   private modal = inject(NzModalService);
+  private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
   loading = false;
@@ -112,6 +116,7 @@ export class PermisosListComponent implements OnInit, OnDestroy {
       label: 'Configurar permisos',
       icon: 'setting',
       color: 'primary',
+      visible: () => this.authService.hasPermission('permisos:assign'),
       action: (item: any) => this.openRolPermisos(item as Rol)
     }
   ];

@@ -1,11 +1,20 @@
 import { Environment } from './environment.interface';
 
+/**
+ * ⚠️ EDITA estos valores tras el aprovisionamiento de Azure:
+ *  - baseUrl: URL del App Service del backend (ej: https://valeras-api.azurewebsites.net)
+ *  - apiKey:  el secret rotado para producción (NO el del repo)
+ *
+ * NOTA: Si quieres mantener apiKey fuera del bundle JS, considera usar
+ * Azure Static Web Apps > Configuration > Application settings y leer
+ * `process.env.NG_APP_API_KEY` con angular-cli build replacements.
+ */
 export const environment: Environment = {
   production: true,
   environment: 'production',
   api: {
-    baseUrl: '192.168.10.20:7206',
-    apiKey: 'V4l3r4s-4p1K3y-S3cur3-2024!'
+    baseUrl: 'https://valeras-api.azurewebsites.net',
+    apiKey: 'REPLACE_WITH_PROD_API_KEY'
   },
   azure: {
     staticWebApps: true,

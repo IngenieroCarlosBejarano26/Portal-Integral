@@ -652,8 +652,25 @@ nz-header.header {
    (incluido el botón flotante).
    ============================================ */
 @media (max-width: 992px) {
-  .main-layout {
-    --sidebar-width: 72px;
+  /* En mobile NO forzamos --sidebar-width: que fluya según `.is-collapsed`
+     como en desktop (72 ↔ 240). Así el botón flotante se reubica al togglear. */
+
+  /* El contenido SIEMPRE mantiene solo el offset del rail colapsado (72px).
+     Cuando el usuario expande el sidebar, éste flota en overlay sobre el contenido
+     en lugar de empujarlo (un sidebar de 240 empujando en una pantalla de 375 rompe
+     la UX — queda el contenido con apenas 135px). */
+  .content-layout {
+    margin-left: 72px !important;
+  }
+
+  /* Sidebar expandido en mobile → overlay con sombra fuerte */
+  .main-layout:not(.is-collapsed) .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    box-shadow: 8px 0 28px -8px rgba(15, 23, 42, 0.35);
   }
 
   /* Liberamos el viewport-locking del desktop para que el body pueda scrollear.

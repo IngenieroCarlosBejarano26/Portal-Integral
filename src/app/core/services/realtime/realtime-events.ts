@@ -35,10 +35,19 @@ export const RealtimeEvents = {
   },
   Usuario: {
     Created: 'usuario:created',
-    Updated: 'usuario:updated'
+    Updated: 'usuario:updated',
+    /** El rol del usuario cambió. Payload: `{ usuarioId, oldRolId, newRolId }`.
+     *  Solo el usuario afectado debe refrescar su JWT. */
+    RolChanged: 'usuario:rol-changed',
+    /** El usuario fue desactivado/eliminado. Payload: `{ usuarioId }`.
+     *  Solo el usuario afectado debe cerrar sesión. */
+    Deactivated: 'usuario:deactivated'
   },
   Permiso: {
-    Updated: 'permiso:updated'
+    Updated: 'permiso:updated',
+    /** Los permisos asignados a un rol cambiaron. Payload: `{ rolId: string }`.
+     *  Los clientes con ese rol deben llamar `authService.refreshToken()`. */
+    RolPermissionsChanged: 'rol:permissions-changed'
   }
 } as const;
 

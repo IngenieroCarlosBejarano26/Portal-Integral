@@ -31,6 +31,8 @@ export interface CurrentUser {
   usuarioId?: string;
   email?: string;
   tenantId?: string;
+  /** Identificador del rol — usado para filtrar el evento `rol:permissions-changed`. */
+  rolId?: string;
 }
 
 interface ApiResponse<T> {
@@ -71,7 +73,8 @@ export class AuthService {
           expiracion: dto.expiracion,
           usuarioId: claims?.sub,
           email: claims?.email,
-          tenantId: claims?.tenantId
+          tenantId: claims?.tenantId,
+          rolId: claims?.rolId
         };
 
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
@@ -91,6 +94,45 @@ export class AuthService {
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
+  }
+
+  /**
+   * Refresca el JWT del usuario actual con sus permisos al día.
+   * Lo dispara el listener de `rol:permissions-changed` cuando un admin cambia
+   * los permisos del rol del usuario logueado.
+   *
+   * Devuelve `true` si el token se actualizó (el caller debería recargar la página
+   * para que el menú/cards re-evalúen permisos).
+   */
+  refreshToken(): Observable<boolean> {
+    const url = `${environment.api!.baseUrl}/api/Auth/refresh-token`;
+    return this.http.post<ApiResponse<LoginResponseDto>>(url, {}).pipe(
+      map((response) => {
+        const dto = response?.data;
+        if (!dto?.token) return false;
+
+        localStorage.setItem(this.TOKEN_KEY, dto.token);
+
+        const claims = this.decodeJwt(dto.token);
+        const user: CurrentUser = {
+          nombreUsuario: dto.nombreUsuario,
+          rol: dto.rol,
+          tenant: dto.tenant,
+          expiracion: dto.expiracion,
+          usuarioId: claims?.sub,
+          email: claims?.email,
+          tenantId: claims?.tenantId,
+          rolId: claims?.rolId
+        };
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+        this.currentUserSubject.next(user);
+        return true;
+      }),
+      catchError((err) => {
+        console.error('refreshToken failed:', err);
+        return of(false);
+      })
+    );
   }
 
   getToken(): string | null {

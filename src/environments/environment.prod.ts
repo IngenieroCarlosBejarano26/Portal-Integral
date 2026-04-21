@@ -14,7 +14,7 @@ export const environment: Environment = {
   environment: 'production',
   api: {
     baseUrl: 'https://valeras-api.azurewebsites.net',
-    apiKey: 'REPLACE_WITH_PROD_API_KEY'
+    apiKey: 'ApiKeyProd24ead3683aa84c8a8da05743cecc60a6'
   },
   azure: {
     staticWebApps: true,

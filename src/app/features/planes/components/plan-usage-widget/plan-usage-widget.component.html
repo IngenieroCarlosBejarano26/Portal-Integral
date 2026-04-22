@@ -1,0 +1,43 @@
+<nz-card class="plan-widget" [nzBordered]="false">
+  <div class="plan-header">
+    <div class="plan-title">
+      <i nz-icon nzType="crown" nzTheme="outline"></i>
+      <span>Plan actual</span>
+    </div>
+    <nz-tag *ngIf="plan" [nzColor]="'gold'">{{ plan.planNombre }}</nz-tag>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando plan…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error && plan">
+    <p class="plan-desc" *ngIf="plan.planDescripcion">{{ plan.planDescripcion }}</p>
+
+    <div class="uso-list">
+      <div class="uso-item" *ngFor="let u of usos">
+        <div class="uso-row">
+          <span class="uso-label">
+            <i nz-icon [nzType]="u.icon" nzTheme="outline"></i>
+            {{ u.label }}
+          </span>
+          <span class="uso-valor">{{ formatoUso(u) }}</span>
+        </div>
+        <nz-progress
+          *ngIf="u.max != null; else ilimitado"
+          [nzPercent]="u.porcentaje ?? 0"
+          [nzStrokeColor]="u.color"
+          [nzShowInfo]="false"
+          nzSize="small">
+        </nz-progress>
+        <ng-template #ilimitado>
+          <div class="ilimitado-bar">Ilimitado</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <button nz-button nzType="primary" nzBlock (click)="irAUpgrade()" class="upgrade-btn">
+      <i nz-icon nzType="rocket" nzTheme="outline"></i>
+      Cambiar de plan
+    </button>
+  </ng-container>
+</nz-card>

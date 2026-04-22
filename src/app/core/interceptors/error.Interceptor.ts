@@ -31,7 +31,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           userMessage = 'No estás autorizado. Por favor, inicia sesión.';
           break;
         case 403:
-          userMessage = 'No tienes permisos para realizar esta acción.';
+          // El backend usa 403 para 2 casos:
+          //  a) Limite del plan alcanzado (mensaje detallado tipo "Has alcanzado el limite de 50 clientes...")
+          //  b) Falta de permisos genericos.
+          // Si trae backendMessage, lo respetamos; el caller decide si re-mostrar o no.
+          userMessage = backendMessage || 'No tienes permisos para realizar esta acción.';
           break;
         case 404:
           userMessage = 'El recurso solicitado no fue encontrado.';

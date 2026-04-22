@@ -14,6 +14,7 @@ import { RolService } from '../../../roles/services/rol.service';
 import { TenantService } from '../../../tenants/services/tenant.service';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents, RealtimeEventName } from '../../../../core/services/realtime/realtime-events';
+import { PlanUsageWidgetComponent } from '../../../planes/components/plan-usage-widget/plan-usage-widget.component';
 
 interface ModuleStat {
   /** Identificador interno usado para mapear eventos realtime. */
@@ -30,7 +31,7 @@ interface ModuleStat {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NzIconModule, NzButtonModule],
+  imports: [CommonModule, NzIconModule, NzButtonModule, PlanUsageWidgetComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

@@ -1,0 +1,57 @@
+<div class="planes-page">
+  <div class="page-header">
+    <h2>
+      <i nz-icon nzType="crown" nzTheme="outline"></i>
+      Planes de suscripcion
+    </h2>
+    <p>Elige el plan que mejor se adapte a tu negocio. Puedes cambiar en cualquier momento.</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando planes…</div>
+
+  <div *ngIf="!loading" class="planes-grid">
+    <nz-card
+      *ngFor="let plan of catalogo"
+      class="plan-card"
+      [class.plan-actual]="esPlanActual(plan.planId)"
+      [nzBordered]="false">
+
+      <div class="plan-card-header">
+        <h3>{{ plan.nombre }}</h3>
+        <nz-tag *ngIf="esPlanActual(plan.planId)" nzColor="green">Plan actual</nz-tag>
+      </div>
+
+      <p class="plan-card-desc">{{ plan.descripcion }}</p>
+
+      <div class="precio">
+        <span class="precio-valor">USD ${{ plan.precioMensualUSD }}</span>
+        <span class="precio-periodo">/ mes</span>
+      </div>
+
+      <ul class="features">
+        <li>
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          {{ formatoLimite(plan.maxClientes) }} clientes
+        </li>
+        <li>
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          {{ formatoLimite(plan.maxValeras) }} valeras
+        </li>
+        <li>
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          {{ formatoLimite(plan.maxUsuarios) }} usuarios
+        </li>
+      </ul>
+
+      <button
+        nz-button
+        nzType="primary"
+        nzBlock
+        [disabled]="esPlanActual(plan.planId) || cambiando === plan.planId"
+        [nzLoading]="cambiando === plan.planId"
+        (click)="cambiarPlan(plan)">
+        {{ esPlanActual(plan.planId) ? 'Plan actual' : 'Seleccionar' }}
+      </button>
+    </nz-card>
+  </div>
+</div>

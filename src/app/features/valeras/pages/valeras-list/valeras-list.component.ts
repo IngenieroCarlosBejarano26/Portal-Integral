@@ -105,7 +105,6 @@ export class ValerasListComponent implements OnInit, OnDestroy {
     {
       key: 'totalAlmuerzos', label: 'Total Almuerzos', type: 'number', required: true, span: 12,
       min: 1, max: 1000,
-      hint: 'Entre 1 y 1.000.',
       errorMessages: {
         required: 'El total de almuerzos es obligatorio.',
         min: 'Debe ser al menos 1.',

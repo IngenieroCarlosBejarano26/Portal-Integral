@@ -45,20 +45,21 @@
 
       <!-- Actions -->
       <div class="card-actions" *ngIf="actions.length" (click)="$event.stopPropagation()">
-        <button
-          *ngFor="let action of actions"
-          nz-button
-          nzSize="small"
-          class="action-btn"
-          [class.danger]="action.color === 'danger'"
-          [class.primary]="action.color === 'primary'"
-          [hidden]="action.visible && !action.visible(item)"
-          nz-tooltip
-          [nzTooltipTitle]="action.label"
-          (click)="action.action(item)">
-          <i nz-icon [nzType]="action.icon" nzTheme="outline"></i>
-          <span class="btn-label">{{ action.label }}</span>
-        </button>
+        <ng-container *ngFor="let action of actions">
+          <button
+            *ngIf="!action.visible || action.visible(item)"
+            nz-button
+            nzSize="small"
+            class="action-btn"
+            [class.danger]="action.color === 'danger'"
+            [class.primary]="action.color === 'primary'"
+            nz-tooltip
+            [nzTooltipTitle]="action.label"
+            (click)="action.action(item)">
+            <i nz-icon [nzType]="action.icon" nzTheme="outline"></i>
+            <span class="btn-label">{{ action.label }}</span>
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>

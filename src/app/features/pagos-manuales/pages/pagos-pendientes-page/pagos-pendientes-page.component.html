@@ -1,0 +1,63 @@
+<div class="page">
+  <div class="header">
+    <div>
+      <h2><i nz-icon nzType="dollar" nzTheme="outline"></i> Solicitudes de pago pendientes</h2>
+      <p>Revisa las transferencias enviadas por los tenants y aprueba o rechaza.</p>
+    </div>
+    <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading">
+      <i nz-icon nzType="reload"></i> Refrescar
+    </button>
+  </div>
+
+  <nz-table #tabla [nzData]="solicitudes" [nzLoading]="loading" nzSize="middle" [nzPageSize]="20">
+    <thead>
+      <tr>
+        <th>Tenant</th>
+        <th>Plan</th>
+        <th>Monto</th>
+        <th>Metodo</th>
+        <th>Referencia</th>
+        <th>Solicitado por</th>
+        <th>Fecha</th>
+        <th>Comprobante</th>
+        <th class="acciones-col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of tabla.data">
+        <td><strong>{{ s.tenantNombre }}</strong></td>
+        <td><nz-tag nzColor="gold">{{ s.planNombre }}</nz-tag></td>
+        <td>$ {{ fmt(s.montoCOP) }} COP <small class="usd">(USD ${{ s.precioUSD }})</small></td>
+        <td><nz-tag>{{ s.metodoPago }}</nz-tag></td>
+        <td><code>{{ s.referenciaPago }}</code></td>
+        <td>{{ s.usuarioSolicitante }}</td>
+        <td>{{ s.fechaSolicitud | date:'short' }}</td>
+        <td>
+          <button *ngIf="s.comprobanteFileName" nz-button nzSize="small" nzType="default" (click)="verComprobante(s)">
+            <i nz-icon nzType="eye"></i> Ver
+          </button>
+          <span *ngIf="!s.comprobanteFileName" class="sin-comp">Sin adjunto</span>
+        </td>
+        <td class="acciones-col">
+          <button nz-button nzType="primary" nzSize="small"
+                  (click)="aprobar(s)"
+                  [nzLoading]="procesando === s.solicitudId"
+                  [disabled]="procesando !== null && procesando !== s.solicitudId">
+            <i nz-icon nzType="check"></i> Aprobar
+          </button>
+          <button nz-button nzDanger nzSize="small"
+                  (click)="rechazar(s)"
+                  [disabled]="procesando !== null">
+            <i nz-icon nzType="close"></i> Rechazar
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="!loading && solicitudes.length === 0">
+        <td colspan="9" class="empty">
+          <i nz-icon nzType="check-circle" nzTheme="outline"></i>
+          No hay solicitudes pendientes.
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>

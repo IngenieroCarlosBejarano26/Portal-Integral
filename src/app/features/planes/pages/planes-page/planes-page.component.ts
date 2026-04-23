@@ -11,6 +11,7 @@ import { PlanService, PlanCatalogo, PlanTenant } from '../../services/plan.servi
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { UsdCopPipe } from '../../../../shared/pipes/usd-cop.pipe';
 import { CurrencyService } from '../../../../core/services/currency/currency.service';
+import { PagarManualModalComponent } from '../../../pagos-manuales/components/pagar-manual-modal/pagar-manual-modal.component';
 
 @Component({
   selector: 'app-planes-page',
@@ -64,31 +65,17 @@ export class PlanesPageComponent implements OnInit {
   cambiarPlan(plan: PlanCatalogo): void {
     if (this.esPlanActual(plan.planId)) return;
 
-    this.modal.confirm({
-      nzTitle: `Cambiar al plan ${plan.nombre}?`,
-      nzContent: `Tu suscripcion sera actualizada inmediatamente al plan ${plan.nombre} ` +
-                 `(USD $${plan.precioMensualUSD} ~ COP $${Math.round(this.currency.toCop(plan.precioMensualUSD)).toLocaleString('es-CO')}/mes). ` +
-                 `Si reduces el plan y excedes los nuevos limites, el cambio sera bloqueado.`,
-      nzOkText: 'Si, cambiar',
-      nzCancelText: 'Cancelar',
-      nzOnOk: () => {
-        this.cambiando = plan.planId;
-        this.planService.cambiarPlan(plan.planId).subscribe({
-          next: (res) => {
-            this.cambiando = null;
-            if (res.success) {
-              this.notification.success('Plan actualizado', res.message ?? `Ahora tienes el plan ${plan.nombre}.`);
-              this.recargar();
-            } else {
-              this.notification.error('No se pudo cambiar el plan', res.message ?? 'Error desconocido.');
-            }
-          },
-          error: (err) => {
-            this.cambiando = null;
-            this.notification.error('Error', err?.error?.message ?? 'No se pudo cambiar el plan.');
-          }
-        });
-      }
+    // Flujo MVP de pago manual: abre modal de pago (Nequi/Bancolombia + comprobante).
+    // Cuando el super-admin apruebe, el plan se activa automaticamente.
+    this.modal.create({
+      nzTitle: `Activar plan ${plan.nombre}`,
+      nzContent: PagarManualModalComponent,
+      nzData: { plan },
+      nzWidth: 720,
+      nzFooter: null,
+      nzMaskClosable: false
+    }).afterClose.subscribe((enviada) => {
+      if (enviada) this.recargar();
     });
   }
 }

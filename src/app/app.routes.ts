@@ -46,6 +46,8 @@ export const routes: Routes = [
         loadChildren: () => import('./features/configuracion-email/configuracion-email.routes').then((m) => m.CONFIGURACION_EMAIL_ROUTES) },
       { path: 'planes', canActivate: [permissionGuard], data: { permission: 'planes:view' },
         loadChildren: () => import('./features/planes/planes.routes').then((m) => m.PLANES_ROUTES) },
+      { path: 'pagos-manuales', canActivate: [permissionGuard], data: { permission: 'pagos-manuales:approve' },
+        loadChildren: () => import('./features/pagos-manuales/pagos-manuales.routes').then((m) => m.PAGOS_MANUALES_ROUTES) },
       { path: 'perfil', loadChildren: () => import('./features/perfil/perfil.routes').then((m) => m.PERFIL_ROUTES) },
     ]
   },

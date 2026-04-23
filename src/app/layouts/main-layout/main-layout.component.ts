@@ -210,7 +210,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'Consumos',  icon: 'bar-chart',     path: '/consumos',  permission: 'consumos:view'  },
       { label: 'Permisos',  icon: 'safety-certificate', path: '/permisos', permission: 'permisos:view' },
       { label: 'Conf. Correo', icon: 'mail', path: '/configuracion-email', permission: 'configuracion-email:view' },
-      { label: 'Mi Plan',   icon: 'crown',         path: '/planes',    permission: 'planes:view' }
+      { label: 'Mi Plan',   icon: 'crown',         path: '/planes',    permission: 'planes:view' },
+      { label: 'Pagos pendientes', icon: 'dollar', path: '/pagos-manuales/pendientes', permission: 'pagos-manuales:approve' }
     ];
 
     // Si no hay permiso definido o el usuario lo tiene, se muestra.

@@ -1,0 +1,110 @@
+<div class="pagar-modal" *ngIf="!cargando">
+  <nz-alert nzType="info" nzShowIcon
+    nzMessage="Sigue 3 pasos sencillos"
+    nzDescription="1) Transfiere el monto exacto a Nequi/Bancolombia. 2) Sube el comprobante. 3) Espera la aprobacion (max 24h)."
+    class="info-alert">
+  </nz-alert>
+
+  <!-- Resumen del plan -->
+  <div class="resumen-plan">
+    <div class="plan-info">
+      <i nz-icon nzType="crown" nzTheme="outline"></i>
+      <div>
+        <strong>Plan {{ plan.nombre }}</strong>
+        <div class="plan-precio">USD ${{ plan.precioMensualUSD }} / mes</div>
+      </div>
+    </div>
+    <div class="monto-cop">
+      <span class="monto-label">Total a transferir</span>
+      <span class="monto-valor">$ {{ montoCOPFormateado }} COP</span>
+    </div>
+  </div>
+
+  <!-- Paso 1: datos de cuenta + QR -->
+  <h4 class="paso-titulo">
+    <span class="paso-num">1</span> Transfiere a una de estas cuentas
+  </h4>
+
+  <div class="metodos-grid">
+    <!-- Nequi -->
+    <div class="metodo-card" [class.activo]="metodoPago === 'Nequi'" (click)="metodoPago = 'Nequi'">
+      <div class="metodo-header">
+        <i nz-icon nzType="mobile" nzTheme="outline"></i>
+        <strong>Nequi</strong>
+      </div>
+      <img *ngIf="qrNequiUrl" [src]="qrNequiUrl" alt="QR Nequi" class="qr-img">
+      <div class="metodo-dato">
+        <span>{{ info?.nequiNumero }}</span>
+        <button nz-button nzSize="small" nzType="text" (click)="copiarAlPortapapeles(info?.nequiNumero ?? '', 'Numero')">
+          <i nz-icon nzType="copy"></i>
+        </button>
+      </div>
+      <small>{{ info?.nequiTitular }}</small>
+    </div>
+
+    <!-- Bancolombia -->
+    <div class="metodo-card" [class.activo]="metodoPago === 'Bancolombia'" (click)="metodoPago = 'Bancolombia'">
+      <div class="metodo-header">
+        <i nz-icon nzType="bank" nzTheme="outline"></i>
+        <strong>Bancolombia</strong>
+      </div>
+      <div class="bancolombia-icon">
+        <i nz-icon nzType="bank" nzTheme="fill" style="font-size: 80px; color: #ffd700;"></i>
+      </div>
+      <div class="metodo-dato">
+        <span>{{ info?.bancolombiaCuenta }}</span>
+        <button nz-button nzSize="small" nzType="text" (click)="copiarAlPortapapeles(info?.bancolombiaCuenta ?? '', 'Cuenta')">
+          <i nz-icon nzType="copy"></i>
+        </button>
+      </div>
+      <small>{{ info?.bancolombiaTipo }} &mdash; {{ info?.bancolombiaTitular }}</small>
+      <small *ngIf="info?.cedula">CC: {{ info?.cedula }}</small>
+    </div>
+  </div>
+
+  <!-- Paso 2: subir comprobante -->
+  <h4 class="paso-titulo">
+    <span class="paso-num">2</span> Sube el comprobante
+  </h4>
+
+  <div class="upload-area">
+    <input type="file" id="comprobante" accept="image/*,application/pdf" (change)="onArchivoSeleccionado($event)" hidden>
+    <label for="comprobante" class="upload-label">
+      <i nz-icon nzType="cloud-upload" nzTheme="outline"></i>
+      <span *ngIf="!comprobanteFileName">Selecciona la imagen o PDF del comprobante (max 5 MB)</span>
+      <span *ngIf="comprobanteFileName" class="file-selected">
+        <i nz-icon nzType="check-circle" nzTheme="fill"></i> {{ comprobanteFileName }}
+      </span>
+    </label>
+  </div>
+
+  <!-- Paso 3: referencia y enviar -->
+  <h4 class="paso-titulo">
+    <span class="paso-num">3</span> Referencia del pago
+  </h4>
+
+  <div class="form-row">
+    <label>Numero de transaccion / referencia <span class="req">*</span></label>
+    <input nz-input placeholder="Ej: 123456789 o referencia del banco"
+           [(ngModel)]="referenciaPago" maxlength="100">
+  </div>
+
+  <div class="form-row">
+    <label>Notas (opcional)</label>
+    <textarea nz-input rows="2" placeholder="Cualquier informacion adicional..."
+              [(ngModel)]="notas" maxlength="500"></textarea>
+  </div>
+
+  <!-- Acciones -->
+  <div class="acciones">
+    <button nz-button nzType="default" (click)="cancelar()" [disabled]="enviando">
+      Cancelar
+    </button>
+    <button nz-button nzType="primary" (click)="enviar()" [nzLoading]="enviando" [disabled]="!referenciaPago.trim()">
+      <i nz-icon nzType="send" nzTheme="outline"></i>
+      Enviar solicitud
+    </button>
+  </div>
+</div>
+
+<div *ngIf="cargando" class="loading">Cargando datos de pago...</div>

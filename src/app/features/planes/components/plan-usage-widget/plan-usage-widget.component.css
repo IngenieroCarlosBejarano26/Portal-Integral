@@ -85,3 +85,18 @@
   border-radius: 8px;
   font-weight: 500;
 }
+
+.trial-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  border-left: 4px solid #f59e0b;
+}
+.trial-banner i { font-size: 18px; color: #d97706; }
+

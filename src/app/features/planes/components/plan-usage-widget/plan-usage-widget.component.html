@@ -7,6 +7,15 @@
     <nz-tag *ngIf="plan" [nzColor]="'gold'">{{ plan.planNombre }}</nz-tag>
   </div>
 
+  <!-- Banner de trial activo -->
+  <div *ngIf="plan?.esTrial && plan?.diasRestantesTrial != null" class="trial-banner">
+    <i nz-icon nzType="gift" nzTheme="outline"></i>
+    <span>
+      <strong>Trial Pro activo</strong> &mdash;
+      {{ plan?.diasRestantesTrial }} {{ (plan?.diasRestantesTrial || 0) === 1 ? 'dia restante' : 'dias restantes' }}
+    </span>
+  </div>
+
   <div *ngIf="loading" class="loading">Cargando plan…</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 

@@ -28,6 +28,11 @@ export interface PlanTenant {
   fechaInicioPlan?: string | null;
   fechaFinPlan?: string | null;
 
+  /** True si el tenant esta en periodo de trial gratuito. */
+  esTrial?: boolean;
+  /** Dias restantes del trial (NULL si no esta en trial). */
+  diasRestantesTrial?: number | null;
+
   // % de uso (calculado en backend, null si limite es null = ilimitado)
   porcentajeClientes?: number | null;
   porcentajeValeras?: number | null;

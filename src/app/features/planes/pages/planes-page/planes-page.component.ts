@@ -9,11 +9,13 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { forkJoin } from 'rxjs';
 import { PlanService, PlanCatalogo, PlanTenant } from '../../services/plan.service';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { UsdCopPipe } from '../../../../shared/pipes/usd-cop.pipe';
+import { CurrencyService } from '../../../../core/services/currency/currency.service';
 
 @Component({
   selector: 'app-planes-page',
   standalone: true,
-  imports: [CommonModule, NzCardModule, NzButtonModule, NzIconModule, NzTagModule, HasPermissionDirective],
+  imports: [CommonModule, NzCardModule, NzButtonModule, NzIconModule, NzTagModule, HasPermissionDirective, UsdCopPipe],
   templateUrl: './planes-page.component.html',
   styleUrl: './planes-page.component.css'
 })
@@ -21,6 +23,7 @@ export class PlanesPageComponent implements OnInit {
   private planService = inject(PlanService);
   private modal = inject(NzModalService);
   private notification = inject(NzNotificationService);
+  private currency = inject(CurrencyService);
 
   catalogo: PlanCatalogo[] = [];
   miPlan: PlanTenant | null = null;
@@ -63,7 +66,9 @@ export class PlanesPageComponent implements OnInit {
 
     this.modal.confirm({
       nzTitle: `Cambiar al plan ${plan.nombre}?`,
-      nzContent: `Tu suscripcion sera actualizada inmediatamente al plan ${plan.nombre} (USD $${plan.precioMensualUSD}/mes). Si reduces el plan y excedes los nuevos limites, el cambio sera bloqueado.`,
+      nzContent: `Tu suscripcion sera actualizada inmediatamente al plan ${plan.nombre} ` +
+                 `(USD $${plan.precioMensualUSD} ~ COP $${Math.round(this.currency.toCop(plan.precioMensualUSD)).toLocaleString('es-CO')}/mes). ` +
+                 `Si reduces el plan y excedes los nuevos limites, el cambio sera bloqueado.`,
       nzOkText: 'Si, cambiar',
       nzCancelText: 'Cancelar',
       nzOnOk: () => {

@@ -26,6 +26,7 @@
       <div class="precio">
         <span class="precio-valor">USD ${{ plan.precioMensualUSD }}</span>
         <span class="precio-periodo">/ mes</span>
+        <div class="precio-cop">~ {{ plan.precioMensualUSD | usdCop:'cop-only' }}</div>
       </div>
 
       <ul class="features">

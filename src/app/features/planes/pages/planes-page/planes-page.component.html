@@ -47,11 +47,17 @@
         nz-button
         nzType="primary"
         nzBlock
+        *appHasPermission="'planes:update'"
         [disabled]="esPlanActual(plan.planId) || cambiando === plan.planId"
         [nzLoading]="cambiando === plan.planId"
         (click)="cambiarPlan(plan)">
         {{ esPlanActual(plan.planId) ? 'Plan actual' : 'Seleccionar' }}
       </button>
+
+      <!-- Mensaje informativo cuando NO tiene permiso de cambiar -->
+      <div *ngIf="esPlanActual(plan.planId)" class="plan-actual-tag-mobile">
+        <nz-tag nzColor="green">Plan actual</nz-tag>
+      </div>
     </nz-card>
   </div>
 </div>

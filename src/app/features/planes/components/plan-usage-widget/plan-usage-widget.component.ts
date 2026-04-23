@@ -10,6 +10,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { PlanService, PlanTenant } from '../../services/plan.service';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 interface UsoItem {
   label: string;
@@ -30,7 +31,7 @@ interface UsoItem {
 @Component({
   selector: 'app-plan-usage-widget',
   standalone: true,
-  imports: [CommonModule, NzCardModule, NzProgressModule, NzButtonModule, NzIconModule, NzTagModule],
+  imports: [CommonModule, NzCardModule, NzProgressModule, NzButtonModule, NzIconModule, NzTagModule, HasPermissionDirective],
   templateUrl: './plan-usage-widget.component.html',
   styleUrl: './plan-usage-widget.component.css'
 })

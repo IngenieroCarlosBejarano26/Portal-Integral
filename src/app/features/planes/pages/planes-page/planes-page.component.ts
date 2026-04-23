@@ -8,11 +8,12 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { forkJoin } from 'rxjs';
 import { PlanService, PlanCatalogo, PlanTenant } from '../../services/plan.service';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-planes-page',
   standalone: true,
-  imports: [CommonModule, NzCardModule, NzButtonModule, NzIconModule, NzTagModule],
+  imports: [CommonModule, NzCardModule, NzButtonModule, NzIconModule, NzTagModule, HasPermissionDirective],
   templateUrl: './planes-page.component.html',
   styleUrl: './planes-page.component.css'
 })

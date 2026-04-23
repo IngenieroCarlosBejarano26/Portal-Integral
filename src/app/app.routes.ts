@@ -44,7 +44,7 @@ export const routes: Routes = [
         loadChildren: () => import('./features/permisos/permisos.routes').then((m) => m.PERMISOS_ROUTES) },
       { path: 'configuracion-email', canActivate: [permissionGuard], data: { permission: 'configuracion-email:view' },
         loadChildren: () => import('./features/configuracion-email/configuracion-email.routes').then((m) => m.CONFIGURACION_EMAIL_ROUTES) },
-      { path: 'planes',
+      { path: 'planes', canActivate: [permissionGuard], data: { permission: 'planes:view' },
         loadChildren: () => import('./features/planes/planes.routes').then((m) => m.PLANES_ROUTES) },
       { path: 'perfil', loadChildren: () => import('./features/perfil/perfil.routes').then((m) => m.PERFIL_ROUTES) },
     ]

@@ -210,8 +210,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'Consumos',  icon: 'bar-chart',     path: '/consumos',  permission: 'consumos:view'  },
       { label: 'Permisos',  icon: 'safety-certificate', path: '/permisos', permission: 'permisos:view' },
       { label: 'Conf. Correo', icon: 'mail', path: '/configuracion-email', permission: 'configuracion-email:view' },
-      // Sin permiso requerido: cualquier usuario autenticado puede ver/cambiar el plan de su tenant.
-      { label: 'Mi Plan',   icon: 'crown',         path: '/planes' }
+      { label: 'Mi Plan',   icon: 'crown',         path: '/planes',    permission: 'planes:view' }
     ];
 
     // Si no hay permiso definido o el usuario lo tiene, se muestra.

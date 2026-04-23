@@ -35,7 +35,8 @@
       </div>
     </div>
 
-    <button nz-button nzType="primary" nzBlock (click)="irAUpgrade()" class="upgrade-btn">
+    <button nz-button nzType="primary" nzBlock (click)="irAUpgrade()" class="upgrade-btn"
+            *appHasPermission="'planes:update'">
       <i nz-icon nzType="rocket" nzTheme="outline"></i>
       Cambiar de plan
     </button>

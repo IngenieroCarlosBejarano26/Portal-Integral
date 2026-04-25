@@ -700,3 +700,60 @@ nz-header.header {
 
   
 }
+
+/* ============================================
+   PLAN BANNER (vencimiento sticky)
+   ============================================ */
+.plan-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.plan-banner--warning {
+  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border-left: 4px solid #f59e0b;
+}
+
+.plan-banner--danger {
+  background: linear-gradient(90deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+
+.plan-banner-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.plan-banner--warning .plan-banner-icon { color: #d97706; }
+.plan-banner--danger  .plan-banner-icon { color: #dc2626; }
+
+.plan-banner-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.plan-banner-cta {
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .plan-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+  }
+  .plan-banner-cta {
+    align-self: stretch;
+  }
+}

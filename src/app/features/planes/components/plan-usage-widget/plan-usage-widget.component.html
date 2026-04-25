@@ -22,6 +22,16 @@
   <ng-container *ngIf="!loading && !error && plan">
     <p class="plan-desc" *ngIf="plan.planDescripcion">{{ plan.planDescripcion }}</p>
 
+    <!-- Vigencia: muestra fecha fin + tag de estado (Activo / Por vencer / EnGracia / Vencido). -->
+    <div *ngIf="plan.fechaFinPlan && !plan.esTrial" class="vigencia-row">
+      <div class="vigencia-info">
+        <i nz-icon nzType="calendar" nzTheme="outline"></i>
+        <span class="vigencia-label">Vigente hasta</span>
+        <span class="vigencia-fecha">{{ plan.fechaFinPlan | date:'yyyy-MM-dd' }}</span>
+      </div>
+      <nz-tag [nzColor]="vigenciaTag.color">{{ vigenciaTag.label }}</nz-tag>
+    </div>
+
     <div class="uso-list">
       <div class="uso-item" *ngFor="let u of usos">
         <div class="uso-row">

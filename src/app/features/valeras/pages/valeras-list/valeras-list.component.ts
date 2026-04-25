@@ -27,6 +27,8 @@ import { RealtimeService } from '../../../../core/services/realtime/realtime.ser
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
 import { AuthService } from '../../../../core/services/auth/authService';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { PlanService } from '../../../planes/services/plan.service';
 
 @Component({
   selector: 'app-valeras-list',
@@ -37,6 +39,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
     NzButtonModule,
     NzIconModule,
     NzInputModule,
+    NzToolTipModule,
     CardGridComponent,
     HasPermissionDirective,
   ],
@@ -51,7 +54,11 @@ export class ValerasListComponent implements OnInit, OnDestroy {
   private notification = inject(NzNotificationService);
   private realtime = inject(RealtimeService);
   private authService = inject(AuthService);
+  private planService = inject(PlanService);
   private destroy$ = new Subject<void>();
+
+  /** True si el plan del tenant esta vencido => bloqueo de creacion. */
+  planVencido = false;
 
   valeras: Valera[] = [];
   filteredValeras: Valera[] = [];
@@ -181,6 +188,11 @@ export class ValerasListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadAll();
+
+    // Estado de vigencia del plan: bloquea boton "Nueva Valera" si esta vencido.
+    this.planService.plan$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(p => this.planVencido = p?.estadoPlan === 'Vencido');
 
     const reloadAll = () => this.loadAll();
     this.realtime

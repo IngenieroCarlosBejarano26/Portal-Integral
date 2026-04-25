@@ -100,3 +100,34 @@
 }
 .trial-banner i { font-size: 18px; color: #d97706; }
 
+.vigencia-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  border-left: 3px solid #6366f1;
+}
+
+.vigencia-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.vigencia-info i { color: #6366f1; font-size: 16px; }
+
+.vigencia-label {
+  color: #6b7280;
+}
+
+.vigencia-fecha {
+  font-weight: 600;
+  color: #1f2937;
+}
+

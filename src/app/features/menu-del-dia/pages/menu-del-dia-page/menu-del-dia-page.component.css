@@ -125,6 +125,56 @@
   color: #0f172a;
 }
 
+.ph-inline--mini {
+  font-size: 0.7rem;
+  padding: 1px 5px;
+}
+
+.vista-bloque {
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vista-eti {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.vista-radios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.asistente {
+  margin-top: 4px;
+  padding: 16px 16px 4px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.asistente-intro {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.asistente .field--last {
+  margin-bottom: 0;
+}
+
 .field {
   margin-bottom: 16px;
 }

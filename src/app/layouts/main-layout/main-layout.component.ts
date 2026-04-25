@@ -64,7 +64,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCurrentUser();
-    this.loadOrganizationName();
     this.initializeMenuItems();
     this.realtime.connect();
     this.subscribeToPermissionChanges();
@@ -258,11 +257,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     } catch {
       /* token mal formado: mantener fallback */
     }
-  }
-
-  private loadOrganizationName(): void {
-    // Mantenido por compatibilidad: ya cubierto por applyOrganizationName().
-    this.applyOrganizationName(this.currentUser);
   }
 
   private initializeMenuItems(): void {

@@ -325,7 +325,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       },
       {
         id: 'comunicacion',
-        label: 'Correo y comunicación',
+        label: 'Comunicación',
         icon: 'mail',
         children: [
           { label: 'Config. de correo', icon: 'setting', path: '/configuracion-email', permission: 'configuracion-email:view' },

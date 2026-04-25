@@ -193,17 +193,57 @@ export class FormModalComponent implements OnInit {
     return index;
   }
 
-  /** Formatea un número como pesos colombianos (sin decimales). */
+  /**
+   * Formatea monto (es-CO) mientras se edita: miles y hasta 2 decimales
+   * sin esperar a perder el foco.
+   */
   readonly currencyFormatter = (value: number | null | undefined): string => {
     if (value === null || value === undefined || isNaN(value as number)) return '';
-    return '$ ' + Number(value).toLocaleString('es-CO');
+    return (
+      '$ ' +
+      Number(value).toLocaleString('es-CO', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      })
+    );
   };
 
-  /** Quita el formato de moneda y devuelve el número plano para el FormControl. */
+  /**
+   * Interpreta el texto (es-CO: $, . miles, , decimales). Devuelve NaN mientras
+   * el valor es claramente incompleto, para no pisar el tecleo; así nz-input-number
+   * mantiene el display y al completar/continuar aplica el formato al instante.
+   */
   readonly currencyParser = (value: string): number => {
-    const digits = (value || '').replace(/[^\d]/g, '');
-    return digits ? Number(digits) : 0;
+    return this.parseColombiaCurrencyToNumber(value);
   };
+
+  /**
+   * Convierte cadena tecleada o ya formateada a número.
+   * NaN = dejar el valor mostrado tal cual (número incompleto o inválido).
+   */
+  private parseColombiaCurrencyToNumber(raw: string): number {
+    if (raw == null) return Number.NaN;
+    let s = raw.replace(/[$\s\u00A0]/g, '').trim();
+    if (s === '' || s === ',') return Number.NaN;
+    if (/,$/.test(s)) return Number.NaN; // p.ej. "1.234," aún no cerró decimales
+
+    const lastComma = s.lastIndexOf(',');
+    if (lastComma >= 0) {
+      const after = s.slice(lastComma + 1);
+      if (after.length > 2) return Number.NaN;
+      if (after.length === 0) return Number.NaN;
+      if (!/^\d+$/.test(after)) return Number.NaN;
+      const intPart = s.slice(0, lastComma).replace(/\./g, '');
+      const n = parseFloat((intPart || '0') + '.' + after);
+      return Number.isNaN(n) ? Number.NaN : n;
+    }
+
+    s = s.replace(/\./g, '');
+    if (s === '') return Number.NaN;
+    if (!/^\d+$/.test(s)) return Number.NaN;
+    const n = parseInt(s, 10);
+    return Number.isNaN(n) ? Number.NaN : n;
+  }
 
   /** Devuelve disabledDate para nz-date-picker (hoy mínimo, no antes de otro campo). */
   getDisabledDateFor(field: FormField): (d: Date) => boolean {

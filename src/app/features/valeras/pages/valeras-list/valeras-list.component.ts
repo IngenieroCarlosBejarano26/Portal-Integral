@@ -199,8 +199,7 @@ export class ValerasListComponent implements OnInit, OnDestroy {
       required: true,
       span: 12,
       min: 1,
-      max: 100_000_000,
-      hint: 'Máximo 100 millones.',
+      max: 100_000_000,  
       errorMessages: {
         required: 'El precio pagado es obligatorio.',
         min: 'Debe ser mayor a 0.',

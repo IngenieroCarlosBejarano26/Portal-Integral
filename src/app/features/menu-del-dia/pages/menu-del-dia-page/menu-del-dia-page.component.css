@@ -73,6 +73,32 @@
 :host ::ng-deep .mb-alert.ant-alert {
   width: 100%;
   max-width: none;
+  /* Fondo oscuro: títulos (message) en blanco, legible con icono */
+  background: linear-gradient(125deg, #0f766e 0%, #0d9488 42%, #14b8a6 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px -6px rgba(13, 148, 136, 0.35);
+}
+
+:host ::ng-deep .mb-alert.ant-alert-warning {
+  /* Misma base inversa; matices ámbar solo en el borde izquierdo si hace falta */
+  background: linear-gradient(125deg, #92400e 0%, #b45309 48%, #d97706 100%) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 24px -6px rgba(180, 83, 9, 0.4);
+}
+
+:host ::ng-deep .mb-alert .ant-alert-message {
+  color: #fff !important;
+  font-weight: 600;
+}
+
+:host ::ng-deep .mb-alert .ant-alert-description {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+:host ::ng-deep .mb-alert .ant-alert-icon,
+:host ::ng-deep .mb-alert .ant-alert-icon .anticon {
+  color: #fff !important;
 }
 
 .layout-grid {

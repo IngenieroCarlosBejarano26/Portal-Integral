@@ -55,7 +55,35 @@ export class PagosPendientesPageComponent implements OnInit, OnDestroy {
       this.notification.warning('Sin comprobante', 'Esta solicitud no tiene archivo adjunto.');
       return;
     }
-    window.open(this.pagoService.comprobanteUrl(s.solicitudId), '_blank');
+
+    // No usamos window.open(url) porque el endpoint requiere JWT/X-Api-Key
+    // y window.open NO inyecta headers. Descargamos el blob via HttpClient
+    // (que pasa por el interceptor con auth) y lo abrimos como object URL.
+    this.procesando = s.solicitudId;
+    this.pagoService.descargarComprobante(s.solicitudId).subscribe({
+      next: (blob) => {
+        this.procesando = null;
+        const url = URL.createObjectURL(blob);
+        const tab = window.open(url, '_blank');
+        if (!tab) {
+          // Pop-up bloqueado: forzamos descarga como fallback.
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = s.comprobanteFileName ?? 'comprobante';
+          a.click();
+        }
+        // Liberamos el object URL despues de un rato (suficiente para que el navegador lo lea).
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (err) => {
+        this.procesando = null;
+        const msg = err?.error?.message
+          ?? (err?.status === 401 ? 'Tu sesion expiro. Vuelve a iniciar sesion.' : null)
+          ?? (err?.status === 404 ? 'El comprobante no existe o no esta disponible.' : null)
+          ?? 'No se pudo descargar el comprobante.';
+        this.notification.error('Error al ver comprobante', msg);
+      }
+    });
   }
 
   aprobar(s: SolicitudPagoManual): void {

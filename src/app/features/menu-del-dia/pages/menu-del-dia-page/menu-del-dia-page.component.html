@@ -1,0 +1,59 @@
+<div class="menu-page">
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Menú del día</h1>
+      <p>
+        Envía un correo HTML a <strong>todos los clientes activos</strong> que tengan email.
+        Usa <code class="ph" ngNonBindable>{{NombreCliente}}</code> para personalizar el saludo.
+      </p>
+    </div>
+  </div>
+
+  <nz-alert
+    *ngIf="!comprobandoSmtp && !smtpListo"
+    nzType="warning"
+    nzShowIcon
+    nzMessage="Configura primero el correo (SMTP)"
+    nzDescription="Ve a Configuración de correo y guarda un servidor SMTP activo antes de enviar."
+    class="mb-alert"
+  ></nz-alert>
+
+  <div class="layout-grid">
+    <nz-card nzTitle="Redactar mensaje" class="card-form">
+      <div class="field">
+        <label>Asunto</label>
+        <input nz-input [(ngModel)]="asunto" placeholder="Menú del día — 25 de abril" />
+      </div>
+      <div class="field">
+        <label>Cuerpo HTML</label>
+        <textarea
+          nz-input
+          [nzAutosize]="{ minRows: 16, maxRows: 28 }"
+          [(ngModel)]="cuerpoHtml"
+          class="html-area"
+        ></textarea>
+      </div>
+      <div class="actions">
+        <button
+          nz-button
+          nzType="primary"
+          nzSize="large"
+          [nzLoading]="enviando"
+          [disabled]="comprobandoSmtp || !smtpListo"
+          (click)="confirmarYEnviar()"
+        >
+          <i nz-icon nzType="send" nzTheme="outline"></i>
+          Enviar a todos los clientes
+        </button>
+      </div>
+    </nz-card>
+
+    <nz-card nzTitle="Último envío" class="card-stats" *ngIf="ultimo">
+      <div class="stats-row">
+        <nz-statistic [nzValue]="ultimo.destinatarios" nzTitle="Con email"></nz-statistic>
+        <nz-statistic [nzValue]="ultimo.enviados" nzTitle="Enviados" [nzValueStyle]="{ color: '#10b981' }"></nz-statistic>
+        <nz-statistic [nzValue]="ultimo.fallidos" nzTitle="Fallidos" [nzValueStyle]="{ color: '#ef4444' }"></nz-statistic>
+      </div>
+    </nz-card>
+  </div>
+</div>

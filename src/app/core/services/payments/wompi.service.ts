@@ -62,6 +62,29 @@ declare global {
 
 const WIDGET_SRC = 'https://checkout.wompi.co/widget.js';
 
+/** Espera a que el script de Wompi exponga `WidgetCheckout` (p. ej. tag ya cargado antes). */
+function pollWidgetReady(maxMs: number, intervalMs: number): Promise<void> {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const tick = (): void => {
+      if (window.WidgetCheckout) {
+        resolve();
+        return;
+      }
+      if (Date.now() - start >= maxMs) {
+        reject(
+          new Error(
+            'El script de Wompi cargo pero no expone WidgetCheckout. Comprueba bloqueos (adblock), red o que https://checkout.wompi.co este accesible.'
+          )
+        );
+        return;
+      }
+      setTimeout(tick, intervalMs);
+    };
+    tick();
+  });
+}
+
 /**
  * Servicio cliente para Wompi. Encapsula:
  *  - Llamadas al backend (`/iniciar`, `/estado`).
@@ -76,7 +99,8 @@ const WIDGET_SRC = 'https://checkout.wompi.co/widget.js';
 export class WompiService {
   private http = inject(HttpClient);
   private base = environment.api!.baseUrl + '/api/pagos-wompi';
-  private widgetScriptLoaded?: Promise<void>;
+  /** Promesa de carga del script; se limpia si falla para permitir reintentar. */
+  private widgetScriptPromise: Promise<void> | null = null;
 
   /** Crea la solicitud y devuelve los parametros firmados para el widget. */
   iniciar(dto: IniciarPagoWompiDto): Observable<ApiResponse<IniciarPagoWompiResponse>> {
@@ -102,21 +126,43 @@ export class WompiService {
    * Resuelve cuando el usuario cierra el widget (con o sin pago).
    */
   async lanzarWidget(data: IniciarPagoWompiResponse): Promise<WompiWidgetResult> {
+    const publicKey = String(data.publicKey ?? '').trim();
+    const reference = String(data.reference ?? '').trim();
+    const sig = String(data.signatureIntegrity ?? '').trim();
+    const amountInCents = Math.round(Number(data.amountInCents));
+
+    if (!publicKey) {
+      throw new Error(
+        'Falta la clave publica de Wompi. Revisa en Azure (o appsettings) Wompi:PublicKey y que coincida con sandbox o produccion.'
+      );
+    }
+    if (!reference) {
+      throw new Error('Respuesta del servidor incompleta: falta la referencia del pago.');
+    }
+    if (!sig) {
+      throw new Error(
+        'Falta la firma de integridad. Revisa Wompi:IntegritySecret en el servidor (debe ser el secreto del panel de Wompi, no la llave privada).'
+      );
+    }
+    if (!Number.isFinite(amountInCents) || amountInCents < 1) {
+      throw new Error('Monto del pago invalido. Actualiza la pagina e intenta de nuevo.');
+    }
+
     await this.cargarWidgetScript();
 
     if (!window.WidgetCheckout) {
-      throw new Error('El widget de Wompi no se pudo cargar.');
+      throw new Error('El widget de Wompi no esta disponible tras cargar el script.');
     }
 
     return new Promise<WompiWidgetResult>((resolve, reject) => {
       try {
         const checkout = new window.WidgetCheckout({
           currency: data.currency || 'COP',
-          amountInCents: data.amountInCents,
-          reference: data.reference,
-          publicKey: data.publicKey,
-          signature: { integrity: data.signatureIntegrity },
-          redirectUrl: data.redirectUrl
+          amountInCents,
+          reference,
+          publicKey,
+          signature: { integrity: sig },
+          redirectUrl: data.redirectUrl?.trim() || undefined
         });
 
         checkout.open((result: WompiWidgetResult) => {
@@ -129,30 +175,42 @@ export class WompiService {
   }
 
   private cargarWidgetScript(): Promise<void> {
-    if (this.widgetScriptLoaded) return this.widgetScriptLoaded;
+    if (window.WidgetCheckout) {
+      return Promise.resolve();
+    }
 
-    this.widgetScriptLoaded = new Promise<void>((resolve, reject) => {
-      // Si por algun motivo ya esta cargado en el DOM, resolvemos.
-      if (window.WidgetCheckout) {
-        resolve();
-        return;
-      }
+    if (!this.widgetScriptPromise) {
+      this.widgetScriptPromise = this.loadWidgetScriptOnce().catch(err => {
+        this.widgetScriptPromise = null;
+        throw err;
+      });
+    }
+    return this.widgetScriptPromise;
+  }
 
-      const existing = document.querySelector<HTMLScriptElement>(`script[src="${WIDGET_SRC}"]`);
-      if (existing) {
-        existing.addEventListener('load', () => resolve());
-        existing.addEventListener('error', () => reject(new Error('No se pudo cargar el widget de Wompi.')));
-        return;
-      }
+  private async loadWidgetScriptOnce(): Promise<void> {
+    if (window.WidgetCheckout) return;
 
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${WIDGET_SRC}"]`);
+    if (existing) {
+      await pollWidgetReady(15000, 50);
+      return;
+    }
+
+    await new Promise<void>((resolve, reject) => {
       const script = document.createElement('script');
       script.src = WIDGET_SRC;
       script.async = true;
       script.onload = () => resolve();
-      script.onerror = () => reject(new Error('No se pudo cargar el widget de Wompi.'));
+      script.onerror = () =>
+        reject(
+          new Error(
+            'No se pudo descargar https://checkout.wompi.co/widget.js. Revisa conexion, firewall o extensiones que bloqueen scripts.'
+          )
+        );
       document.head.appendChild(script);
     });
 
-    return this.widgetScriptLoaded;
+    await pollWidgetReady(15000, 50);
   }
 }

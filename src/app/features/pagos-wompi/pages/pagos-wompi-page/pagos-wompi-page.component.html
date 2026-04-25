@@ -1,28 +1,30 @@
 <div class="page">
-  <div class="header">
-    <div class="header-text">
-      <h2>
-        <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
-        Pagos en línea
-      </h2>
-      <p>
-        Activa o renueva tu plan al instante con tarjeta, PSE, Nequi o Bancolombia QR.
-        Aquí puedes ver el historial y el estado de cada pago.
-      </p>
-    </div>
-
-    <div class="header-actions">
-      <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading">
-        <i nz-icon nzType="reload" nzTheme="outline"></i>
-        Refrescar
-      </button>
-      <button nz-button nzType="primary" (click)="abrirSeleccionPlan()">
-        <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
-        Pagar plan ahora
-      </button>
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <h2>
+          <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
+          Pagos en línea
+        </h2>
+        <p>
+          Activa o renueva tu plan al instante con tarjeta, PSE, Nequi o Bancolombia QR.
+          Aquí puedes ver el historial y el estado de cada pago.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading" class="btn-hero">
+          <i nz-icon nzType="reload" nzTheme="outline"></i>
+          Refrescar
+        </button>
+        <button nz-button nzType="primary" (click)="abrirSeleccionPlan()" class="btn-hero primary">
+          <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
+          Pagar plan ahora
+        </button>
+      </div>
     </div>
   </div>
 
+  <div class="table-wrap">
   <nz-table #tabla
             [nzData]="pagos"
             [nzLoading]="loading"
@@ -86,6 +88,7 @@
       </tr>
     </tbody>
   </nz-table>
+  </div>
 
   <p class="footnote">
     <i nz-icon nzType="safety-certificate" nzTheme="outline"></i>

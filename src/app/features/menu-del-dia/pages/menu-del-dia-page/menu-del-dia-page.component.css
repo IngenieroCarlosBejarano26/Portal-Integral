@@ -1,0 +1,85 @@
+.menu-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.hero {
+  margin-bottom: 24px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background: linear-gradient(125deg, #059669 0%, #10b981 40%, #34d399 100%);
+  color: #fff;
+  box-shadow: 0 12px 36px rgba(5, 150, 105, 0.35);
+}
+
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 1.65rem;
+  font-weight: 700;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 720px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  opacity: 0.95;
+}
+
+.hero .ph {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.mb-alert {
+  margin-bottom: 20px;
+}
+
+.layout-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.card-form,
+.card-stats {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.html-area {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.actions {
+  margin-top: 8px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 900px) {
+  .layout-grid {
+    grid-template-columns: 1fr 280px;
+    align-items: start;
+  }
+}

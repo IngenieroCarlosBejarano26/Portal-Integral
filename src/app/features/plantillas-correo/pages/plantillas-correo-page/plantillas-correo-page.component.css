@@ -1,0 +1,88 @@
+.plantillas-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #818cf8 100%);
+  color: #fff;
+  box-shadow: 0 12px 40px rgba(79, 70, 229, 0.35);
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 640px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+.hero .ph {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.hint-alert {
+  margin-bottom: 20px;
+}
+
+.table-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.acciones {
+  white-space: nowrap;
+  width: 140px;
+}
+
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: #6b7280;
+}
+
+.empty i {
+  font-size: 40px;
+  color: #c7d2fe;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.modal-form .lbl {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin: 12px 0 6px;
+}
+
+.modal-form .lbl:first-child {
+  margin-top: 0;
+}
+
+.html-area {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}

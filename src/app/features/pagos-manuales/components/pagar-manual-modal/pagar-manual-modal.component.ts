@@ -179,12 +179,19 @@ export class PagarManualModalComponent implements OnInit, OnDestroy {
   // FLUJO WOMPI
   // ============================================================================
 
+  /** Texto legible para fallos del script o del constructor del widget de Wompi. */
+  private mensajeErrorWidget(err: unknown): string {
+    if (err instanceof Error && err.message?.trim()) return err.message;
+    if (typeof err === 'string' && err.trim()) return err;
+    return 'Error abriendo el widget. Si persiste, revisa bloqueo de red, llaves Wompi (sandbox vs produccion) y la firma de integridad en el servidor.';
+  }
+
   private async abrirWidget(): Promise<void> {
     if (!this.wompiData) return;
     try {
       await this.wompiService.lanzarWidget(this.wompiData);
-    } catch (err) {
-      this.wompiError = (err as Error)?.message ?? 'Error abriendo el widget.';
+    } catch (err: unknown) {
+      this.wompiError = this.mensajeErrorWidget(err);
       return;
     }
 

@@ -112,7 +112,16 @@ export class PerfilComponent implements OnInit {
   changePassword(): void {
     const fields: FormField[] = [
       { key: 'actual', label: 'Contraseña actual', type: 'password', required: true },
-      { key: 'nueva', label: 'Nueva contraseña', type: 'password', required: true, span: 12 },
+      {
+        key: 'nueva',
+        label: 'Nueva contraseña',
+        type: 'password',
+        required: true,
+        minLength: 8,
+        span: 12,
+        hint: 'Mínimo 8 caracteres.',
+        errorMessages: { minlength: 'La nueva contraseña debe tener al menos 8 caracteres.' }
+      },
       { key: 'confirmar', label: 'Confirmar contraseña', type: 'password', required: true, span: 12 }
     ];
 
@@ -129,7 +138,21 @@ export class PerfilComponent implements OnInit {
         this.notification.error('Error', 'Las contraseñas no coinciden');
         return;
       }
-      this.notification.info('Pendiente', 'El cambio de contraseña estará disponible pronto');
+      this.authService
+        .cambiarContrasena({ passwordActual: result.actual, passwordNueva: result.nueva })
+        .subscribe({
+          next: (res) => {
+            if (res.success) {
+              this.notification.success('Contraseña actualizada', res.message || 'Puedes seguir usando el portal con normalidad.');
+            } else {
+              this.notification.error('No se pudo cambiar', res.message || 'Revisa la contraseña actual.');
+            }
+          },
+          error: (err) => {
+            const msg = err?.error?.message || err?.message || 'Error de conexión.';
+            this.notification.error('Error', msg);
+          }
+        });
     });
   }
 

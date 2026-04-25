@@ -122,7 +122,11 @@ export class ConsumusListComponent implements OnInit, OnDestroy {
         : 'Cliente desconocido',
       clienteDocumento: cliente?.documento ?? '—',
       fechaConsumoFormateada: c.fechaConsumo
-        ? new Date(c.fechaConsumo).toLocaleString('es-CO')
+        ? new Date(c.fechaConsumo).toLocaleString('es-CO', {
+            timeZone: 'America/Bogota',
+            dateStyle: 'short',
+            timeStyle: 'short'
+          })
         : 'Sin fecha'
     };
   }

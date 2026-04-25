@@ -1,14 +1,17 @@
 <div class="page">
-  <div class="header">
-    <div>
-      <h2><i nz-icon nzType="dollar" nzTheme="outline"></i> Solicitudes de pago pendientes</h2>
-      <p>Revisa las transferencias enviadas por los tenants y aprueba o rechaza.</p>
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <h2><i nz-icon nzType="dollar" nzTheme="outline"></i> Solicitudes de pago pendientes</h2>
+        <p>Revisa las transferencias enviadas por los tenants y aprueba o rechaza.</p>
+      </div>
+      <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading" class="btn-hero">
+        <i nz-icon nzType="reload"></i> Refrescar
+      </button>
     </div>
-    <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading">
-      <i nz-icon nzType="reload"></i> Refrescar
-    </button>
   </div>
 
+  <div class="table-wrap">
   <nz-table #tabla [nzData]="solicitudes" [nzLoading]="loading" nzSize="middle" [nzPageSize]="20">
     <thead>
       <tr>
@@ -60,4 +63,5 @@
       </tr>
     </tbody>
   </nz-table>
+  </div>
 </div>

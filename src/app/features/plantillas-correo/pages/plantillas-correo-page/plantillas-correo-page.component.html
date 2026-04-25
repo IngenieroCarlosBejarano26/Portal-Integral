@@ -1,0 +1,89 @@
+<div class="plantillas-page">
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Plantillas de correo</h1>
+      <p>
+        Personaliza los textos HTML que usa el sistema para correos al cliente.
+        Usa el placeholder <code class="ph" ngNonBindable>{{NombreCliente}}</code> donde quieras el nombre.
+      </p>
+    </div>
+    <button
+      nz-button
+      nzType="primary"
+      *appHasPermission="['configuracion-email:create', 'configuracion-email:update']"
+      (click)="abrirNueva()">
+      <i nz-icon nzType="plus" nzTheme="outline"></i>
+      Nueva plantilla
+    </button>
+  </div>
+
+  <nz-alert
+    nzType="info"
+    nzShowIcon
+    nzMessage="Códigos sugeridos"
+    nzDescription="Ejemplos: menu-del-dia, consumo-valera (notificación al cliente al registrar un consumo; en el HTML use los placeholders con doble llave: NombreCliente, FechaHora, ResumenAlmuerzos, CodigoValera, AlmuerzosUsados, etc.). El código no debería cambiar una vez en uso."
+    class="hint-alert"
+  ></nz-alert>
+
+  <nz-spin [nzSpinning]="loading">
+    <div class="table-card">
+      <nz-table [nzData]="plantillas" nzSize="middle" [nzPageSize]="10" [nzShowPagination]="plantillas.length > 10">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Asunto</th>
+            <th class="acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of plantillas">
+            <td><nz-tag nzColor="geekblue">{{ p.codigo }}</nz-tag></td>
+            <td>{{ p.asunto }}</td>
+            <td class="acciones">
+              <button nz-button nzType="default" nzSize="small" (click)="abrirEditar(p)">
+                <i nz-icon nzType="edit" nzTheme="outline"></i>
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <div *ngIf="!loading && plantillas.length === 0" class="empty">
+        <i nz-icon nzType="mail" nzTheme="outline"></i>
+        <p>Aún no hay plantillas guardadas. Crea una con el botón superior.</p>
+      </div>
+    </div>
+  </nz-spin>
+</div>
+
+<nz-modal
+  [(nzVisible)]="modalVisible"
+  [nzTitle]="isNew ? 'Nueva plantilla' : 'Editar plantilla'"
+  (nzOnCancel)="cerrarModal()"
+  [nzOkLoading]="saving"
+  [nzOkDisabled]="!puedeGuardar()"
+  (nzOnOk)="guardar()"
+  nzWidth="800px"
+  nzOkText="Guardar"
+>
+  <ng-container *nzModalContent>
+    <div class="modal-form">
+      <label class="lbl">Código (único)</label>
+      <input
+        nz-input
+        [(ngModel)]="editCodigo"
+        placeholder="menu-del-dia"
+        [disabled]="!isNew"
+      />
+      <label class="lbl">Asunto</label>
+      <input nz-input [(ngModel)]="editAsunto" placeholder="Asunto del correo" />
+      <label class="lbl">Cuerpo HTML</label>
+      <textarea
+        nz-input
+        [nzAutosize]="{ minRows: 14, maxRows: 24 }"
+        [(ngModel)]="editCuerpo"
+        class="html-area"
+      ></textarea>
+    </div>
+  </ng-container>
+</nz-modal>

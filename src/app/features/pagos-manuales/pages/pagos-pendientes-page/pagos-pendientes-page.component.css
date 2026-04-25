@@ -1,14 +1,55 @@
 .page { padding: 24px; max-width: 1400px; margin: 0 auto; }
-.header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 20px;
+
+.hero {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background: linear-gradient(125deg, #0f766e 0%, #0d9488 45%, #14b8a6 100%);
+  color: #fff;
+  box-shadow: 0 12px 36px rgba(13, 148, 136, 0.3);
+  overflow: hidden;
 }
-.header h2 {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 22px; margin: 0; color: #1f2937;
+.hero-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 28px 32px;
 }
-.header h2 i { color: #10b981; }
-.header p { color: #6b7280; font-size: 13px; margin: 4px 0 0; }
+.hero h2 {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.6rem; margin: 0; font-weight: 700; letter-spacing: -0.02em;
+  color: #fff;
+}
+.hero h2 i { color: #ccfbf1; font-size: 1.45rem; }
+.hero p {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.95rem; margin: 10px 0 0; max-width: 720px; line-height: 1.5;
+}
+.btn-hero.ant-btn-default {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.btn-hero.ant-btn-default:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.table-wrap {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 4px 4px 0;
+  overflow: hidden;
+}
+.table-wrap ::ng-deep .ant-table-thead > tr > th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
 
 .acciones-col { white-space: nowrap; display: flex; gap: 6px; }
 .usd { color: #6b7280; font-size: 11px; }

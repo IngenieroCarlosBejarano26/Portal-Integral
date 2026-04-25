@@ -227,6 +227,15 @@ export class AuthService {
    * Obtiene el total de usuarios del tenant actual via endpoint ligero
    * `GET /api/Auth/usuarios/{tenantId}/count` (sólo SELECT COUNT(*)).
    */
+  /**
+   * Cambia la contraseña del usuario autenticado (valida la contraseña actual).
+   * `POST /api/Auth/me/cambiar-contrasena`
+   */
+  cambiarContrasena(dto: { passwordActual: string; passwordNueva: string }): Observable<ApiResponse<boolean>> {
+    const url = `${environment.api!.baseUrl}/api/Auth/me/cambiar-contrasena`;
+    return this.http.post<ApiResponse<boolean>>(url, dto);
+  }
+
   getUsuariosCountByTenant(): Observable<number> {
     const token = this.getToken();
     if (!token) return of(0);

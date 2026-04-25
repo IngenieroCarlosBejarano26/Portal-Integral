@@ -6,6 +6,7 @@ import { map, tap } from 'rxjs/operators';
 export interface Valera {
   valeraID?: string;
   clienteID?: string;
+  descripcion?: string;
   fechaCompra?: string;
   fechaVencimiento?: string;
   totalAlmuerzos?: number;

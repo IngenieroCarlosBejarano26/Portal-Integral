@@ -52,6 +52,16 @@ export interface FormField {
   >>;
   /** Texto de ayuda mostrado bajo el campo (no es un error, es una pista). */
   hint?: string;
+
+  /** Fecha: deshabilitar días anteriores al inicio de hoy (hora local). */
+  disableDatesBeforeToday?: boolean;
+  /**
+   * Si `disableDatesBeforeToday` está activo: en `createOnly` la regla solo aplica al crear
+   * (útil para la fecha de compra al editar valeras antiguas).
+   */
+  minTodayMode?: 'always' | 'createOnly';
+  /** Fecha: no permitir selector anterior al valor de otro control de fecha (mismo día permitido). */
+  notBeforeField?: string;
 }
 
 export interface FormModalData {
@@ -194,6 +204,42 @@ export class FormModalComponent implements OnInit {
     const digits = (value || '').replace(/[^\d]/g, '');
     return digits ? Number(digits) : 0;
   };
+
+  /** Devuelve disabledDate para nz-date-picker (hoy mínimo, no antes de otro campo). */
+  getDisabledDateFor(field: FormField): (d: Date) => boolean {
+    const useMinToday =
+      field.disableDatesBeforeToday &&
+      (field.minTodayMode !== 'createOnly' || (this.data.mode ?? 'create') === 'create');
+    const otherKey = field.notBeforeField;
+
+    if (!useMinToday && !otherKey) return () => false;
+
+    return (current: Date): boolean => {
+      if (!current) return false;
+      const cur = this.startOfLocalDay(current);
+
+      if (useMinToday) {
+        const today = this.startOfLocalDay(new Date());
+        if (cur < today) return true;
+      }
+
+      if (otherKey) {
+        const otherVal = this.form?.get(otherKey)?.value as Date | string | null | undefined;
+        if (otherVal) {
+          const o = this.startOfLocalDay(
+            otherVal instanceof Date ? otherVal : new Date(otherVal),
+          );
+          if (!isNaN(o) && cur < o) return true;
+        }
+      }
+
+      return false;
+    };
+  }
+
+  private startOfLocalDay(d: Date): number {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
 
   cancel(): void {
     this.modalRef.close();

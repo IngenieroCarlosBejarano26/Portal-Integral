@@ -60,7 +60,7 @@ export class ConsumusListComponent implements OnInit, OnDestroy {
       { key: 'clienteDocumento', label: 'Documento', icon: 'idcard',
         format: (v) => v || '—' },
       { key: 'observaciones', label: 'Observaciones', icon: 'snippets',
-        format: (v) => v || 'Consumo desde el sistema' }
+        format: (v) => v || 'Registrado desde el sistema' }
     ]
   };
 

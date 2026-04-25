@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzModalRef, NZ_MODAL_DATA } from 'ng-zorro-antd/modal';
@@ -7,11 +7,35 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { Subscription, interval, merge } from 'rxjs';
+import { switchMap, takeWhile } from 'rxjs/operators';
 import { PagoManualService, InfoPagoPublica, MetodoPago } from '../../services/pago-manual.service';
 import { CurrencyService } from '../../../../core/services/currency/currency.service';
 import { PlanCatalogo } from '../../../planes/services/plan.service';
+import { WompiService, IniciarPagoWompiResponse } from '../../../../core/services/payments/wompi.service';
+import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
+import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
 
-interface ModalData { plan: PlanCatalogo; }
+/**
+ * Datos opcionales que el invocador puede pasar al abrir el modal.
+ * - `iniciarFlujo`: si se pasa 'wompi' o 'manual', el modal se salta la pantalla
+ *   de selección y arranca directo en ese flujo. Útil cuando ya estamos en una
+ *   pestaña dedicada (ej. "Pagos en línea") y la elección no aporta nada.
+ */
+interface ModalData {
+  plan: PlanCatalogo;
+  iniciarFlujo?: 'seleccion' | 'manual' | 'wompi';
+}
+
+/**
+ * Estados del modal:
+ *  - seleccion: usuario aun no eligio metodo (vista inicial con dos cards).
+ *  - manual: flujo de transferencia + comprobante (igual al original).
+ *  - wompi: esperando que el usuario interactue con el widget.
+ *  - wompi-pendiente: widget cerrado, polling al backend esperando webhook.
+ *  - wompi-aprobado / wompi-rechazado: estados terminales.
+ */
+type Flujo = 'seleccion' | 'manual' | 'wompi' | 'wompi-pendiente' | 'wompi-aprobado' | 'wompi-rechazado';
 
 @Component({
   selector: 'app-pagar-manual-modal',
@@ -20,7 +44,7 @@ interface ModalData { plan: PlanCatalogo; }
   templateUrl: './pagar-manual-modal.component.html',
   styleUrl: './pagar-manual-modal.component.css'
 })
-export class PagarManualModalComponent implements OnInit {
+export class PagarManualModalComponent implements OnInit, OnDestroy {
   private data: ModalData = inject(NZ_MODAL_DATA);
   plan: PlanCatalogo = this.data.plan;
 
@@ -28,7 +52,14 @@ export class PagarManualModalComponent implements OnInit {
   private currency = inject(CurrencyService);
   private modalRef = inject(NzModalRef);
   private notification = inject(NzNotificationService);
+  private wompiService = inject(WompiService);
+  private realtime = inject(RealtimeService);
 
+  // ---------- Estado general ----------
+  flujo: Flujo = 'seleccion';
+  cargando = false;
+
+  // ---------- Estado del flujo manual ----------
   info: InfoPagoPublica | null = null;
   metodoPago: MetodoPago = 'Nequi';
   referenciaPago = '';
@@ -39,15 +70,186 @@ export class PagarManualModalComponent implements OnInit {
   comprobantePreviewUrl: string | null = null;
   comprobanteSizeKb: number | null = null;
   enviando = false;
-  cargando = true;
   copiado: 'Nequi' | 'Bancolombia' | null = null;
 
+  // ---------- Estado del flujo Wompi ----------
+  wompiData: IniciarPagoWompiResponse | null = null;
+  wompiError: string | null = null;
+  wompiMotivoRechazo: string | null = null;
+  private pollingSub?: Subscription;
+  private realtimeSub?: Subscription;
+
   ngOnInit(): void {
-    this.pagoService.obtenerInfoPago().subscribe({
-      next: (info) => { this.info = info; this.cargando = false; },
-      error: () => { this.cargando = false; this.notification.error('Error', 'No se pudieron cargar los datos de pago.'); }
+    // Suscripcion temprana a los eventos del webhook Wompi del propio tenant.
+    // Si el webhook llega mientras el usuario sigue interactuando con el widget,
+    // no perdemos el evento (lo aplicamos cuando ya tengamos `wompiData`).
+    const aprobado$ = this.realtime.on<any>(RealtimeEvents.PagoWompi.Approved);
+    const rechazado$ = this.realtime.on<any>(RealtimeEvents.PagoWompi.Declined);
+
+    this.realtimeSub = merge(
+      aprobado$.pipe(switchMap(async payload => ({ tipo: 'aprobado' as const, payload }))),
+      rechazado$.pipe(switchMap(async payload => ({ tipo: 'rechazado' as const, payload })))
+    ).subscribe(({ tipo, payload }) => {
+      if (!this.esMiReferencia(payload)) return;
+      if (tipo === 'aprobado') this.marcarAprobado();
+      else this.marcarRechazado(payload?.motivoRechazo ?? payload?.wompiStatus);
+    });
+
+    // Si nos pidieron arrancar directamente en un flujo, lo disparamos.
+    // Útil cuando el modal se invoca desde la pestaña "Pagos en línea".
+    const inicial = this.data.iniciarFlujo;
+    if (inicial === 'wompi') {
+      this.elegirWompi();
+    } else if (inicial === 'manual') {
+      this.elegirManual();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.pollingSub?.unsubscribe();
+    this.realtimeSub?.unsubscribe();
+  }
+
+  // ============================================================================
+  // SELECCION DE FLUJO
+  // ============================================================================
+
+  elegirWompi(): void {
+    this.flujo = 'wompi';
+    this.wompiError = null;
+    this.cargando = true;
+    this.wompiService.iniciar({
+      planSolicitadoId: this.plan.planId,
+      precioUSD: this.plan.precioMensualUSD,
+      tasaCambio: this.currency.getRate(),
+      montoCOP: this.montoCOP
+    }).subscribe({
+      next: (res) => {
+        if (!res.success || !res.data) {
+          this.cargando = false;
+          this.wompiError = res.message ?? 'No se pudo iniciar el pago en linea.';
+          return;
+        }
+        this.wompiData = res.data;
+        this.cargando = false;
+        void this.abrirWidget();
+      },
+      error: (err) => {
+        this.cargando = false;
+        this.wompiError = err?.error?.message ?? 'No se pudo iniciar el pago en linea.';
+      }
     });
   }
+
+  elegirManual(): void {
+    this.flujo = 'manual';
+    if (this.info || this.cargando) return;
+    this.cargando = true;
+    this.pagoService.obtenerInfoPago().subscribe({
+      next: (info) => { this.info = info; this.cargando = false; },
+      error: () => {
+        this.cargando = false;
+        this.notification.error('Error', 'No se pudieron cargar los datos de pago.');
+      }
+    });
+  }
+
+  volverASeleccion(): void {
+    if (this.enviando) return;
+    // Si el modal fue abierto en un flujo fijo (ej. desde la pestaña "Pagos en
+    // línea"), no hay selección previa a la que volver: cerramos el modal.
+    if (!this.puedeVolverASeleccion) {
+      this.cancelar();
+      return;
+    }
+    this.flujo = 'seleccion';
+    this.wompiError = null;
+  }
+
+  /**
+   * True si tiene sentido mostrar el link "volver a selección". Si el modal
+   * fue abierto con `iniciarFlujo`, no hay nada a qué volver dentro del modal:
+   * lo correcto es cerrarlo y que el usuario vea la página invocadora.
+   */
+  get puedeVolverASeleccion(): boolean {
+    return !this.data.iniciarFlujo;
+  }
+
+  // ============================================================================
+  // FLUJO WOMPI
+  // ============================================================================
+
+  private async abrirWidget(): Promise<void> {
+    if (!this.wompiData) return;
+    try {
+      await this.wompiService.lanzarWidget(this.wompiData);
+    } catch (err) {
+      this.wompiError = (err as Error)?.message ?? 'Error abriendo el widget.';
+      return;
+    }
+
+    // El widget cerro. Pasamos a estado pendiente y disparamos polling
+    // mientras esperamos el webhook (el realtime puede llegar antes).
+    if (this.flujo === 'wompi') {
+      this.flujo = 'wompi-pendiente';
+      this.iniciarPollingEstado();
+    }
+  }
+
+  private iniciarPollingEstado(): void {
+    if (!this.wompiData) return;
+    const reference = this.wompiData.reference;
+
+    // Polling cada 3s durante 30s. Para de inmediato si llegamos a estado terminal
+    // o si el realtime ya cambio el flujo.
+    let intentos = 0;
+    this.pollingSub = interval(3000).pipe(
+      takeWhile(() => intentos < 10 && this.flujo === 'wompi-pendiente'),
+      switchMap(() => {
+        intentos++;
+        return this.wompiService.consultarEstado(reference);
+      })
+    ).subscribe({
+      next: (estado) => {
+        if (!estado) return;
+        if (estado.estado === 'Aprobado') this.marcarAprobado();
+        else if (estado.estado === 'Rechazado') this.marcarRechazado(estado.motivoRechazo ?? estado.wompiStatus);
+      }
+    });
+  }
+
+  private esMiReferencia(payload: any): boolean {
+    if (!this.wompiData) return false;
+    return payload?.wompiReference === this.wompiData.reference;
+  }
+
+  private marcarAprobado(): void {
+    if (this.flujo === 'wompi-aprobado') return;
+    this.flujo = 'wompi-aprobado';
+    this.pollingSub?.unsubscribe();
+    this.notification.success('Pago aprobado', 'Tu plan se activo correctamente.');
+  }
+
+  private marcarRechazado(motivo?: string | null): void {
+    if (this.flujo === 'wompi-rechazado') return;
+    this.flujo = 'wompi-rechazado';
+    this.wompiMotivoRechazo = motivo ?? null;
+    this.pollingSub?.unsubscribe();
+  }
+
+  reintentarWompi(): void {
+    this.wompiError = null;
+    this.wompiData = null;
+    this.elegirWompi();
+  }
+
+  cerrarConExito(): void {
+    this.modalRef.close('wompi-aprobado');
+  }
+
+  // ============================================================================
+  // FLUJO MANUAL (sin cambios funcionales)
+  // ============================================================================
 
   get montoCOP(): number {
     return Math.round(this.currency.toCop(this.plan.precioMensualUSD));
@@ -58,7 +260,6 @@ export class PagarManualModalComponent implements OnInit {
   }
 
   get qrNequiUrl(): string {
-    // QR generado desde la API gratuita de qrserver. Codifica el numero Nequi.
     const numeroLimpio = (this.info?.nequiNumero ?? '').replace(/\s+/g, '');
     if (!numeroLimpio) return '';
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(numeroLimpio)}`;

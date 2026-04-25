@@ -1,0 +1,367 @@
+/* =========================================================================
+   Comunicación (Configuración / Plantillas / Menú del día) — layout compartido
+   Hero indigo, banners ce-status-banner, grid ce-grid, cards ce-card.
+   ========================================================================= */
+
+.ce-page {
+  gap: 16px;
+}
+
+/* Hero alineado entre módulos de correo */
+.ce-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.ce-hero .hero-text {
+  flex: 1;
+  min-width: min(100%, 240px);
+}
+
+.ce-hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.ce-hero-sub,
+.ce-hero .subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  max-width: 640px;
+}
+
+.ce-hero .ph {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.ce-hero-actions {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.ce-hero-actions .ant-btn-primary {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ce-spin {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ce-spin .ant-spin-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Banner de estado (1 línea o varias) */
+.ce-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  letter-spacing: -0.005em;
+}
+
+.ce-status-banner--stack {
+  align-items: flex-start;
+}
+
+.ce-status-banner--stack > i:first-child {
+  margin-top: 2px;
+}
+
+.ce-status-banner i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.ce-status-banner.is-empty {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.ce-status-banner.is-active {
+  background: var(--accent-softer);
+  border-color: var(--accent-soft);
+  color: #065f46;
+}
+
+.ce-status-banner.is-active i {
+  color: var(--accent);
+}
+
+.ce-status-banner.is-inactive {
+  background: var(--bg-subtle);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.ce-status-banner.is-info {
+  background: var(--info-soft, #cffafe);
+  border-color: #a5f3fc;
+  color: #0e7490;
+}
+
+.ce-status-banner.is-info i {
+  color: #06b6d4;
+}
+
+/* Form & grid */
+.ce-form {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ce-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+.ce-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* Cards */
+.ce-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow var(--duration-fast) var(--ease);
+}
+
+.ce-card:focus-within {
+  box-shadow: var(--shadow-sm);
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--border));
+}
+
+.ce-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.ce-card-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.ce-card-head i {
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.ce-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ce-fi.ce-fi,
+.ce-page .ce-fi {
+  margin-bottom: 6px !important;
+}
+
+.ce-page .ce-fi .ant-form-item-label {
+  padding-bottom: 2px !important;
+  line-height: 1.3 !important;
+}
+
+.ce-page .ce-fi .ant-form-item-label > label {
+  height: 22px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--text-strong) !important;
+  letter-spacing: -0.005em;
+}
+
+.ce-page .ce-fi .ant-form-item-explain {
+  min-height: 18px !important;
+  font-size: 11px !important;
+}
+
+.ce-page .ce-fi .ant-input,
+.ce-page .ce-fi .ant-input-affix-wrapper,
+.ce-page .ce-fi .ant-select-selector {
+  height: 34px !important;
+  font-size: 13px !important;
+}
+
+.ce-page .ce-fi .ant-select-selection-item,
+.ce-page .ce-fi .ant-select-selection-placeholder {
+  line-height: 32px !important;
+}
+
+.ce-fi--inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  margin-top: 4px !important;
+  margin-bottom: 0 !important;
+}
+
+.ce-page .ce-fi--inline .ant-form-item-label {
+  padding: 0 !important;
+  flex: 1;
+}
+
+.ce-page .ce-fi--inline .ant-form-item-control {
+  flex: 0 0 auto;
+  width: auto !important;
+}
+
+/* Tip */
+.ce-tip {
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--primary-softer);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ce-tip i {
+  color: var(--primary);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Título del tip (línea propia) — no aplica a <strong> dentro de <p> */
+.ce-tip > div > strong:first-child {
+  display: block;
+  color: var(--primary-active);
+  font-weight: 700;
+  margin-bottom: 2px;
+  font-size: 12.5px;
+  letter-spacing: -0.005em;
+}
+
+.ce-tip p {
+  margin: 0;
+  color: var(--text-strong);
+}
+
+.ce-tip p strong {
+  display: inline;
+  font-size: inherit;
+  letter-spacing: normal;
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.ce-tip code {
+  background: rgba(91, 91, 214, 0.1);
+  color: var(--primary-active);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+/* Listas informativas dentro de ce-card (p. ej. plantillas reservadas) */
+.ce-info-list {
+  margin: 0 0 10px 18px;
+  padding: 0;
+  line-height: 1.5;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.ce-info-list li {
+  margin: 0 0 4px;
+}
+
+.ce-info-list strong {
+  color: var(--text-strong);
+}
+
+.ce-info-footer {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+  line-height: 1.4;
+}
+
+/* Contenedor de tabla (borde y sombra como card) */
+.ce-table-wrap {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--border, #e2e8f0);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 960px) {
+  .ce-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 720px) {
+  .ce-card {
+    padding: 10px 14px;
+  }
+
+  .ce-card-head {
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+  }
+
+  .ce-page .ce-fi {
+    margin-bottom: 4px !important;
+  }
+
+  .ce-page .ce-fi .ant-input,
+  .ce-page .ce-fi .ant-select-selector {
+    height: 32px !important;
+  }
+}

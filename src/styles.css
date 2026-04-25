@@ -1,3 +1,5 @@
+@import './app/shared/styles/comunicacion-pages.css';
+
 /* ============================================
    GLOBAL STYLES — Sistema de diseño premium
    ────────────────────────────────────────────
@@ -1073,4 +1075,3 @@ a.ant-card:hover,
 .user-dropdown-menu li.logout-item:hover .anticon {
   color: #dc2626;
 }
-

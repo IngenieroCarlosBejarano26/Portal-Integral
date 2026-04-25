@@ -1,8 +1,8 @@
-<div class="plantillas-page">
-  <div class="hero app-hero app-hero--indigo">
+<div class="page-container ce-page plantillas-page">
+  <div class="hero app-hero app-hero--indigo ce-hero">
     <div class="hero-text">
       <h1>Plantillas de correo</h1>
-      <p>
+      <p class="subtitle ce-hero-sub">
         Personaliza el HTML (y asunto) que el sistema reemplaza al enviar correos. Los reemplazos se escriben
         con <strong>dos llaves</strong>, p. ej. <code class="ph" ngNonBindable>{{NombreCliente}}</code>.
         Los códigos <code class="ph">consumo-valera</code>, <code class="ph">valera-qr</code> y
@@ -10,31 +10,33 @@
         vincularse al flujo correspondiente.
       </p>
     </div>
-    <button
-      nz-button
-      nzType="primary"
-      *appHasPermission="'plantillas-correo:update'"
-      (click)="abrirNueva()">
-      <i nz-icon nzType="plus" nzTheme="outline"></i>
-      Nueva plantilla
-    </button>
-  </div>
-
-  <div class="ref-banner" role="region" aria-label="Resumen de plantillas del sistema">
-    <i nz-icon class="ref-banner-ico" nzType="info-circle" nzTheme="fill"></i>
-    <div>
-      <p class="ref-banner-tit">Plantillas reservadas por el sistema</p>
-      <ul class="ref-list" ngNonBindable>
-        <li><strong>consumo-valera</strong> — Tras un consumo: {{NombreCliente}}, {{FechaHora}}, {{ResumenAlmuerzos}}, {{CodigoValera}}, etc.</li>
-        <li><strong>valera-qr</strong> — Al crear valera: incluir &lt;img src="cid:qr" /&gt; y {{UrlEscaneo}}, {{FechaVencimiento}}, etc.</li>
-        <li><strong>menu-del-dia</strong> — Envío del menú: {{FechaHoy}}, {{FechaHoyLarga}} y el nombre del cliente.</li>
-      </ul>
-      <p class="ref-footer">No renombres un código en uso: el backend lo resuelve por el nombre exacto en la base del tenant.</p>
+    <div class="ce-hero-actions">
+      <button
+        nz-button
+        nzType="primary"
+        *appHasPermission="'plantillas-correo:update'"
+        (click)="abrirNueva()">
+        <i nz-icon nzType="plus" nzTheme="outline"></i>
+        Nueva plantilla
+      </button>
     </div>
   </div>
 
-  <nz-spin [nzSpinning]="loading">
-    <div class="table-card">
+  <section class="ce-card" aria-label="Resumen de plantillas del sistema">
+    <header class="ce-card-head">
+      <i nz-icon nzType="info-circle"></i>
+      <h3>Plantillas reservadas por el sistema</h3>
+    </header>
+    <ul class="ce-info-list" ngNonBindable>
+      <li><strong>consumo-valera</strong> — Tras un consumo: {{NombreCliente}}, {{FechaHora}}, {{ResumenAlmuerzos}}, {{CodigoValera}}, etc.</li>
+      <li><strong>valera-qr</strong> — Al crear valera: incluir &lt;img src="cid:qr" /&gt; y {{UrlEscaneo}}, {{FechaVencimiento}}, etc.</li>
+      <li><strong>menu-del-dia</strong> — Envío del menú: {{FechaHoy}}, {{FechaHoyLarga}} y el nombre del cliente.</li>
+    </ul>
+    <p class="ce-info-footer">No renombres un código en uso: el backend lo resuelve por el nombre exacto en la base del tenant.</p>
+  </section>
+
+  <nz-spin [nzSpinning]="loading" class="ce-spin">
+    <div class="ce-table-wrap">
       <nz-table [nzData]="plantillas" nzSize="middle" [nzPageSize]="10" [nzShowPagination]="plantillas.length > 10">
         <thead>
           <tr>

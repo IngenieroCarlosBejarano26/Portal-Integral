@@ -5,8 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
@@ -33,8 +31,6 @@ import {
     NzButtonModule,
     NzInputModule,
     NzIconModule,
-    NzAlertModule,
-    NzCardModule,
     NzStatisticModule,
     NzTagModule,
     NzRadioModule

@@ -3,8 +3,11 @@
     <div class="hero-text">
       <h1>Plantillas de correo</h1>
       <p>
-        Personaliza los textos HTML que usa el sistema para correos al cliente.
-        Usa el placeholder <code class="ph" ngNonBindable>{{NombreCliente}}</code> donde quieras el nombre.
+        Personaliza el HTML (y asunto) que el sistema reemplaza al enviar correos. Los reemplazos se escriben
+        con <strong>dos llaves</strong>, p. ej. <code class="ph" ngNonBindable>{{NombreCliente}}</code>.
+        Los códigos <code class="ph">consumo-valera</code>, <code class="ph">valera-qr</code> y
+        <code class="ph">menu-del-dia</code> tienen un significado fijo: deben llamarse exactamente así para
+        vincularse al flujo correspondiente.
       </p>
     </div>
     <button
@@ -17,13 +20,18 @@
     </button>
   </div>
 
-  <nz-alert
-    nzType="info"
-    nzShowIcon
-    nzMessage="Códigos sugeridos"
-    nzDescription="Ejemplos: menu-del-dia, consumo-valera (notificación al cliente al registrar un consumo; en el HTML use los placeholders con doble llave: NombreCliente, FechaHora, ResumenAlmuerzos, CodigoValera, AlmuerzosUsados, etc.). El código no debería cambiar una vez en uso."
-    class="hint-alert"
-  ></nz-alert>
+  <div class="ref-banner" role="region" aria-label="Resumen de plantillas del sistema">
+    <i nz-icon class="ref-banner-ico" nzType="info-circle" nzTheme="fill"></i>
+    <div>
+      <p class="ref-banner-tit">Plantillas reservadas por el sistema</p>
+      <ul class="ref-list" ngNonBindable>
+        <li><strong>consumo-valera</strong> — Tras un consumo: {{NombreCliente}}, {{FechaHora}}, {{ResumenAlmuerzos}}, {{CodigoValera}}, etc.</li>
+        <li><strong>valera-qr</strong> — Al crear valera: incluir &lt;img src="cid:qr" /&gt; y {{UrlEscaneo}}, {{FechaVencimiento}}, etc.</li>
+        <li><strong>menu-del-dia</strong> — Envío del menú: {{FechaHoy}}, {{FechaHoyLarga}} y el nombre del cliente.</li>
+      </ul>
+      <p class="ref-footer">No renombres un código en uso: el backend lo resuelve por el nombre exacto en la base del tenant.</p>
+    </div>
+  </div>
 
   <nz-spin [nzSpinning]="loading">
     <div class="table-card">
@@ -31,6 +39,7 @@
         <thead>
           <tr>
             <th>Código</th>
+            <th>Uso en el sistema</th>
             <th>Asunto</th>
             <th class="acciones">Acciones</th>
           </tr>
@@ -38,6 +47,7 @@
         <tbody>
           <tr *ngFor="let p of plantillas">
             <td><nz-tag nzColor="geekblue">{{ p.codigo }}</nz-tag></td>
+            <td class="cel-uso"><span class="uso-text">{{ resumenUso(p.codigo) }}</span></td>
             <td>{{ p.asunto }}</td>
             <td class="acciones">
               <button nz-button nzType="default" nzSize="small" (click)="abrirEditar(p)">
@@ -63,7 +73,7 @@
   [nzOkLoading]="saving"
   [nzOkDisabled]="!puedeGuardar()"
   (nzOnOk)="guardar()"
-  nzWidth="800px"
+  nzWidth="900px"
   nzOkText="Guardar"
 >
   <ng-container *nzModalContent>
@@ -84,6 +94,30 @@
         [(ngModel)]="editCuerpo"
         class="html-area"
       ></textarea>
+      <nz-collapse class="ref-collapse" [nzBordered]="false">
+        <nz-collapse-panel
+          nzHeader="Guía: plantillas de sistema (códigos fijos) y placeholders"
+          [(nzActive)]="refPanelAbierto"
+        >
+          <p class="ref-intro">
+            Escribe en asunto o en HTML claves con doble llave. Cada flujo reemplaza solo lo que aplica
+            (no pasa nada si dejas claves de otro módulo).
+          </p>
+          <div class="ref-panels" *ngFor="let r of refSistema">
+            <h4 class="ref-h4">
+              <code>{{ r.codigo }}</code>
+              <span class="ref-h4-title">{{ r.titulo }}</span>
+            </h4>
+            <p class="ref-cuando">{{ r.cuando }}</p>
+            <p class="ref-asunto"><strong>Asunto:</strong> {{ r.asunto }}</p>
+            <p class="ref-phs"><strong>Claves</strong> (cópialas con llaves en el editor):</p>
+            <div class="chips">
+              <code class="ch" *ngFor="let c of r.placeholders">{{ ph(c) }}</code>
+            </div>
+            <p class="ref-extra" *ngIf="r.extra">{{ r.extra }}</p>
+          </div>
+        </nz-collapse-panel>
+      </nz-collapse>
     </div>
   </ng-container>
 </nz-modal>

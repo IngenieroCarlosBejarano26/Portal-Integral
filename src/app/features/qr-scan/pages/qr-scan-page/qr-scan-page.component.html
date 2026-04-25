@@ -27,12 +27,12 @@
             [nzType]="puedeConsumir ? 'qrcode' : (vencida || sinCupo || inactiva ? 'stop' : 'lock')"
             class="qr-header-icon"></i>
           <h1>Valera escaneada</h1>
-          <p>{{ puedeConsumir ? 'Lista para consumir un almuerzo' : 'No es posible consumir' }}</p>
+          <p>{{ puedeConsumir ? 'Lista para registrar un uso' : 'No es posible registrar un uso' }}</p>
         </header>
 
-        <!-- Cliente -->
+        <!-- Titular de la valera -->
         <section class="qr-section">
-          <span class="qr-label">Cliente</span>
+          <span class="qr-label">Titular</span>
           <div class="qr-client">
             <div class="qr-avatar">{{ clienteNombreCompleto.charAt(0) | uppercase }}</div>
             <div>
@@ -42,7 +42,15 @@
           </div>
         </section>
 
-        <!-- Almuerzos: indicador grande -->
+        <!-- Tipo / descripcion de valera (identificacion) -->
+        <section class="qr-section">
+          <span class="qr-label">Descripción</span>
+          <p class="qr-descripcion">
+            <strong>{{ (v.descripcion && v.descripcion.trim()) || '—' }}</strong>
+          </p>
+        </section>
+
+        <!-- Usos: indicador grande -->
         <section class="qr-section qr-stat">
           <div class="qr-stat-block">
             <span class="qr-stat-value">{{ almuerzosRestantes }}</span>
@@ -83,7 +91,7 @@
             [nzLoading]="consuming()"
             (click)="consumir()">
             <i nz-icon nzType="thunderbolt"></i>
-            Consumir 1 almuerzo
+            Registrar 1 uso
           </button>
           <button nz-button nzSize="large" class="qr-secondary" (click)="irADetalle()">
             <i nz-icon nzType="home"></i> Ir al inicio

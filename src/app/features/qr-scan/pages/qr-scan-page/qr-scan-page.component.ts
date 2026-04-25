@@ -18,8 +18,8 @@ import { AuthService } from '../../../../core/services/auth/authService';
  *  1. authGuard → si no está logueado, redirige a /login?returnUrl=/v/{codigo}
  *  2. Carga la valera por código QR
  *  3. Carga el cliente asociado (para mostrar nombre/documento)
- *  4. Si el usuario tiene `valeras:execute` y la valera es consumible,
- *     muestra botón grande "Consumir 1 almuerzo"
+ *  4. Si el usuario tiene `valeras:execute` y la valera permite uso,
+ *     muestra botón "Registrar 1 uso"
  *  5. Si no, muestra el detalle en modo lectura
  */
 @Component({
@@ -107,7 +107,7 @@ export class QrScanPageComponent implements OnInit {
   get razonNoConsumir(): string | null {
     if (this.inactiva) return 'Esta valera está inactiva.';
     if (this.vencida) return 'Esta valera está vencida.';
-    if (this.sinCupo) return 'No quedan almuerzos disponibles en esta valera.';
+    if (this.sinCupo) return 'No quedan usos disponibles en esta valera.';
     if (!this.authService.hasPermission('valeras:execute')) {
       return 'No tienes permiso para registrar consumos.';
     }
@@ -116,8 +116,8 @@ export class QrScanPageComponent implements OnInit {
 
   get clienteNombreCompleto(): string {
     const c = this.cliente();
-    if (!c) return 'Cliente';
-    return `${c.nombre ?? ''} ${c.apellido ?? ''}`.trim() || 'Cliente';
+    if (!c) return 'Titular';
+    return `${c.nombre ?? ''} ${c.apellido ?? ''}`.trim() || 'Titular';
   }
 
   // ── Acción ─────────────────────────────────────────────────────────────
@@ -126,24 +126,24 @@ export class QrScanPageComponent implements OnInit {
     if (!v?.valeraID || !this.puedeConsumir) return;
 
     this.modal.confirm({
-      nzTitle: '¿Registrar consumo?',
-      nzContent: `${this.clienteNombreCompleto} · Quedarán ${this.almuerzosRestantes - 1} almuerzo(s)`,
-      nzOkText: 'Sí, consumir',
+      nzTitle: '¿Registrar uso?',
+      nzContent: `${this.clienteNombreCompleto} · Quedarán ${this.almuerzosRestantes - 1} uso(s)`,
+      nzOkText: 'Sí, registrar',
       nzCancelText: 'Cancelar',
       nzOnOk: () => new Promise<void>((resolve) => {
         this.consuming.set(true);
         this.consumoService.createConsumo({
           valeraID: v.valeraID,
           fechaConsumo: new Date().toISOString(),
-          observaciones: 'Consumo registrado vía escaneo QR'
+          observaciones: 'Uso registrado vía escaneo QR'
         }).subscribe({
           next: () => {
             this.consuming.set(false);
             // Optimistic update local del contador
             this.valera.set({ ...v, almuerzosConsumidos: (v.almuerzosConsumidos ?? 0) + 1 });
             this.notification.success(
-              'Consumo registrado',
-              `Quedan ${this.almuerzosRestantes} almuerzo(s).`
+              'Uso registrado',
+              `Quedan ${this.almuerzosRestantes} uso(s).`
             );
             resolve();
           },

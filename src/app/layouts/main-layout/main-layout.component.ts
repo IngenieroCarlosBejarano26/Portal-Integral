@@ -302,7 +302,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           { label: 'Clientes', icon: 'usergroup-add', path: '/clientes', permission: 'clientes:view' },
           { label: 'Empresas', icon: 'shop', path: '/empresas', permission: 'empresas:view' },
           { label: 'Valeras', icon: 'gift', path: '/valeras', permission: 'valeras:view' },
-          { label: 'Consumos', icon: 'bar-chart', path: '/consumos', permission: 'consumos:view' }
+          { label: 'Usos', icon: 'bar-chart', path: '/consumos', permission: 'consumos:view' }
         ]
       },
       {

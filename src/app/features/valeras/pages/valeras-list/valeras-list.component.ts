@@ -69,11 +69,11 @@ export class ValerasListComponent implements OnInit, OnDestroy {
 
   private clienteField: FormField = {
     key: 'clienteID',
-    label: 'Cliente',
+    label: 'Titular',
     type: 'select',
     required: true,
     span: 12,
-    placeholder: 'Selecciona un cliente',
+    placeholder: 'Selecciona un titular',
     options: [],
   };
 
@@ -84,8 +84,14 @@ export class ValerasListComponent implements OnInit, OnDestroy {
     statusKey: 'estado',
     fields: [
       {
+        key: 'descripcion',
+        label: 'Descripción',
+        icon: 'file-text',
+        format: (v) => (v && String(v).trim() ? String(v) : '—'),
+      },
+      {
         key: 'totalAlmuerzos',
-        label: 'Almuerzos',
+        label: 'Usos (usados / total)',
         icon: 'shopping-cart',
         format: (v, item) => `${item.almuerzosConsumidos ?? 0} / ${v ?? 0}`,
       },
@@ -113,7 +119,7 @@ export class ValerasListComponent implements OnInit, OnDestroy {
 
   cardActions: CardAction[] = [
     {
-      label: 'Consumir',
+      label: 'Registrar uso',
       icon: 'thunderbolt',
       color: 'primary',
       action: (item) => this.consumirAlmuerzo(item),
@@ -139,11 +145,26 @@ export class ValerasListComponent implements OnInit, OnDestroy {
   fields: FormField[] = [
     this.clienteField,
     {
+      key: 'descripcion',
+      label: 'Descripción',
+      type: 'textarea',
+      required: true,
+      span: 24,
+      maxLength: 500,
+      placeholder: 'Qué cubre o identifica (producto, servicio, canje, categoría, etc.)',
+      errorMessages: {
+        required: 'Indica qué identifica o cubre esta valera.',
+        maxlength: 'Máximo 500 caracteres.',
+      },
+    },
+    {
       key: 'fechaCompra',
       label: 'Fecha Compra',
       type: 'date',
       required: true,
       span: 12,
+      disableDatesBeforeToday: true,
+      minTodayMode: 'createOnly',
       errorMessages: { required: 'La fecha de compra es obligatoria.' },
     },
     {
@@ -152,18 +173,21 @@ export class ValerasListComponent implements OnInit, OnDestroy {
       type: 'date',
       required: true,
       span: 12,
+      disableDatesBeforeToday: true,
+      minTodayMode: 'always',
+      notBeforeField: 'fechaCompra',
       errorMessages: { required: 'La fecha de vencimiento es obligatoria.' },
     },
     {
       key: 'totalAlmuerzos',
-      label: 'Total Almuerzos',
+      label: 'Total de usos',
       type: 'number',
       required: true,
       span: 12,
       min: 1,
       max: 1000,
       errorMessages: {
-        required: 'El total de almuerzos es obligatorio.',
+        required: 'El total de usos es obligatorio.',
         min: 'Debe ser al menos 1.',
         max: 'No puede superar 1.000.',
       },
@@ -215,7 +239,7 @@ export class ValerasListComponent implements OnInit, OnDestroy {
       .on(RealtimeEvents.Cliente.Updated)
       .pipe(takeUntil(this.destroy$))
       .subscribe(reloadAll);
-    // Un consumo cambia los almuerzos disponibles → hay que refrescar valeras también.
+    // Un consumo cambia los usos disponibles → refrescar valeras también.
     this.realtime
       .on(RealtimeEvents.Consumo.Created)
       .pipe(takeUntil(this.destroy$))
@@ -275,15 +299,14 @@ export class ValerasListComponent implements OnInit, OnDestroy {
       ...v,
       clienteNombre: c
         ? `${c.nombre ?? ''} ${c.apellido ?? ''}`.trim()
-        : 'Cliente desconocido',
+        : 'Titular no encontrado',
       clienteDocumento: c?.documento ?? '—',
     };
   }
 
   /**
-   * Incrementa localmente el contador de almuerzos consumidos de una valera
-   * para dar feedback visual inmediato tras registrar un consumo, sin esperar
-   * al round-trip del refetch ni al evento SignalR.
+   * Incrementa localmente el contador de usos consumidos de una valera
+   * para feedback inmediato tras registrar un consumo, sin el round-trip del refetch.
    */
   private applyOptimisticConsumo(valeraID: string): void {
     const idx = this.valeras.findIndex((v) => v.valeraID === valeraID);
@@ -315,6 +338,7 @@ export class ValerasListComponent implements OnInit, OnDestroy {
       (v) =>
         v.clienteNombre?.toLowerCase().includes(term) ||
         v.clienteDocumento?.toLowerCase().includes(term) ||
+        v.descripcion?.toLowerCase().includes(term) ||
         v.codigoQR?.toLowerCase().includes(term),
     );
   }
@@ -332,16 +356,16 @@ export class ValerasListComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  /** Modal liviano de confirmación rápida para consumir un almuerzo. */
+  /** Confirmación rápida para registrar un uso (consumo) en la valera. */
   consumirAlmuerzo(valera: Valera): void {
     if (!valera.valeraID) return;
     const restantes =
       (valera.totalAlmuerzos ?? 0) - (valera.almuerzosConsumidos ?? 0);
 
     this.modal.confirm({
-      nzTitle: '¿Registrar consumo?',
-      nzContent: `Cliente: ${valera.clienteNombre} · Quedan ${restantes} almuerzo(s)`,
-      nzOkText: 'Consumir',
+      nzTitle: '¿Registrar uso?',
+      nzContent: `Titular: ${valera.clienteNombre} · Quedan ${restantes} uso(s)`,
+      nzOkText: 'Registrar',
       nzCancelText: 'Cancelar',
       nzOnOk: () =>
         new Promise<void>((resolve) => {
@@ -358,8 +382,8 @@ export class ValerasListComponent implements OnInit, OnDestroy {
                 this.applyOptimisticConsumo(valera.valeraID!);
 
                 this.notification.success(
-                  'Consumo registrado',
-                  `${restantes - 1} almuerzo(s) restantes`,
+                  'Uso registrado',
+                  `${restantes - 1} uso(s) restantes`,
                 );
 
                 // 2) Refetch defensivo: garantiza datos frescos del servidor

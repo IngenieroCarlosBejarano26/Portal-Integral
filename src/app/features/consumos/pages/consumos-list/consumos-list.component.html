@@ -1,8 +1,8 @@
 <div class="page-container">
   <div class="page-header">
     <div class="page-header-content">
-      <h1>Historial de Consumos</h1>
-      <p class="subtitle">Registro cronológico de almuerzos consumidos. Para registrar un nuevo consumo, ve al módulo de Valeras.</p>
+      <h1>Historial de usos</h1>
+      <p class="subtitle">Registro cronológico de usos. Para uno nuevo, ve al módulo de Valeras.</p>
     </div>
     <div class="page-header-actions">
       <button nz-button (click)="onReload()">
@@ -17,7 +17,7 @@
       <nz-input-group [nzPrefix]="searchIcon">
         <input
           nz-input
-          placeholder="Buscar por cliente, documento, código QR u observaciones..."
+          placeholder="Buscar por titular, documento, código QR u observaciones..."
           [(ngModel)]="searchValue"
           (input)="onSearch($any($event.target).value)" />
       </nz-input-group>
@@ -25,7 +25,7 @@
         <i nz-icon nzType="search" nzTheme="outline"></i>
       </ng-template>
     </div>
-    <span class="toolbar-meta">{{ filteredConsumos.length }} consumo(s)</span>
+    <span class="toolbar-meta">{{ filteredConsumos.length }} registro(s)</span>
   </div>
 
   <div class="cards-wrapper">
@@ -34,7 +34,7 @@
       [config]="cardConfig"
       [actions]="[]"
       [loading]="loading"
-      emptyText="No hay consumos registrados">
+      emptyText="No hay usos registrados">
     </app-card-grid>
   </div>
 </div>

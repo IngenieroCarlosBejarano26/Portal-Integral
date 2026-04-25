@@ -73,7 +73,9 @@ export class PlanesPageComponent implements OnInit {
       nzData: { plan },
       nzWidth: 720,
       nzFooter: null,
-      nzMaskClosable: false
+      nzMaskClosable: false,
+      nzCentered: true,
+      nzClassName: 'pagar-manual-modal-class'
     }).afterClose.subscribe((enviada) => {
       if (enviada) this.recargar();
     });

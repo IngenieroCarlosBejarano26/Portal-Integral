@@ -1,110 +1,200 @@
 <div class="pagar-modal" *ngIf="!cargando">
-  <nz-alert nzType="info" nzShowIcon
-    nzMessage="Sigue 3 pasos sencillos"
-    nzDescription="1) Transfiere el monto exacto a Nequi/Bancolombia. 2) Sube el comprobante. 3) Espera la aprobacion (max 24h)."
-    class="info-alert">
-  </nz-alert>
 
   <!-- Resumen del plan -->
-  <div class="resumen-plan">
-    <div class="plan-info">
-      <i nz-icon nzType="crown" nzTheme="outline"></i>
-      <div>
-        <strong>Plan {{ plan.nombre }}</strong>
-        <div class="plan-precio">USD ${{ plan.precioMensualUSD }} / mes</div>
+  <section class="resumen-card">
+    <div class="resumen-left">
+      <div class="resumen-icono">
+        <i nz-icon nzType="crown" nzTheme="fill"></i>
+      </div>
+      <div class="resumen-texto">
+        <span class="resumen-eyebrow">Plan seleccionado</span>
+        <h3 class="resumen-titulo">{{ plan.nombre }}</h3>
+        <span class="resumen-desc">{{ plan.descripcion }}</span>
       </div>
     </div>
-    <div class="monto-cop">
-      <span class="monto-label">Total a transferir</span>
-      <span class="monto-valor">$ {{ montoCOPFormateado }} COP</span>
-    </div>
-  </div>
 
-  <!-- Paso 1: datos de cuenta + QR -->
-  <h4 class="paso-titulo">
-    <span class="paso-num">1</span> Transfiere a una de estas cuentas
-  </h4>
-
-  <div class="metodos-grid">
-    <!-- Nequi -->
-    <div class="metodo-card" [class.activo]="metodoPago === 'Nequi'" (click)="metodoPago = 'Nequi'">
-      <div class="metodo-header">
-        <i nz-icon nzType="mobile" nzTheme="outline"></i>
-        <strong>Nequi</strong>
-      </div>
-      <img *ngIf="qrNequiUrl" [src]="qrNequiUrl" alt="QR Nequi" class="qr-img">
-      <div class="metodo-dato">
-        <span>{{ info?.nequiNumero }}</span>
-        <button nz-button nzSize="small" nzType="text" (click)="copiarAlPortapapeles(info?.nequiNumero ?? '', 'Numero')">
-          <i nz-icon nzType="copy"></i>
-        </button>
-      </div>
-      <small>{{ info?.nequiTitular }}</small>
-    </div>
-
-    <!-- Bancolombia -->
-    <div class="metodo-card" [class.activo]="metodoPago === 'Bancolombia'" (click)="metodoPago = 'Bancolombia'">
-      <div class="metodo-header">
-        <i nz-icon nzType="bank" nzTheme="outline"></i>
-        <strong>Bancolombia</strong>
-      </div>
-      <div class="bancolombia-icon">
-        <i nz-icon nzType="bank" nzTheme="fill" style="font-size: 80px; color: #ffd700;"></i>
-      </div>
-      <div class="metodo-dato">
-        <span>{{ info?.bancolombiaCuenta }}</span>
-        <button nz-button nzSize="small" nzType="text" (click)="copiarAlPortapapeles(info?.bancolombiaCuenta ?? '', 'Cuenta')">
-          <i nz-icon nzType="copy"></i>
-        </button>
-      </div>
-      <small>{{ info?.bancolombiaTipo }} &mdash; {{ info?.bancolombiaTitular }}</small>
-      <small *ngIf="info?.cedula">CC: {{ info?.cedula }}</small>
-    </div>
-  </div>
-
-  <!-- Paso 2: subir comprobante -->
-  <h4 class="paso-titulo">
-    <span class="paso-num">2</span> Sube el comprobante
-  </h4>
-
-  <div class="upload-area">
-    <input type="file" id="comprobante" accept="image/*,application/pdf" (change)="onArchivoSeleccionado($event)" hidden>
-    <label for="comprobante" class="upload-label">
-      <i nz-icon nzType="cloud-upload" nzTheme="outline"></i>
-      <span *ngIf="!comprobanteFileName">Selecciona la imagen o PDF del comprobante (max 5 MB)</span>
-      <span *ngIf="comprobanteFileName" class="file-selected">
-        <i nz-icon nzType="check-circle" nzTheme="fill"></i> {{ comprobanteFileName }}
+    <div class="resumen-right">
+      <span class="resumen-precio-usd">USD ${{ plan.precioMensualUSD }}<small>/mes</small></span>
+      <span class="resumen-precio-cop">≈ ${{ montoCOPFormateado }} COP</span>
+      <span class="resumen-tasa">
+        <i nz-icon nzType="swap" nzTheme="outline"></i>
+        Tasa USD→COP: ${{ tasaCambioFormateada }}
       </span>
-    </label>
-  </div>
+    </div>
+  </section>
 
-  <!-- Paso 3: referencia y enviar -->
-  <h4 class="paso-titulo">
-    <span class="paso-num">3</span> Referencia del pago
-  </h4>
+  <!-- Stepper -->
+  <nav class="stepper" aria-label="Progreso de la solicitud">
+    <div class="step" [class.active]="pasoActual >= 1" [class.done]="pasoActual > 1">
+      <span class="step-dot">
+        <i *ngIf="pasoActual > 1" nz-icon nzType="check" nzTheme="outline"></i>
+        <span *ngIf="pasoActual <= 1">1</span>
+      </span>
+      <span class="step-label">Cuenta</span>
+    </div>
+    <div class="step-line" [class.active]="pasoActual >= 2"></div>
+    <div class="step" [class.active]="pasoActual >= 2" [class.done]="pasoActual > 2">
+      <span class="step-dot">
+        <i *ngIf="pasoActual > 2" nz-icon nzType="check" nzTheme="outline"></i>
+        <span *ngIf="pasoActual <= 2">2</span>
+      </span>
+      <span class="step-label">Comprobante</span>
+    </div>
+    <div class="step-line" [class.active]="pasoActual >= 3"></div>
+    <div class="step" [class.active]="pasoActual >= 3">
+      <span class="step-dot"><span>3</span></span>
+      <span class="step-label">Referencia</span>
+    </div>
+  </nav>
 
-  <div class="form-row">
-    <label>Numero de transaccion / referencia <span class="req">*</span></label>
-    <input nz-input placeholder="Ej: 123456789 o referencia del banco"
-           [(ngModel)]="referenciaPago" maxlength="100">
-  </div>
+  <!-- Paso 1: cuentas -->
+  <section class="seccion">
+    <header class="seccion-header">
+      <h4>¿A dónde transferir?</h4>
+      <span class="seccion-hint">Elige el método y transfiere el monto exacto</span>
+    </header>
 
-  <div class="form-row">
-    <label>Notas (opcional)</label>
-    <textarea nz-input rows="2" placeholder="Cualquier informacion adicional..."
-              [(ngModel)]="notas" maxlength="500"></textarea>
-  </div>
+    <div class="metodos-grid">
+      <!-- Nequi -->
+      <button type="button"
+              class="metodo-card"
+              [class.activo]="metodoPago === 'Nequi'"
+              (click)="metodoPago = 'Nequi'">
+        <span *ngIf="metodoPago === 'Nequi'" class="metodo-check">
+          <i nz-icon nzType="check" nzTheme="outline"></i>
+        </span>
+        <div class="metodo-header">
+          <i nz-icon nzType="mobile" nzTheme="outline"></i>
+          <strong>Nequi</strong>
+        </div>
 
-  <!-- Acciones -->
-  <div class="acciones">
-    <button nz-button nzType="default" (click)="cancelar()" [disabled]="enviando">
-      Cancelar
-    </button>
-    <button nz-button nzType="primary" (click)="enviar()" [nzLoading]="enviando" [disabled]="!referenciaPago.trim()">
-      <i nz-icon nzType="send" nzTheme="outline"></i>
-      Enviar solicitud
-    </button>
-  </div>
+        <div class="qr-wrap">
+          <img *ngIf="qrNequiUrl" [src]="qrNequiUrl" alt="QR Nequi" class="qr-img" loading="lazy">
+        </div>
+
+        <div class="metodo-numero">{{ info?.nequiNumero }}</div>
+        <small class="metodo-titular">{{ info?.nequiTitular }}</small>
+
+        <button nz-button nzSize="small" nzType="default" class="copiar-btn"
+                nz-tooltip nzTooltipTitle="Copiar número"
+                (click)="$event.stopPropagation(); copiarAlPortapapeles(info?.nequiNumero ?? '', 'Número', 'Nequi')">
+          <i nz-icon [nzType]="copiado === 'Nequi' ? 'check' : 'copy'" nzTheme="outline"></i>
+          {{ copiado === 'Nequi' ? 'Copiado' : 'Copiar' }}
+        </button>
+      </button>
+
+      <!-- Bancolombia -->
+      <button type="button"
+              class="metodo-card"
+              [class.activo]="metodoPago === 'Bancolombia'"
+              (click)="metodoPago = 'Bancolombia'">
+        <span *ngIf="metodoPago === 'Bancolombia'" class="metodo-check">
+          <i nz-icon nzType="check" nzTheme="outline"></i>
+        </span>
+        <div class="metodo-header">
+          <i nz-icon nzType="bank" nzTheme="outline"></i>
+          <strong>Bancolombia</strong>
+        </div>
+
+        <div class="banco-detalle">
+          <span class="banco-tipo">{{ info?.bancolombiaTipo }}</span>
+          <div class="banco-numero">{{ info?.bancolombiaCuenta }}</div>
+          <small class="metodo-titular">{{ info?.bancolombiaTitular }}</small>
+          <small *ngIf="info?.cedula" class="banco-cedula">CC: {{ info?.cedula }}</small>
+        </div>
+
+        <button nz-button nzSize="small" nzType="default" class="copiar-btn"
+                nz-tooltip nzTooltipTitle="Copiar cuenta"
+                (click)="$event.stopPropagation(); copiarAlPortapapeles(info?.bancolombiaCuenta ?? '', 'Cuenta', 'Bancolombia')">
+          <i nz-icon [nzType]="copiado === 'Bancolombia' ? 'check' : 'copy'" nzTheme="outline"></i>
+          {{ copiado === 'Bancolombia' ? 'Copiado' : 'Copiar' }}
+        </button>
+      </button>
+    </div>
+  </section>
+
+  <!-- Paso 2: comprobante -->
+  <section class="seccion">
+    <header class="seccion-header">
+      <h4>Comprobante de pago</h4>
+      <span class="seccion-hint">Imagen o PDF, máximo 5 MB</span>
+    </header>
+
+    <div *ngIf="!comprobanteFileName"
+         class="upload-area"
+         (drop)="onArchivoSoltado($event)"
+         (dragover)="onDragOver($event)">
+      <input type="file" id="comprobante" accept="image/*,application/pdf" (change)="onArchivoSeleccionado($event)" hidden>
+      <label for="comprobante" class="upload-label">
+        <i nz-icon nzType="cloud-upload" nzTheme="outline"></i>
+        <div class="upload-texts">
+          <span class="upload-title">Arrastra el archivo aquí o haz clic para seleccionarlo</span>
+          <span class="upload-sub">JPG, PNG o PDF · máx. 5 MB</span>
+        </div>
+      </label>
+    </div>
+
+    <div *ngIf="comprobanteFileName" class="archivo-card">
+      <div class="archivo-thumb">
+        <img *ngIf="comprobantePreviewUrl" [src]="comprobantePreviewUrl" alt="Vista previa">
+        <i *ngIf="!comprobantePreviewUrl" nz-icon nzType="file-pdf" nzTheme="outline"></i>
+      </div>
+      <div class="archivo-info">
+        <span class="archivo-nombre" [title]="comprobanteFileName">{{ comprobanteFileName }}</span>
+        <span class="archivo-meta">
+          <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+          Listo · {{ comprobanteSizeKb }} KB
+        </span>
+      </div>
+      <button nz-button nzType="text" nzDanger nzShape="circle"
+              nz-tooltip nzTooltipTitle="Quitar archivo"
+              (click)="removerComprobante()">
+        <i nz-icon nzType="delete" nzTheme="outline"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Paso 3: referencia y notas -->
+  <section class="seccion">
+    <header class="seccion-header">
+      <h4>Referencia del pago</h4>
+      <span class="seccion-hint">Número de transacción que entregó el banco</span>
+    </header>
+
+    <div class="form-row">
+      <label for="ref">Referencia / N° transacción <span class="req">*</span></label>
+      <input id="ref" nz-input placeholder="Ej: 123456789"
+             [(ngModel)]="referenciaPago" maxlength="100">
+    </div>
+
+    <div class="form-row">
+      <label for="notas">Notas <span class="opc">(opcional)</span></label>
+      <textarea id="notas" nz-input rows="2" placeholder="Cualquier información adicional…"
+                [(ngModel)]="notas" maxlength="500"></textarea>
+    </div>
+  </section>
+
+  <!-- Footer sticky -->
+  <footer class="footer-sticky">
+    <div class="footer-monto">
+      <span class="footer-monto-label">Total a transferir</span>
+      <span class="footer-monto-valor">${{ montoCOPFormateado }} <small>COP</small></span>
+    </div>
+    <div class="footer-actions">
+      <button nz-button nzType="default" (click)="cancelar()" [disabled]="enviando">
+        Cancelar
+      </button>
+      <button nz-button nzType="primary" (click)="enviar()"
+              [nzLoading]="enviando"
+              [disabled]="!referenciaPago.trim()">
+        <i nz-icon nzType="send" nzTheme="outline"></i>
+        Enviar solicitud
+      </button>
+    </div>
+  </footer>
 </div>
 
-<div *ngIf="cargando" class="loading">Cargando datos de pago...</div>
+<div *ngIf="cargando" class="loading">
+  <i nz-icon nzType="loading" nzTheme="outline"></i>
+  Cargando datos de pago…
+</div>

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
@@ -32,7 +31,6 @@ import {
     RouterLink,
     FormsModule,
     NzButtonModule,
-    NzFormModule,
     NzInputModule,
     NzIconModule,
     NzAlertModule,
@@ -140,9 +138,6 @@ export class MenuDelDiaPageComponent implements OnInit {
 
   /** Cambia entre asistente (texto en claro) y editor HTML. */
   cambioVista(nueva: 'formulario' | 'html'): void {
-    if (!this.puedeEditarMenu) {
-      return;
-    }
     if (nueva === 'html') {
       this.actualizarCuerpoDesdeFormulario();
       this.vista = 'html';

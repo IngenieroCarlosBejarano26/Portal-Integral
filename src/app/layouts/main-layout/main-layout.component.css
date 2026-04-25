@@ -490,6 +490,71 @@ nz-header.header {
   font-size: 18px;
 }
 
+/* Submenús (segmentos) */
+.menu ::ng-deep .ant-menu-submenu-title {
+  font-size: 13px;
+  font-weight: 600;
+  height: 42px !important;
+  line-height: 42px !important;
+  margin: 3px 12px !important;
+  width: calc(100% - 24px) !important;
+  border-radius: 10px;
+  color: #4a4f57;
+  padding: 0 14px !important;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menu ::ng-deep .ant-menu-submenu-title .anticon:first-of-type {
+  font-size: 17px;
+  color: #9aa0a6;
+  margin-right: 12px !important;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.menu ::ng-deep .ant-menu-submenu-open > .ant-menu-submenu-title {
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.menu ::ng-deep .ant-menu-submenu-open > .ant-menu-submenu-title .anticon:first-of-type {
+  color: var(--primary);
+}
+
+.menu ::ng-deep .ant-menu-submenu-title:hover {
+  background: #f5f7ff !important;
+  color: var(--primary) !important;
+}
+
+.menu ::ng-deep .ant-menu-submenu-title:hover .anticon:first-of-type {
+  color: var(--primary) !important;
+  transform: scale(1.06);
+}
+
+.menu ::ng-deep .ant-menu-sub.ant-menu-inline {
+  background: transparent !important;
+}
+
+.menu ::ng-deep .ant-menu-sub .ant-menu-item {
+  padding-left: 44px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  margin: 2px 12px 2px 8px !important;
+  font-size: 12.5px;
+  width: calc(100% - 20px) !important;
+}
+
+.menu ::ng-deep .ant-menu-inline-collapsed .ant-menu-submenu-title {
+  padding: 0 !important;
+  margin: 4px 12px !important;
+  justify-content: center;
+  width: calc(100% - 24px) !important;
+}
+
+.menu ::ng-deep .ant-menu-inline-collapsed .ant-menu-submenu-title .anticon:first-of-type {
+  margin-right: 0 !important;
+  font-size: 18px;
+}
+
 /* ============================================
    SIDEBAR FOOTER
    ============================================ */

@@ -155,7 +155,7 @@ export class PlantillasCorreoPageComponent implements OnInit {
   }
 
   puedeGuardar(): boolean {
-    return this.authService.hasPermission(['configuracion-email:update', 'configuracion-email:create']);
+    return this.authService.hasPermission('plantillas-correo:update');
   }
 
   /** El modal espera la promesa para mantener el loading y no cerrar antes de tiempo. */

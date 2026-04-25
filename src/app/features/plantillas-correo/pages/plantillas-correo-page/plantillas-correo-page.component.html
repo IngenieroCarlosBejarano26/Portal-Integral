@@ -13,7 +13,7 @@
     <button
       nz-button
       nzType="primary"
-      *appHasPermission="['configuracion-email:create', 'configuracion-email:update']"
+      *appHasPermission="'plantillas-correo:update'"
       (click)="abrirNueva()">
       <i nz-icon nzType="plus" nzTheme="outline"></i>
       Nueva plantilla
@@ -50,7 +50,12 @@
             <td class="cel-uso"><span class="uso-text">{{ resumenUso(p.codigo) }}</span></td>
             <td>{{ p.asunto }}</td>
             <td class="acciones">
-              <button nz-button nzType="default" nzSize="small" (click)="abrirEditar(p)">
+              <button
+                nz-button
+                nzType="default"
+                nzSize="small"
+                *appHasPermission="'plantillas-correo:update'"
+                (click)="abrirEditar(p)">
                 <i nz-icon nzType="edit" nzTheme="outline"></i>
                 Editar
               </button>

@@ -3,6 +3,15 @@
   min-width: 0;
   padding: 0;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.menu-page .app-hero {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 .app-hero--emerald {
@@ -41,20 +50,45 @@
   font-size: 0.88rem;
 }
 
+.menu-form-fieldset {
+  border: none;
+  margin: 0 0 4px;
+  padding: 0;
+  min-width: 0;
+}
+
+.menu-form-fieldset:disabled,
+.menu-form-fieldset[disabled] {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
 .mb-alert {
   margin-bottom: 20px;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .mb-alert.ant-alert {
+  width: 100%;
+  max-width: none;
 }
 
 .layout-grid {
   display: grid;
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 28px;
   min-width: 0;
+  width: 100%;
   align-items: start;
 }
 
 .card-form,
 .card-stats {
   min-width: 0;
+  width: 100%;
+  max-width: none;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 12px 24px -4px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
@@ -317,9 +351,3 @@
   flex-wrap: wrap;
 }
 
-@media (min-width: 1024px) {
-  .layout-grid {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 28px;
-  }
-}

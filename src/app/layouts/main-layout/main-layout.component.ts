@@ -277,8 +277,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'Consumos',  icon: 'bar-chart',     path: '/consumos',  permission: 'consumos:view'  },
       { label: 'Permisos',  icon: 'safety-certificate', path: '/permisos', permission: 'permisos:view' },
       { label: 'Conf. Correo', icon: 'mail', path: '/configuracion-email', permission: 'configuracion-email:view' },
-      { label: 'Plantillas de correo', icon: 'file-text', path: '/plantillas-correo', permission: 'configuracion-email:view' },
-      { label: 'Menú del día', icon: 'coffee', path: '/menu-del-dia', permission: 'configuracion-email:update' },
+      { label: 'Plantillas de correo', icon: 'file-text', path: '/plantillas-correo', permission: 'plantillas-correo:view' },
+      { label: 'Menú del día', icon: 'coffee', path: '/menu-del-dia', permission: 'menu-del-dia:view' },
       { label: 'Mi Plan',   icon: 'crown',         path: '/planes',    permission: 'planes:view' },
       { label: 'Pagos en línea', icon: 'thunderbolt', path: '/pagos-wompi', permission: 'pagos-manuales:create' },
       { label: 'Pagos pendientes', icon: 'dollar', path: '/pagos-manuales/pendientes', permission: 'pagos-manuales:approve' }

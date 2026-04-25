@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, Router } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -13,19 +13,26 @@ import { ScreenInfoService } from '../../core/services/screen/screen-info.servic
 import { RealtimeService } from '../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../core/services/realtime/realtime-events';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PlanService, PlanTenant } from '../../features/planes/services/plan.service';
 
-interface MenuItem {
+/** Ítem hoja (ruta) dentro de un submenú o el dashboard superior. */
+interface MenuLeaf {
   label: string;
-  icon?: any;
-  path?: string;
-  children?: MenuItem[];
-  /** Código de permiso requerido para ver este ítem en el menú. */
+  icon: string;
+  path: string;
+  /** Código de permiso requerido para ver el ítem. */
   permission?: string;
-  divider?: boolean;
+}
+
+/** Bloque plegable (Operación, Configuración, etc.). */
+interface MenuGroup {
+  id: string;
+  label: string;
+  icon: string;
+  children: MenuLeaf[];
 }
 
 @Component({
@@ -57,7 +64,15 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   isCollapsed = false;
   currentUser: any;
-  menuItems: MenuItem[] = [];
+  /** Dashboard (fuera de grupos) o null si no aplica. */
+  menuDashboard: MenuLeaf | null = null;
+  /** Secciones con al menos un ítem visible. */
+  menuGroups: MenuGroup[] = [];
+  /**
+   * Control de apertura por grupo (id → abierto). Al navegar se sincroniza
+   * con el segmento de la ruta; el usuario puede plegar o abrir a mano.
+   */
+  submenuOpen: Record<string, boolean> = {};
   organizationName = '—';
   /** Plan + estado de vigencia del tenant. Alimenta el banner sticky. */
   plan: PlanTenant | null = null;
@@ -65,6 +80,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadCurrentUser();
     this.initializeMenuItems();
+    this.syncSubmenusFromRoute();
+    this.router.events
+      .pipe(
+        takeUntil(this.destroy$),
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+      )
+      .subscribe(() => this.syncSubmenusFromRoute());
     this.realtime.connect();
     this.subscribeToPermissionChanges();
     this.subscribeToOwnRolChange();
@@ -183,6 +205,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       this.router.navigateByUrl('/dashboard', { skipLocationChange: true })
         .then(() => this.router.navigateByUrl(url));
       this.initializeMenuItems();
+      this.syncSubmenusFromRoute();
     });
   }
 
@@ -220,7 +243,9 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   isActive(path?: string): boolean {
     if (!path) return false;
-    return this.router.url.startsWith(path);
+    const u = this.router.url.split('?')[0];
+    if (u === path) return true;
+    return u.startsWith(path + '/');
   }
 
   getUserInitial(): string {
@@ -259,30 +284,86 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     }
   }
 
+  private canSee(permission?: string): boolean {
+    return !permission || this.authService.hasPermission(permission);
+  }
+
+  private filterLeafs(leaves: MenuLeaf[]): MenuLeaf[] {
+    return leaves.filter((l) => this.canSee(l.permission));
+  }
+
   private initializeMenuItems(): void {
-    const all: MenuItem[] = [
-      { label: 'Dashboard', icon: 'dashboard',     path: '/dashboard', permission: 'dashboard:view' },
-      { label: 'Clientes',  icon: 'usergroup-add', path: '/clientes',  permission: 'clientes:view'  },
-      { label: 'Empresas',  icon: 'shop',          path: '/empresas',  permission: 'empresas:view'  },
-      { label: 'Usuarios',  icon: 'team',          path: '/usuarios',  permission: 'usuarios:view'  },
-      { label: 'Roles',     icon: 'safety',        path: '/roles',     permission: 'roles:view'     },
-      { label: 'Tenants',   icon: 'bank',          path: '/tenants',   permission: 'tenants:view'   },
-      { label: 'Valeras',   icon: 'gift',          path: '/valeras',   permission: 'valeras:view'   },
-      { label: 'Consumos',  icon: 'bar-chart',     path: '/consumos',  permission: 'consumos:view'  },
-      { label: 'Permisos',  icon: 'safety-certificate', path: '/permisos', permission: 'permisos:view' },
-      { label: 'Conf. Correo', icon: 'mail', path: '/configuracion-email', permission: 'configuracion-email:view' },
-      { label: 'Plantillas de correo', icon: 'file-text', path: '/plantillas-correo', permission: 'plantillas-correo:view' },
-      { label: 'Menú del día', icon: 'coffee', path: '/menu-del-dia', permission: 'menu-del-dia:view' },
-      { label: 'Mi Plan',   icon: 'crown',         path: '/planes',    permission: 'planes:view' },
-      { label: 'Pagos en línea', icon: 'thunderbolt', path: '/pagos-wompi', permission: 'pagos-manuales:create' },
-      { label: 'Pagos pendientes', icon: 'dollar', path: '/pagos-manuales/pendientes', permission: 'pagos-manuales:approve' }
+    const groupsDef: Array<Omit<MenuGroup, 'children'> & { children: MenuLeaf[] }> = [
+      {
+        id: 'operacion',
+        label: 'Operación',
+        icon: 'appstore',
+        children: [
+          { label: 'Clientes', icon: 'usergroup-add', path: '/clientes', permission: 'clientes:view' },
+          { label: 'Empresas', icon: 'shop', path: '/empresas', permission: 'empresas:view' },
+          { label: 'Valeras', icon: 'gift', path: '/valeras', permission: 'valeras:view' },
+          { label: 'Consumos', icon: 'bar-chart', path: '/consumos', permission: 'consumos:view' }
+        ]
+      },
+      {
+        id: 'administracion',
+        label: 'Administración',
+        icon: 'team',
+        children: [
+          { label: 'Usuarios', icon: 'user', path: '/usuarios', permission: 'usuarios:view' },
+          { label: 'Roles', icon: 'safety', path: '/roles', permission: 'roles:view' },
+          { label: 'Permisos', icon: 'safety-certificate', path: '/permisos', permission: 'permisos:view' }
+        ]
+      },
+      {
+        id: 'plataforma',
+        label: 'Plataforma',
+        icon: 'cloud-server',
+        children: [
+          { label: 'Tenants', icon: 'bank', path: '/tenants', permission: 'tenants:view' }
+        ]
+      },
+      {
+        id: 'comunicacion',
+        label: 'Correo y comunicación',
+        icon: 'mail',
+        children: [
+          { label: 'Config. de correo', icon: 'setting', path: '/configuracion-email', permission: 'configuracion-email:view' },
+          { label: 'Plantillas de correo', icon: 'file-text', path: '/plantillas-correo', permission: 'plantillas-correo:view' },
+          { label: 'Menú del día', icon: 'coffee', path: '/menu-del-dia', permission: 'menu-del-dia:view' }
+        ]
+      },
+      {
+        id: 'plan-pagos',
+        label: 'Plan y pagos',
+        icon: 'wallet',
+        children: [
+          { label: 'Mi plan', icon: 'crown', path: '/planes', permission: 'planes:view' },
+          { label: 'Pagos en línea', icon: 'thunderbolt', path: '/pagos-wompi', permission: 'pagos-manuales:create' },
+          { label: 'Pagos pendientes', icon: 'dollar', path: '/pagos-manuales/pendientes', permission: 'pagos-manuales:approve' }
+        ]
+      }
     ];
 
-    // Si no hay permiso definido o el usuario lo tiene, se muestra.
-    // Admin tiene acceso total → vé todo (gestión por hasPermission del AuthService).
-    this.menuItems = all.filter(
-      item => !item.permission || this.authService.hasPermission(item.permission)
-    );
+    const dash: MenuLeaf = { label: 'Dashboard', icon: 'dashboard', path: '/dashboard', permission: 'dashboard:view' };
+    this.menuDashboard = this.canSee(dash.permission) ? dash : null;
+
+    this.menuGroups = groupsDef
+      .map((g) => ({ ...g, children: this.filterLeafs(g.children) }))
+      .filter((g) => g.children.length > 0);
+
+    this.submenuOpen = Object.fromEntries(this.menuGroups.map((g) => [g.id, false])) as Record<string, boolean>;
+    this.syncSubmenusFromRoute();
+  }
+
+  /** Deja abiertos solo los submenús que contienen la ruta activa. */
+  private syncSubmenusFromRoute(): void {
+    const u = this.router.url.split('?')[0];
+    for (const g of this.menuGroups) {
+      this.submenuOpen[g.id] = g.children.some(
+        (c) => u === c.path || u.startsWith(c.path + '/')
+      );
+    }
   }
 
   toggleSidebar(): void {

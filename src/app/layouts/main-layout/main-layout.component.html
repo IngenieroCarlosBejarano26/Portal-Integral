@@ -74,18 +74,42 @@
 
     <!-- Menu -->
     <div class="menu-section" *ngIf="!isCollapsed">
-      <span class="menu-section-label">Navegación</span>
+      <span class="menu-section-label">Secciones</span>
     </div>
 
-    <ul nz-menu class="menu" nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+    <ul
+      nz-menu
+      class="menu"
+      nzTheme="light"
+      nzMode="inline"
+      [nzInlineCollapsed]="isCollapsed"
+    >
       <li
-        *ngFor="let item of menuItems"
+        *ngIf="menuDashboard"
         nz-menu-item
-        [nzSelected]="isActive(item.path)"
-        [nzMatchRouter]="false"
-        (click)="item.path && navigateTo(item.path)">
-        <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
-        <span>{{ item.label }}</span>
+        [nzSelected]="isActive(menuDashboard.path)"
+        (click)="navigateTo(menuDashboard.path)">
+        <i nz-icon [nzType]="menuDashboard.icon" nzTheme="outline"></i>
+        <span>{{ menuDashboard.label }}</span>
+      </li>
+
+      <li
+        *ngFor="let group of menuGroups"
+        nz-submenu
+        [nzTitle]="group.label"
+        [nzIcon]="group.icon"
+        [(nzOpen)]="submenuOpen[group.id]"
+      >
+        <ul>
+          <li
+            *ngFor="let item of group.children"
+            nz-menu-item
+            [nzSelected]="isActive(item.path)"
+            (click)="navigateTo(item.path)">
+            <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
+            <span>{{ item.label }}</span>
+          </li>
+        </ul>
       </li>
     </ul>
 

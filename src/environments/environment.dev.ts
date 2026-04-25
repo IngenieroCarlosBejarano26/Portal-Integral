@@ -5,7 +5,6 @@ export const environment: Environment = {
   environment: 'development',
   api: {
     baseUrl: 'http://192.168.10.20:5161',
-    apiKey: 'V4l3r4s-4p1K3y-S3cur3-2024!'
+    apiKey: 'V4l3r4s-4p1K3y-S3cur3-2024!',
   },
 };
-

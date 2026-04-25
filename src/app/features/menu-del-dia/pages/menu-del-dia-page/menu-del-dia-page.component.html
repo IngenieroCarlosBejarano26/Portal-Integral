@@ -1,5 +1,5 @@
 <div class="menu-page">
-  <div class="hero">
+  <div class="app-hero app-hero--emerald">
     <div class="hero-text">
       <h1>Menú del día</h1>
       <p>
@@ -80,45 +80,47 @@
             Escribe el menú en palabras. El encabezado, el saludo a cada cliente y el pie del mensaje
             se generan solos.
           </p>
-          <div class="field">
-            <label>Entrada</label>
-            <textarea
-              nz-input
-              [(ngModel)]="menuSimple.entrada"
-              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-              [nzAutosize]="{ minRows: 2, maxRows: 5 }"
-              placeholder="Ej. Crema de verduras, ensalada César…"
-            ></textarea>
-          </div>
-          <div class="field">
-            <label>Plato fuerte</label>
-            <textarea
-              nz-input
-              [(ngModel)]="menuSimple.platoFuerte"
-              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-              [nzAutosize]="{ minRows: 2, maxRows: 5 }"
-              placeholder="Ej. Bandeja paisa, trucha al ajillo, opción vegetariana: …"
-            ></textarea>
-          </div>
-          <div class="field">
-            <label>Bebida</label>
-            <textarea
-              nz-input
-              [(ngModel)]="menuSimple.bebida"
-              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-              [nzAutosize]="{ minRows: 1, maxRows: 3 }"
-              placeholder="Ej. Limonada, jugo, agua…"
-            ></textarea>
-          </div>
-          <div class="field field--last">
-            <label>Nota u observación (opcional)</label>
-            <textarea
-              nz-input
-              [(ngModel)]="menuSimple.nota"
-              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-              [nzAutosize]="{ minRows: 1, maxRows: 3 }"
-              placeholder="Cambio de plato, horario, promoción del día, etc."
-            ></textarea>
+          <div class="asistente-grid">
+            <div class="field">
+              <label>Entrada</label>
+              <textarea
+                nz-input
+                [(ngModel)]="menuSimple.entrada"
+                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                [nzAutosize]="{ minRows: 2, maxRows: 5 }"
+                placeholder="Ej. Crema de verduras, ensalada César…"
+              ></textarea>
+            </div>
+            <div class="field">
+              <label>Plato fuerte</label>
+              <textarea
+                nz-input
+                [(ngModel)]="menuSimple.platoFuerte"
+                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                [nzAutosize]="{ minRows: 2, maxRows: 5 }"
+                placeholder="Ej. Bandeja paisa, trucha al ajillo, opción vegetariana: …"
+              ></textarea>
+            </div>
+            <div class="field">
+              <label>Bebida</label>
+              <textarea
+                nz-input
+                [(ngModel)]="menuSimple.bebida"
+                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+                placeholder="Ej. Limonada, jugo, agua…"
+              ></textarea>
+            </div>
+            <div class="field asistente-field--nota field--last">
+              <label>Nota u observación (opcional)</label>
+              <textarea
+                nz-input
+                [(ngModel)]="menuSimple.nota"
+                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+                placeholder="Cambio de plato, horario, promoción del día, etc."
+              ></textarea>
+            </div>
           </div>
         </div>
       </ng-container>

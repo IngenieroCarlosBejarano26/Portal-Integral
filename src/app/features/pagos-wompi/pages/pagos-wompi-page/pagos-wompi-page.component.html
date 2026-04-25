@@ -1,26 +1,24 @@
-<div class="page">
-  <div class="hero">
-    <div class="hero-inner">
-      <div class="hero-text">
-        <h2>
-          <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
-          Pagos en línea
-        </h2>
-        <p>
-          Activa o renueva tu plan al instante con tarjeta, PSE, Nequi o Bancolombia QR.
-          Aquí puedes ver el historial y el estado de cada pago.
-        </p>
-      </div>
-      <div class="header-actions">
-        <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading" class="btn-hero">
-          <i nz-icon nzType="reload" nzTheme="outline"></i>
-          Refrescar
-        </button>
-        <button nz-button nzType="primary" (click)="abrirSeleccionPlan()" class="btn-hero primary">
-          <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
-          Pagar plan ahora
-        </button>
-      </div>
+<div class="page-container pagos-wompi-page">
+  <div class="app-hero app-hero--indigo pagos-hero">
+    <div class="hero-text">
+      <h2>
+        <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
+        Pagos en línea
+      </h2>
+      <p>
+        Activa o renueva tu plan al instante con tarjeta, PSE, Nequi o Bancolombia QR.
+        Aquí puedes ver el historial y el estado de cada pago.
+      </p>
+    </div>
+    <div class="header-actions">
+      <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading" class="btn-hero">
+        <i nz-icon nzType="reload" nzTheme="outline"></i>
+        Refrescar
+      </button>
+      <button nz-button nzType="primary" (click)="abrirSeleccionPlan()" class="btn-hero primary">
+        <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
+        Pagar plan ahora
+      </button>
     </div>
   </div>
 

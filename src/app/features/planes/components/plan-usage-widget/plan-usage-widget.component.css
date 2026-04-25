@@ -62,7 +62,7 @@
   color: #4b5563;
 }
 
-.uso-label i { color: #6366f1; }
+.uso-label i { color: var(--primary); }
 
 .uso-valor {
   font-weight: 600;
@@ -109,7 +109,7 @@
   background: #f9fafb;
   border-radius: 8px;
   margin-bottom: 14px;
-  border-left: 3px solid #6366f1;
+  border-left: 3px solid var(--primary);
 }
 
 .vigencia-info {
@@ -120,7 +120,7 @@
   color: #4b5563;
 }
 
-.vigencia-info i { color: #6366f1; font-size: 16px; }
+.vigencia-info i { color: var(--primary); font-size: 16px; }
 
 .vigencia-label {
   color: #6b7280;

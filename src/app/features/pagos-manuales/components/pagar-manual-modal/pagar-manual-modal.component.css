@@ -1,6 +1,6 @@
 :host {
-  --pm-primary: #6366f1;
-  --pm-primary-soft: #eef2ff;
+  --pm-primary: var(--primary);
+  --pm-primary-soft: var(--primary-soft);
   --pm-accent: #f59e0b;
   --pm-success: #10b981;
   --pm-success-soft: #ecfdf5;

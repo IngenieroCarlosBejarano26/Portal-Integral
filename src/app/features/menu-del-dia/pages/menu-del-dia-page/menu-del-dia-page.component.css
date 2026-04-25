@@ -50,6 +50,81 @@
   border: 1px solid #e5e7eb;
 }
 
+/* Título de la card: "Redactar mensaje" + tag del código de plantilla */
+.menu-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-card-title-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.menu-card-codigo {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.card-lead {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #4b5563;
+  background: #f0fdf4;
+  border: 1px solid #d1fae5;
+  border-radius: 10px;
+}
+
+.card-lead a {
+  color: #047857;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.placeholders-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.placeholders-inline-label {
+  width: 100%;
+  font-weight: 600;
+  color: #475569;
+}
+
+@media (min-width: 480px) {
+  .placeholders-inline-label {
+    width: auto;
+  }
+}
+
+.ph-inline {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  color: #0f172a;
+}
+
 .field {
   margin-bottom: 16px;
 }
@@ -69,6 +144,57 @@
 
 .actions {
   margin-top: 8px;
+}
+
+.actions-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.actions-row .secundarias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (min-width: 600px) {
+  .actions-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+.placeholders {
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 0.8rem;
+  opacity: 0.95;
+}
+
+.placeholders > span {
+  width: 100%;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+@media (min-width: 500px) {
+  .placeholders > span {
+    width: auto;
+    margin-bottom: 0;
+  }
+}
+
+.hero a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
 }
 
 .stats-row {

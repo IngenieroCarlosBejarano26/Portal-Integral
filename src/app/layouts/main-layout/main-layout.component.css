@@ -596,10 +596,15 @@ nz-header.header {
    ============================================ */
 /* ============================================
    CONTENT AREA — Workspace donde se renderizan los módulos
+   (flex: el <nz-content> hace scroll; evita 100vh + overflow:hidden y contenido
+   inalcanzable en Planes, Menú del día, etc. en desktop)
    ============================================ */
 .content-layout {
   margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
   height: 100vh;
+  min-height: 0;
   overflow: hidden;
   position: relative;
   transition: margin-left 0.25s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
@@ -640,9 +645,17 @@ nz-header.header {
   position: relative;
   z-index: 2;
   padding: 0;
-  height: 100vh;
-  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   background: transparent !important;
+}
+
+.content-layout > .plan-banner {
+  flex-shrink: 0;
 }
 
 /* ============================================

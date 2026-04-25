@@ -34,4 +34,13 @@ export class PlantillasCorreoService {
       map((res) => !!res?.success)
     );
   }
+
+  /** Plantilla por codigo, o null si no existe. */
+  obtenerPorCodigo(codigo: string): Observable<PlantillaEmailDto | null> {
+    return this.http
+      .get<ApiResponse<PlantillaEmailDto | null>>(
+        `${this.endpoint}/${encodeURIComponent(codigo)}`
+      )
+      .pipe(map((res) => res?.data ?? null));
+  }
 }

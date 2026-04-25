@@ -3,8 +3,15 @@
     <div class="hero-text">
       <h1>Menú del día</h1>
       <p>
-        Envía un correo HTML a <strong>todos los clientes activos</strong> que tengan email.
-        Usa <code class="ph" ngNonBindable>{{NombreCliente}}</code> para personalizar el saludo.
+        Envía un correo HTML a <strong>todos los clientes activos</strong> con email.
+        Puedes guardar un borrador en la base como plantilla <code class="ph">menu-del-dia</code> y reutilizarlo
+        o editarlo desde <a routerLink="/plantillas-correo">Plantillas de correo</a>.
+      </p>
+      <p class="placeholders" ngNonBindable>
+        <span>Placeholders al enviar:</span>
+        <nz-tag>{{NombreCliente}}</nz-tag>
+        <nz-tag>{{FechaHoy}}</nz-tag>
+        <nz-tag>{{FechaHoyLarga}}</nz-tag>
       </p>
     </div>
   </div>
@@ -19,10 +26,35 @@
   ></nz-alert>
 
   <div class="layout-grid">
-    <nz-card nzTitle="Redactar mensaje" class="card-form">
+    <nz-card [nzTitle]="tituloRedactarTpl" class="card-form">
+      <ng-template #tituloRedactarTpl>
+        <div class="menu-card-title">
+          <span class="menu-card-title-text">Redactar mensaje</span>
+          <nz-tag nzColor="success" class="menu-card-codigo">menu-del-dia</nz-tag>
+        </div>
+      </ng-template>
+
+      <p class="card-lead">
+        Este formulario edita la misma plantilla <strong>menu-del-dia</strong> que aparece en
+        <a routerLink="/plantillas-correo">Plantillas de correo</a>. Si guardas aquí o allí, el
+        contenido queda unificado en la base del tenant.
+      </p>
+
+      <div class="placeholders-inline" ngNonBindable>
+        <span class="placeholders-inline-label">Se reemplazan al enviar:</span>
+        <code class="ph-inline">{{NombreCliente}}</code>
+        <code class="ph-inline">{{NombreClienteTexto}}</code>
+        <code class="ph-inline">{{FechaHoy}}</code>
+        <code class="ph-inline">{{FechaHoyLarga}}</code>
+      </div>
+
       <div class="field">
         <label>Asunto</label>
-        <input nz-input [(ngModel)]="asunto" placeholder="Menú del día — 25 de abril" />
+        <input
+          nz-input
+          [(ngModel)]="asunto"
+          [attr.placeholder]="placeholderAsuntoEjemplo"
+        />
       </div>
       <div class="field">
         <label>Cuerpo HTML</label>
@@ -33,7 +65,7 @@
           class="html-area"
         ></textarea>
       </div>
-      <div class="actions">
+      <div class="actions actions-row">
         <button
           nz-button
           nzType="primary"
@@ -45,6 +77,31 @@
           <i nz-icon nzType="send" nzTheme="outline"></i>
           Enviar a todos los clientes
         </button>
+        <div class="secundarias">
+          <button
+            nz-button
+            [nzLoading]="guardandoPlantilla"
+            (click)="guardarComoPlantillaMenu()"
+            [disabled]="!asunto.trim() || !cuerpoHtml.trim()"
+            title="Almacena en la BD (código menu-del-dia) para reabrir o editar en Plantillas"
+          >
+            <i nz-icon nzType="save" nzTheme="outline"></i>
+            Guardar plantilla
+          </button>
+          <button
+            nz-button
+            (click)="recargarPlantillaDesdeServidor()"
+            [nzLoading]="cargandoPlantilla"
+            title="Sobrescribe el editor con la plantilla guardada en el servidor"
+          >
+            <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
+            Cargar plantilla
+          </button>
+          <button nz-button (click)="restaurarTextoDeEjemplo()">
+            <i nz-icon nzType="undo" nzTheme="outline"></i>
+            Restaurar ejemplo
+          </button>
+        </div>
       </div>
     </nz-card>
 

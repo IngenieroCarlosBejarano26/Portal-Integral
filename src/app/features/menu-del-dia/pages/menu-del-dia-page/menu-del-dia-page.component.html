@@ -3,12 +3,12 @@
     <div class="hero-text">
       <h1>Menú del día</h1>
       <p>
-        Envía un correo HTML a <strong>todos los clientes activos</strong> con email.
-        Puedes guardar un borrador en la base como plantilla <code class="ph">menu-del-dia</code> y reutilizarlo
-        o editarlo desde <a routerLink="/plantillas-correo">Plantillas de correo</a>.
+        Rellena el <strong>asistente</strong> (entrada, plato, bebida) en texto claro. El correo a tus clientes
+        se arma en automático, con un diseño adecuado. No hace falta saber HTML.
+        También puedes <strong>guardar plantilla</strong> o editar en <a routerLink="/plantillas-correo">Plantillas de correo</a>.
       </p>
       <p class="placeholders" ngNonBindable>
-        <span>Placeholders al enviar:</span>
+        <span>El sistema añade en el correo:</span>
         <nz-tag>{{NombreCliente}}</nz-tag>
         <nz-tag>{{FechaHoy}}</nz-tag>
         <nz-tag>{{FechaHoyLarga}}</nz-tag>
@@ -25,6 +25,15 @@
     class="mb-alert"
   ></nz-alert>
 
+  <nz-alert
+    *ngIf="cuerpoSinAsistente && vista === 'html'"
+    nzType="info"
+    nzShowIcon
+    class="mb-alert"
+    nzMessage="Vista avanzada (HTML sin asistente)"
+    nzDescription="La plantilla cargada no se creó con el asistente. Sigue en HTML, o elige 'Asistente' y confirma para pasar a texto en claro (se ofrece reemplazar el diseño).">
+  </nz-alert>
+
   <div class="layout-grid">
     <nz-card [nzTitle]="tituloRedactarTpl" class="card-form">
       <ng-template #tituloRedactarTpl>
@@ -35,36 +44,98 @@
       </ng-template>
 
       <p class="card-lead">
-        Este formulario edita la misma plantilla <strong>menu-del-dia</strong> que aparece en
-        <a routerLink="/plantillas-correo">Plantillas de correo</a>. Si guardas aquí o allí, el
-        contenido queda unificado en la base del tenant.
+        Misma plantilla <strong>menu-del-dia</strong> que en
+        <a routerLink="/plantillas-correo">Plantillas de correo</a>. Lo que indiques se guarda y envía por correo
+        a todos los clientes con email.
       </p>
 
-      <div class="placeholders-inline" ngNonBindable>
-        <span class="placeholders-inline-label">Se reemplazan al enviar:</span>
+      <div class="vista-bloque">
+        <span class="vista-eti">Cómo quieres editar</span>
+        <nz-radio-group [ngModel]="vista" (ngModelChange)="cambioVista($event)" class="vista-radios" nzSize="default">
+          <label nz-radio-button [nzValue]="'formulario'">Asistente (recomendado)</label>
+          <label nz-radio-button [nzValue]="'html'">Solo edición avanzada (HTML)</label>
+        </nz-radio-group>
+      </div>
+
+      <div class="placeholders-inline" ngNonBindable *ngIf="vista === 'formulario'">
+        <span class="placeholders-inline-label">Añadidos al enviar (no hace falta copiarlos):</span>
         <code class="ph-inline">{{NombreCliente}}</code>
-        <code class="ph-inline">{{NombreClienteTexto}}</code>
         <code class="ph-inline">{{FechaHoy}}</code>
         <code class="ph-inline">{{FechaHoyLarga}}</code>
       </div>
 
       <div class="field">
-        <label>Asunto</label>
+        <label>Asunto del correo</label>
         <input
           nz-input
           [(ngModel)]="asunto"
           [attr.placeholder]="placeholderAsuntoEjemplo"
         />
+        <p class="field-hint" ngNonBindable>Puedes dejar <code class="ph-inline ph-inline--mini">{{FechaHoy}}</code> en el asunto; se reemplaza al enviar.</p>
       </div>
-      <div class="field">
-        <label>Cuerpo HTML</label>
-        <textarea
-          nz-input
-          [nzAutosize]="{ minRows: 16, maxRows: 28 }"
-          [(ngModel)]="cuerpoHtml"
-          class="html-area"
-        ></textarea>
-      </div>
+
+      <ng-container *ngIf="vista === 'formulario'">
+        <div class="asistente">
+          <p class="asistente-intro">
+            Escribe el menú en palabras. El encabezado, el saludo a cada cliente y el pie del mensaje
+            se generan solos.
+          </p>
+          <div class="field">
+            <label>Entrada</label>
+            <textarea
+              nz-input
+              [(ngModel)]="menuSimple.entrada"
+              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+              [nzAutosize]="{ minRows: 2, maxRows: 5 }"
+              placeholder="Ej. Crema de verduras, ensalada César…"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label>Plato fuerte</label>
+            <textarea
+              nz-input
+              [(ngModel)]="menuSimple.platoFuerte"
+              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+              [nzAutosize]="{ minRows: 2, maxRows: 5 }"
+              placeholder="Ej. Bandeja paisa, trucha al ajillo, opción vegetariana: …"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label>Bebida</label>
+            <textarea
+              nz-input
+              [(ngModel)]="menuSimple.bebida"
+              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+              [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+              placeholder="Ej. Limonada, jugo, agua…"
+            ></textarea>
+          </div>
+          <div class="field field--last">
+            <label>Nota u observación (opcional)</label>
+            <textarea
+              nz-input
+              [(ngModel)]="menuSimple.nota"
+              (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+              [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+              placeholder="Cambio de plato, horario, promoción del día, etc."
+            ></textarea>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="vista === 'html'">
+        <div class="field">
+          <label>Cuerpo HTML</label>
+          <p class="field-hint">Solo para quienes ya conocen HTML. Incluye los placeholders que necesites.</p>
+          <textarea
+            nz-input
+            [nzAutosize]="{ minRows: 16, maxRows: 28 }"
+            [(ngModel)]="cuerpoHtml"
+            class="html-area"
+          ></textarea>
+        </div>
+      </ng-container>
+
       <div class="actions actions-row">
         <button
           nz-button
@@ -92,14 +163,14 @@
             nz-button
             (click)="recargarPlantillaDesdeServidor()"
             [nzLoading]="cargandoPlantilla"
-            title="Sobrescribe el editor con la plantilla guardada en el servidor"
+            title="Carga el último copy guardado en el servidor en esta pantalla"
           >
             <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
             Cargar plantilla
           </button>
           <button nz-button (click)="restaurarTextoDeEjemplo()">
             <i nz-icon nzType="undo" nzTheme="outline"></i>
-            Restaurar ejemplo
+            Vaciar menú (asistente)
           </button>
         </div>
       </div>

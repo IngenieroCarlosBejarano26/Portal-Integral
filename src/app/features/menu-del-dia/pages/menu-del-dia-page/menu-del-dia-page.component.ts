@@ -12,9 +12,16 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { ComunicacionService } from '../../services/comunicacion.service';
 import { ConfiguracionEmailService } from '../../../configuracion-email/services/configuracion-email.service';
 import { PlantillasCorreoService } from '../../../plantillas-correo/services/plantillas-correo.service';
+import {
+  buildMenuDiaCuerpoHtml,
+  defaultMenuDiaVacio,
+  MenuDiaSimple,
+  parseMenuDiaCuerpoHtml
+} from '../../utils/menu-dia-mail-builder';
 
 @Component({
   selector: 'app-menu-del-dia-page',
@@ -30,7 +37,8 @@ import { PlantillasCorreoService } from '../../../plantillas-correo/services/pla
     NzAlertModule,
     NzCardModule,
     NzStatisticModule,
-    NzTagModule
+    NzTagModule,
+    NzRadioModule
   ],
   templateUrl: './menu-del-dia-page.component.html',
   styleUrl: './menu-del-dia-page.component.css'
@@ -53,18 +61,36 @@ export class MenuDelDiaPageComponent implements OnInit {
 
   asunto = 'Menú del día';
   cuerpoHtml = '';
+  /** Formulario en claro; el HTML se genera y guarda comentario interno para reabrir. */
+  menuSimple: MenuDiaSimple = defaultMenuDiaVacio();
+  /** formulario: asistente sin HTML. html: edición cruda. */
+  vista: 'formulario' | 'html' = 'formulario';
+  /** true si el HTML en BD no trae el bloque de metadatos (plantilla antigua o editada a mano). */
+  cuerpoSinAsistente = false;
+
   enviando = false;
   guardandoPlantilla = false;
   ultimo: { destinatarios: number; enviados: number; fallidos: number } | null = null;
 
   ngOnInit(): void {
     this.asunto = 'Menú del día — {{FechaHoy}}';
-    this.cuerpoHtml = this.cuerpoPorDefecto();
+    this.menuSimple = defaultMenuDiaVacio();
+    this.cuerpoHtml = buildMenuDiaCuerpoHtml(this.menuSimple);
     this.plantillas.obtenerPorCodigo(MenuDelDiaPageComponent.PlantillaMenuCodigo).subscribe({
       next: (p) => {
         this.cargandoPlantilla = false;
         if (p?.cuerpoHtml?.trim()) {
           this.cuerpoHtml = p.cuerpoHtml;
+          const parsed = parseMenuDiaCuerpoHtml(p.cuerpoHtml);
+          if (parsed) {
+            this.menuSimple = parsed;
+            this.actualizarCuerpoDesdeFormulario();
+            this.vista = 'formulario';
+            this.cuerpoSinAsistente = false;
+          } else {
+            this.cuerpoSinAsistente = true;
+            this.vista = 'html';
+          }
         }
         if (p?.asunto?.trim()) {
           this.asunto = p.asunto;
@@ -86,22 +112,55 @@ export class MenuDelDiaPageComponent implements OnInit {
     });
   }
 
-  private cuerpoPorDefecto(): string {
-    // Placeholders reemplazados en el servidor al enviar (no son binding de Angular).
-    return `<!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8" /></head>
-<body style="font-family: -apple-system, Segoe UI, Roboto, sans-serif; color: #1f2937; line-height: 1.6; max-width: 560px; margin: 0 auto; padding: 16px;">
-  <p style="color: #6b7280; font-size: 13px; margin: 0 0 8px 0;">{{FechaHoyLarga}}</p>
-  <p>Hola <strong>{{NombreCliente}}</strong>,</p>
-  <p>Compartimos nuestro <strong>menú del día</strong> ({{FechaHoy}}):</p>
-  <ul>
-    <li>Entrada: …</li>
-    <li>Plato fuerte: …</li>
-    <li>Bebida: …</li>
-  </ul>
-  <p>¡Te esperamos!</p>
-  <p style="font-size: 12px; color: #9ca3af; margin-top: 24px;">Mensaje automático. Por favor no respondas a este correo.</p>
-</body></html>`;
+  private aplicarCuerpoTrasCarga(): void {
+    const parsed = parseMenuDiaCuerpoHtml(this.cuerpoHtml);
+    if (parsed) {
+      this.menuSimple = parsed;
+      this.actualizarCuerpoDesdeFormulario();
+      this.vista = 'formulario';
+      this.cuerpoSinAsistente = false;
+    } else {
+      this.cuerpoSinAsistente = (this.cuerpoHtml || '').trim().length > 0;
+      this.vista = 'html';
+    }
+  }
+
+  /** Regenera el HTML a partir de los textos (vista asistente). */
+  actualizarCuerpoDesdeFormulario(): void {
+    this.cuerpoHtml = buildMenuDiaCuerpoHtml(this.menuSimple);
+    this.cuerpoSinAsistente = false;
+  }
+
+  /** Cambia entre asistente (texto en claro) y editor HTML. */
+  cambioVista(nueva: 'formulario' | 'html'): void {
+    if (nueva === 'html') {
+      this.actualizarCuerpoDesdeFormulario();
+      this.vista = 'html';
+      return;
+    }
+    const parsed = parseMenuDiaCuerpoHtml(this.cuerpoHtml);
+    if (parsed) {
+      this.menuSimple = parsed;
+      this.actualizarCuerpoDesdeFormulario();
+      this.vista = 'formulario';
+      this.cuerpoSinAsistente = false;
+      return;
+    }
+    this.vista = 'html';
+    this.modal.confirm({
+      nzTitle: 'Cambiar al asistente',
+      nzContent:
+        'El HTML no proviene del asistente (plantilla antigua o edición en Plantillas de correo). Si continúas, se reemplaza por un menú con campos vacíos para que los rellenes en claro.',
+      nzOkText: 'Usar asistente',
+      nzOkType: 'primary',
+      nzCancelText: 'Cancelar',
+      nzOnOk: () => {
+        this.menuSimple = defaultMenuDiaVacio();
+        this.actualizarCuerpoDesdeFormulario();
+        this.vista = 'formulario';
+        this.cuerpoSinAsistente = false;
+      }
+    });
   }
 
   recargarPlantillaDesdeServidor(): void {
@@ -111,6 +170,7 @@ export class MenuDelDiaPageComponent implements OnInit {
         this.cargandoPlantilla = false;
         if (p?.cuerpoHtml?.trim()) {
           this.cuerpoHtml = p.cuerpoHtml;
+          this.aplicarCuerpoTrasCarga();
         } else {
           this.notification.info('Plantilla en servidor', 'No hay plantilla guardada con código menu-del-dia.');
         }
@@ -127,11 +187,17 @@ export class MenuDelDiaPageComponent implements OnInit {
 
   restaurarTextoDeEjemplo(): void {
     this.asunto = 'Menú del día — {{FechaHoy}}';
-    this.cuerpoHtml = this.cuerpoPorDefecto();
-    this.notification.success('Listo', 'Se restauró el texto de ejemplo. Puedes editarlo antes de enviar o guardar.');
+    this.menuSimple = defaultMenuDiaVacio();
+    this.actualizarCuerpoDesdeFormulario();
+    this.vista = 'formulario';
+    this.cuerpoSinAsistente = false;
+    this.notification.success('Listo', 'Se vació el menú. Completa el asistente o cambia a HTML si lo prefieres.');
   }
 
   guardarComoPlantillaMenu(): void {
+    if (this.vista === 'formulario') {
+      this.actualizarCuerpoDesdeFormulario();
+    }
     if (!this.asunto.trim() || !this.cuerpoHtml.trim()) {
       this.notification.warning('Faltan datos', 'Completa asunto y cuerpo antes de guardar la plantilla.');
       return;
@@ -161,6 +227,9 @@ export class MenuDelDiaPageComponent implements OnInit {
   }
 
   confirmarYEnviar(): void {
+    if (this.vista === 'formulario') {
+      this.actualizarCuerpoDesdeFormulario();
+    }
     if (!this.asunto.trim() || !this.cuerpoHtml.trim()) {
       this.notification.warning('Faltan datos', 'Completa asunto y cuerpo del mensaje.');
       return;

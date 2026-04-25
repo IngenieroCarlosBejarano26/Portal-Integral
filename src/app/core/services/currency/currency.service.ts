@@ -2,20 +2,28 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { ApiResponse } from '../base-api.service';
+import { environment } from '../../../../environments/environment.local';
 
-interface FrankfurterResponse {
-  amount: number;
-  base: string;
+/** Payload devuelto por GET /api/tasa-cambio del backend Valeras. */
+interface TasaCambioDto {
+  from: string;
+  to: string;
+  rate: number;
   date: string;
-  rates: { [code: string]: number };
 }
 
 /**
  * Servicio para obtener la tasa de cambio USD->COP en tiempo real.
- * - Usa la API gratuita de Frankfurter (mantenida por el Banco Central Europeo).
- * - Cachea la tasa por 6 horas en memoria + localStorage para evitar requests
- *   innecesarios y sobrevivir a reloads.
- * - Si la API falla, usa una tasa fallback razonable (~4000 COP/USD).
+ *
+ * Consume el endpoint `GET /api/tasa-cambio` de nuestro backend, que actúa
+ * como proxy hacia el proveedor externo (Frankfurter). Esto evita problemas
+ * de CORS/preflight redirect al llamar APIs públicas directamente desde la SPA
+ * y permite cachear/cambiar el proveedor sin tocar el frontend.
+ *
+ * Estrategia de cache:
+ *  - 6 horas en memoria (BehaviorSubject) + localStorage para sobrevivir reloads.
+ *  - Si el backend falla, usa una tasa fallback razonable (~4000 COP/USD).
  */
 @Injectable({ providedIn: 'root' })
 export class CurrencyService {
@@ -24,12 +32,12 @@ export class CurrencyService {
   private readonly STORAGE_KEY = 'usd_cop_rate';
   private readonly CACHE_HOURS = 6;
   private readonly FALLBACK_RATE = 4000; // COP por 1 USD
+  private readonly endpoint = `${environment.api!.baseUrl}/api/tasa-cambio`;
 
   private rateSubject = new BehaviorSubject<number>(this.readCached() ?? this.FALLBACK_RATE);
   public rate$ = this.rateSubject.asObservable();
 
   constructor() {
-    // Cargar tasa fresca al arrancar si el cache esta vencido o no existe.
     if (!this.readCached()) {
       this.fetchUsdToCop().subscribe();
     }
@@ -45,18 +53,17 @@ export class CurrencyService {
     return usd * this.rateSubject.value;
   }
 
-  /** Refresca la tasa desde la API (devuelve la tasa nueva). */
+  /** Refresca la tasa desde el backend (devuelve la tasa nueva). */
   fetchUsdToCop(): Observable<number> {
-    return this.http
-      .get<FrankfurterResponse>('https://api.frankfurter.app/latest?from=USD&to=COP')
-      .pipe(
-        map(res => res?.rates?.['COP'] ?? this.FALLBACK_RATE),
-        tap(rate => {
-          this.rateSubject.next(rate);
-          this.writeCache(rate);
-        }),
-        catchError(() => of(this.FALLBACK_RATE))
-      );
+    const url = `${this.endpoint}?from=USD&to=COP`;
+    return this.http.get<ApiResponse<TasaCambioDto>>(url).pipe(
+      map(res => res?.data?.rate ?? this.FALLBACK_RATE),
+      tap(rate => {
+        this.rateSubject.next(rate);
+        this.writeCache(rate);
+      }),
+      catchError(() => of(this.FALLBACK_RATE))
+    );
   }
 
   // --- cache helpers ---

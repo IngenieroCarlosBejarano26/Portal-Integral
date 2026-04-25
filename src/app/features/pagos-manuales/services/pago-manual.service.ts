@@ -73,9 +73,24 @@ export class PagoManualService {
     return this.http.get<ApiResponse<SolicitudPagoManual[]>>(`${this.base}/pendientes`).pipe(map(r => r?.data ?? []));
   }
 
-  /** URL del comprobante (descarga directa con auth). */
+  /**
+   * URL absoluta del endpoint de descarga del comprobante.
+   * OJO: requiere Authorization (JWT) + X-Api-Key, asi que NO sirve para
+   * abrirla con `window.open(url)` (no se inyectarian los headers).
+   * Para mostrarla en una pestana usa `descargarComprobante()` y
+   * `URL.createObjectURL(blob)`.
+   */
   comprobanteUrl(solicitudId: string): string {
     return `${this.base}/${solicitudId}/comprobante`;
+  }
+
+  /**
+   * Descarga el comprobante como Blob (con auth automatica via interceptor).
+   * Devuelve el blob con su Content-Type para que el caller decida si lo abre
+   * en una pestana, lo embebe en un <img> o lo fuerza a descargar.
+   */
+  descargarComprobante(solicitudId: string): Observable<Blob> {
+    return this.http.get(this.comprobanteUrl(solicitudId), { responseType: 'blob' });
   }
 
   aprobar(solicitudId: string): Observable<ApiResponse<boolean>> {

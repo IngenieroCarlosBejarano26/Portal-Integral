@@ -17,6 +17,8 @@ import { AuthService } from '../../../../core/services/auth/authService';
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { PlanService } from '../../../planes/services/plan.service';
 
 @Component({
   selector: 'app-usuarios-list',
@@ -27,6 +29,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
     NzButtonModule,
     NzIconModule,
     NzInputModule,
+    NzToolTipModule,
     CardGridComponent,
     HasPermissionDirective
   ],
@@ -40,7 +43,11 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   private modal = inject(NzModalService);
   private notification = inject(NzNotificationService);
   private realtime = inject(RealtimeService);
+  private planService = inject(PlanService);
   private destroy$ = new Subject<void>();
+
+  /** True si el plan del tenant esta vencido => bloqueo de creacion. */
+  planVencido = false;
 
   usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
@@ -149,6 +156,11 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     this.realtime.on(RealtimeEvents.Rol.Created).pipe(takeUntil(this.destroy$)).subscribe(reloadRoles);
     this.realtime.on(RealtimeEvents.Rol.Updated).pipe(takeUntil(this.destroy$)).subscribe(reloadRoles);
     this.realtime.on(RealtimeEvents.Rol.Deleted).pipe(takeUntil(this.destroy$)).subscribe(reloadRoles);
+
+    // Estado de vigencia del plan: bloquea el boton "Nuevo Usuario" si esta vencido.
+    this.planService.plan$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(p => this.planVencido = p?.estadoPlan === 'Vencido');
   }
 
   ngOnDestroy(): void {

@@ -6,6 +6,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CardGridComponent, CardConfig, CardAction } from '../../../../shared/components/card-grid/card-grid.component';
@@ -16,6 +17,7 @@ import { RealtimeService } from '../../../../core/services/realtime/realtime.ser
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
 import { AuthService } from '../../../../core/services/auth/authService';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { PlanService } from '../../../planes/services/plan.service';
 
 @Component({
   selector: 'app-clientes-list',
@@ -26,6 +28,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
     NzButtonModule,
     NzIconModule,
     NzInputModule,
+    NzToolTipModule,
     CardGridComponent,
     HasPermissionDirective
   ],
@@ -39,7 +42,11 @@ private notification = inject(NzNotificationService);
 private modal = inject(NzModalService);
 private realtime = inject(RealtimeService);
 private authService = inject(AuthService);
+private planService = inject(PlanService);
 private destroy$ = new Subject<void>();
+
+/** True si el plan del tenant esta vencido => bloqueo de creacion. */
+planVencido = false;
 
 clientes: Cliente[] = [];
 filteredClientes: Cliente[] = [];
@@ -138,6 +145,12 @@ private empresaField: FormField = {
     this.realtime.on(RealtimeEvents.Empresa.Created).pipe(takeUntil(this.destroy$)).subscribe(reloadEmpresas);
     this.realtime.on(RealtimeEvents.Empresa.Updated).pipe(takeUntil(this.destroy$)).subscribe(reloadEmpresas);
     this.realtime.on(RealtimeEvents.Empresa.Deleted).pipe(takeUntil(this.destroy$)).subscribe(reloadEmpresas);
+
+    // Estado de vigencia del plan: bloquea boton "Nuevo Cliente" si esta vencido.
+    // El plan lo carga el MainLayout; aqui solo nos suscribimos al stream compartido.
+    this.planService.plan$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(p => this.planVencido = p?.estadoPlan === 'Vencido');
   }
 
   private loadEmpresaOptions(): void {

@@ -16,6 +16,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { PlanService, PlanTenant } from '../../features/planes/services/plan.service';
 
 interface MenuItem {
   label: string;
@@ -52,11 +53,14 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private modal = inject(NzModalService);
   private notification = inject(NzNotificationService);
+  private planService = inject(PlanService);
 
   isCollapsed = false;
   currentUser: any;
   menuItems: MenuItem[] = [];
   organizationName = '—';
+  /** Plan + estado de vigencia del tenant. Alimenta el banner sticky. */
+  plan: PlanTenant | null = null;
 
   ngOnInit(): void {
     this.loadCurrentUser();
@@ -66,7 +70,70 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.subscribeToPermissionChanges();
     this.subscribeToOwnRolChange();
     this.subscribeToOwnDeactivation();
+    this.subscribeToPlanChanges();
   }
+
+  /**
+   * Mantiene `this.plan` sincronizado con el plan + estado de vigencia. Se carga
+   * al iniciar y se refresca cuando llegan eventos que pueden afectar la vigencia
+   * (pago aprobado por el super admin, webhook Wompi confirmado, etc.).
+   *
+   * Es BEST-EFFORT: si el endpoint falla (ej: planes:view no autorizado por algun
+   * rol limitado), simplemente no se muestra el banner.
+   */
+  private subscribeToPlanChanges(): void {
+    this.planService.plan$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(p => this.plan = p);
+
+    this.refreshPlan();
+
+    const eventos = [
+      RealtimeEvents.PagoManual.Approved,
+      RealtimeEvents.PagoWompi.Approved
+    ];
+    eventos.forEach(ev => {
+      this.realtime.on(ev)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => this.refreshPlan());
+    });
+  }
+
+  private refreshPlan(): void {
+    if (!this.authService.hasPermission('planes:view')) return;
+    this.planService.obtenerMiPlan().subscribe({
+      error: () => { /* best-effort: si el endpoint falla, no mostramos banner */ }
+    });
+  }
+
+  /** True si debemos mostrar el banner sticky (estado EnGracia o Vencido). */
+  get mostrarBannerVencimiento(): boolean {
+    const estado = this.plan?.estadoPlan;
+    return estado === 'EnGracia' || estado === 'Vencido';
+  }
+
+  /** Texto del banner segun estado y dias. */
+  get textoBannerVencimiento(): string {
+    if (!this.plan) return '';
+    const dias = this.plan.diasVencido ?? 0;
+    if (this.plan.estadoPlan === 'EnGracia') {
+      const restanGracia = Math.max(0, (this.plan.diasGracia ?? 7) - dias);
+      const hace = dias === 1 ? 'hace 1 dia' : `hace ${dias} dias`;
+      const restan = restanGracia === 1 ? '1 dia' : `${restanGracia} dias`;
+      return `Tu plan ${this.plan.planNombre} vencio ${hace}. Te quedan ${restan} de gracia para crear nuevos recursos. Renueva o cambia de plan para evitar bloqueos.`;
+    }
+    if (this.plan.estadoPlan === 'Vencido') {
+      return `Tu plan ${this.plan.planNombre} esta vencido y la creacion de clientes, valeras y usuarios esta BLOQUEADA. Renueva o cambia de plan para continuar.`;
+    }
+    return '';
+  }
+
+  /** Color del banner segun severidad. */
+  get colorBannerVencimiento(): 'warning' | 'danger' {
+    return this.plan?.estadoPlan === 'Vencido' ? 'danger' : 'warning';
+  }
+
+  goToPlanes(): void { this.router.navigate(['/planes']); }
 
   /**
    * Si un admin desactiva/elimina al usuario actual, lo deslogeamos al instante

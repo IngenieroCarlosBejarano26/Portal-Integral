@@ -111,6 +111,26 @@
 
   <!-- Content -->
   <nz-layout class="content-layout" [class.collapsed]="isCollapsed">
+    <!-- Banner sticky de vencimiento de plan (solo EnGracia/Vencido). -->
+    <div
+      *ngIf="mostrarBannerVencimiento"
+      class="plan-banner"
+      [class.plan-banner--danger]="colorBannerVencimiento === 'danger'"
+      [class.plan-banner--warning]="colorBannerVencimiento === 'warning'"
+      role="alert">
+      <i nz-icon nzType="warning" nzTheme="fill" class="plan-banner-icon"></i>
+      <span class="plan-banner-text">{{ textoBannerVencimiento }}</span>
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="small"
+        class="plan-banner-cta"
+        (click)="goToPlanes()">
+        <i nz-icon nzType="rocket" nzTheme="outline"></i>
+        Ir a planes
+      </button>
+    </div>
+
     <nz-content class="content">
       <router-outlet></router-outlet>
     </nz-content>

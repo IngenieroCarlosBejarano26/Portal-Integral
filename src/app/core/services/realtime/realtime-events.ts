@@ -54,6 +54,14 @@ export const RealtimeEvents = {
     Approved: 'pago-wompi:approved',
     /** Webhook de Wompi marco el pago como rechazado/anulado/error. */
     Declined: 'pago-wompi:declined'
+  },
+  PagoManual: {
+    /** Una nueva solicitud manual fue creada (visible para super admin). */
+    Created: 'pago-manual:created',
+    /** El super admin aprobo una solicitud manual: el plan del tenant se activo / renovo. */
+    Approved: 'pago-manual:approved',
+    /** El super admin rechazo una solicitud manual. */
+    Rejected: 'pago-manual:rejected'
   }
 } as const;
 
@@ -67,4 +75,5 @@ export type RealtimeEventName =
   | typeof RealtimeEvents.Tenant[keyof typeof RealtimeEvents.Tenant]
   | typeof RealtimeEvents.Usuario[keyof typeof RealtimeEvents.Usuario]
   | typeof RealtimeEvents.Permiso[keyof typeof RealtimeEvents.Permiso]
-  | typeof RealtimeEvents.PagoWompi[keyof typeof RealtimeEvents.PagoWompi];
+  | typeof RealtimeEvents.PagoWompi[keyof typeof RealtimeEvents.PagoWompi]
+  | typeof RealtimeEvents.PagoManual[keyof typeof RealtimeEvents.PagoManual];

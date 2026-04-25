@@ -130,4 +130,33 @@ export class PlanUsageWidgetComponent implements OnInit, OnDestroy {
   formatoUso(u: UsoItem): string {
     return `${u.actual} / ${u.max ?? '∞'}`;
   }
+
+  /**
+   * Tag de estado de vigencia para mostrar al lado de la fecha "Vigente hasta".
+   *
+   * Mapeo:
+   *  - Vencido               => rojo, "Vencido"
+   *  - EnGracia              => naranja, "En gracia (N d)"
+   *  - Activo + por vencer   => amarillo, "Vence en N d" (cuando <= 7 dias)
+   *  - Activo                => verde, "Activo"
+   *  - SinVigencia           => por defecto verde claro, "Sin vencimiento"
+   */
+  get vigenciaTag(): { color: string; label: string } {
+    const p = this.plan;
+    if (!p) return { color: 'default', label: '—' };
+
+    if (p.estadoPlan === 'Vencido') return { color: 'red', label: 'Vencido' };
+    if (p.estadoPlan === 'EnGracia') {
+      const restan = Math.max(0, (p.diasGracia ?? 7) - (p.diasVencido ?? 0));
+      return { color: 'orange', label: `En gracia (${restan} d)` };
+    }
+    if (p.estadoPlan === 'Activo') {
+      const dias = p.diasParaVencimiento ?? null;
+      if (dias != null && dias <= 7) {
+        return { color: 'gold', label: dias <= 0 ? 'Vence hoy' : `Vence en ${dias} d` };
+      }
+      return { color: 'green', label: 'Activo' };
+    }
+    return { color: 'blue', label: 'Sin vencimiento' };
+  }
 }

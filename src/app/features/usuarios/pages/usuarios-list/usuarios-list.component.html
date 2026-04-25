@@ -9,7 +9,14 @@
         <i nz-icon nzType="reload" nzTheme="outline"></i>
         Actualizar
       </button>
-      <button nz-button nzType="primary" (click)="openForm()" *appHasPermission="'usuarios:create'">
+      <button
+        nz-button
+        nzType="primary"
+        nz-tooltip
+        [nzTooltipTitle]="planVencido ? 'Tu plan esta vencido. Renueva o cambia de plan para crear mas usuarios.' : ''"
+        [disabled]="planVencido"
+        (click)="openForm()"
+        *appHasPermission="'usuarios:create'">
         <i nz-icon nzType="plus" nzTheme="outline"></i>
         Nuevo Usuario
       </button>

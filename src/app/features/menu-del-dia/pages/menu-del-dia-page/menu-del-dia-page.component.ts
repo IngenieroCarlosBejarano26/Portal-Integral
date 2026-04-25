@@ -13,6 +13,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { AuthService } from '../../../../core/services/auth/authService';
 import { ComunicacionService } from '../../services/comunicacion.service';
 import { ConfiguracionEmailService } from '../../../configuracion-email/services/configuracion-email.service';
 import { PlantillasCorreoService } from '../../../plantillas-correo/services/plantillas-correo.service';
@@ -49,11 +50,17 @@ export class MenuDelDiaPageComponent implements OnInit {
   /** Texto de ayuda en el input asunto; incluye claves con llaves, sin que Angular lo interprete. */
   readonly placeholderAsuntoEjemplo = 'Menú del día — {{FechaHoy}}';
 
+  private authService = inject(AuthService);
   private comunicacion = inject(ComunicacionService);
   private configEmail = inject(ConfiguracionEmailService);
   private plantillas = inject(PlantillasCorreoService);
   private notification = inject(NzNotificationService);
   private modal = inject(NzModalService);
+
+  /** Enviar, guardar plantilla y editar cuerpos (API comunicación + plantilla). */
+  get puedeEditarMenu(): boolean {
+    return this.authService.hasPermission('menu-del-dia:update');
+  }
 
   smtpListo = false;
   comprobandoSmtp = true;
@@ -133,6 +140,9 @@ export class MenuDelDiaPageComponent implements OnInit {
 
   /** Cambia entre asistente (texto en claro) y editor HTML. */
   cambioVista(nueva: 'formulario' | 'html'): void {
+    if (!this.puedeEditarMenu) {
+      return;
+    }
     if (nueva === 'html') {
       this.actualizarCuerpoDesdeFormulario();
       this.vista = 'html';
@@ -186,6 +196,10 @@ export class MenuDelDiaPageComponent implements OnInit {
   }
 
   restaurarTextoDeEjemplo(): void {
+    if (!this.puedeEditarMenu) {
+      this.notification.warning('Sin permiso', 'Tu rol no puede modificar el menú del día.');
+      return;
+    }
     this.asunto = 'Menú del día — {{FechaHoy}}';
     this.menuSimple = defaultMenuDiaVacio();
     this.actualizarCuerpoDesdeFormulario();
@@ -195,6 +209,10 @@ export class MenuDelDiaPageComponent implements OnInit {
   }
 
   guardarComoPlantillaMenu(): void {
+    if (!this.puedeEditarMenu) {
+      this.notification.warning('Sin permiso', 'Tu rol no puede guardar el menú en plantillas.');
+      return;
+    }
     if (this.vista === 'formulario') {
       this.actualizarCuerpoDesdeFormulario();
     }
@@ -227,6 +245,10 @@ export class MenuDelDiaPageComponent implements OnInit {
   }
 
   confirmarYEnviar(): void {
+    if (!this.puedeEditarMenu) {
+      this.notification.warning('Sin permiso', 'Tu rol no puede enviar el menú del día.');
+      return;
+    }
     if (this.vista === 'formulario') {
       this.actualizarCuerpoDesdeFormulario();
     }

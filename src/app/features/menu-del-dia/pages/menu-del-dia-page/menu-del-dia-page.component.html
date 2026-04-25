@@ -49,6 +49,16 @@
         a todos los clientes con email.
       </p>
 
+      <nz-alert
+        *ngIf="!puedeEditarMenu"
+        nzType="info"
+        nzShowIcon
+        class="mb-alert"
+        nzMessage="Solo consulta"
+        nzDescription="Tu rol puede revisar el contenido pero no enviar ni modificar. Un administrador puede asignar el permiso «Menú del día: actualizar» en el módulo Permisos."
+      ></nz-alert>
+
+      <fieldset class="menu-form-fieldset" [disabled]="!puedeEditarMenu">
       <div class="vista-bloque">
         <span class="vista-eti">Cómo quieres editar</span>
         <nz-radio-group [ngModel]="vista" (ngModelChange)="cambioVista($event)" class="vista-radios" nzSize="default">
@@ -137,6 +147,7 @@
           ></textarea>
         </div>
       </ng-container>
+      </fieldset>
 
       <div class="actions actions-row">
         <button
@@ -144,7 +155,7 @@
           nzType="primary"
           nzSize="large"
           [nzLoading]="enviando"
-          [disabled]="comprobandoSmtp || !smtpListo"
+          [disabled]="!puedeEditarMenu || comprobandoSmtp || !smtpListo"
           (click)="confirmarYEnviar()"
         >
           <i nz-icon nzType="send" nzTheme="outline"></i>
@@ -153,6 +164,7 @@
         <div class="secundarias">
           <button
             nz-button
+            *ngIf="puedeEditarMenu"
             [nzLoading]="guardandoPlantilla"
             (click)="guardarComoPlantillaMenu()"
             [disabled]="!asunto.trim() || !cuerpoHtml.trim()"
@@ -170,7 +182,7 @@
             <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
             Cargar plantilla
           </button>
-          <button nz-button (click)="restaurarTextoDeEjemplo()">
+          <button nz-button *ngIf="puedeEditarMenu" (click)="restaurarTextoDeEjemplo()">
             <i nz-icon nzType="undo" nzTheme="outline"></i>
             Vaciar menú (asistente)
           </button>

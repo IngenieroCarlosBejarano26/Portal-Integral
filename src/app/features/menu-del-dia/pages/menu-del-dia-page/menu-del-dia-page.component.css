@@ -3,51 +3,50 @@
   min-width: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.menu-page__grid {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 1000px) {
+  .menu-page__grid.menu-page__grid--split {
+    grid-template-columns: 1fr 300px;
+  }
+}
+
+.menu-page .ce-hero .placeholders {
+  margin: 10px 0 0;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.menu-page .app-hero {
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
-}
-
-.app-hero--emerald {
-  margin-bottom: 28px;
-  box-shadow: 0 20px 50px rgba(5, 150, 105, 0.28), 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.hero-text {
-  position: relative;
-  z-index: 1;
-}
-
-.app-hero h1,
-.hero h1 {
-  margin: 0 0 12px;
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-}
-
-.app-hero p,
-.hero p {
-  margin: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.92);
   max-width: 880px;
-  font-size: 0.98rem;
-  line-height: 1.6;
-  opacity: 0.98;
+  font-weight: 500;
 }
 
-.app-hero .ph,
-.hero .ph {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.88rem;
+.menu-page .ce-hero .placeholders > span {
+  width: 100%;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.95;
+}
+
+@media (min-width: 500px) {
+  .menu-page .ce-hero .placeholders > span {
+    width: auto;
+    margin-bottom: 0;
+  }
+}
+
+.menu-page .ce-status-banner a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .menu-form-fieldset {
@@ -63,128 +62,82 @@
   pointer-events: none;
 }
 
-.mb-alert {
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
-}
-
-:host ::ng-deep .mb-alert.ant-alert {
-  width: 100%;
-  max-width: none;
-  /* Fondo oscuro: títulos (message) en blanco, legible con icono */
-  background: linear-gradient(125deg, #0f766e 0%, #0d9488 42%, #14b8a6 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px -6px rgba(13, 148, 136, 0.35);
-}
-
-:host ::ng-deep .mb-alert.ant-alert-warning {
-  /* Misma base inversa; matices ámbar solo en el borde izquierdo si hace falta */
-  background: linear-gradient(125deg, #92400e 0%, #b45309 48%, #d97706 100%) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 24px -6px rgba(180, 83, 9, 0.4);
-}
-
-:host ::ng-deep .mb-alert .ant-alert-message {
-  color: #fff !important;
-  font-weight: 600;
-}
-
-:host ::ng-deep .mb-alert .ant-alert-description {
-  color: rgba(255, 255, 255, 0.9) !important;
-}
-
-:host ::ng-deep .mb-alert .ant-alert-icon,
-:host ::ng-deep .mb-alert .ant-alert-icon .anticon {
-  color: #fff !important;
-}
-
-.layout-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 28px;
-  min-width: 0;
-  width: 100%;
-  align-items: start;
-}
-
-.card-form,
-.card-stats {
-  min-width: 0;
-  width: 100%;
-  max-width: none;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 12px 24px -4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-:host ::ng-deep .card-form .ant-card-head {
-  min-height: 64px;
-  padding: 0 28px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-bottom: 1px solid #e2e8f0;
-  border-radius: 16px 16px 0 0;
-}
-
-:host ::ng-deep .card-form .ant-card-body {
-  padding: 24px 28px 28px;
-}
-
-:host ::ng-deep .card-stats {
-  border-radius: 16px;
-}
-
-:host ::ng-deep .card-stats .ant-card-head {
-  min-height: 56px;
-  padding: 0 24px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #fafbfc;
-}
-
-:host ::ng-deep .card-stats .ant-card-body {
-  padding: 20px 24px 24px;
-}
-
-/* Título de la card: "Redactar mensaje" + tag del código de plantilla */
-.menu-card-title {
-  display: flex;
+.menu-redactar-head {
   flex-wrap: wrap;
   align-items: center;
+  gap: 8px 12px;
+}
+
+.menu-redactar-head h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.menu-redactar-head .menu-card-codigo {
+  margin-left: auto;
+}
+
+@media (max-width: 480px) {
+  .menu-redactar-head .menu-card-codigo {
+    margin-left: 0;
+  }
+}
+
+.menu-lead-tip {
+  margin: 0 0 12px;
+}
+
+.menu-lead-tip p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.menu-lead-tip a {
+  font-weight: 600;
+  color: var(--primary-active);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.menu-inline-banner {
+  margin: 0 0 12px;
+}
+
+.menu-card-form {
+  min-width: 0;
+}
+
+.menu-card-stats .stats-row {
+  margin: 0;
+}
+
+.vista-bloque {
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-.menu-card-title-text {
-  font-size: 1rem;
+.vista-eti {
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #111827;
-}
-
-.menu-card-codigo {
-  margin: 0;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.card-lead {
-  margin: 0 0 20px;
-  padding: 14px 16px;
-  font-size: 0.9rem;
-  line-height: 1.55;
   color: #374151;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-  border: 1px solid #a7f3d0;
-  border-radius: 12px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
-.card-lead a {
-  color: #047857;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.vista-radios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+:host ::ng-deep .vista-radios.ant-radio-group .ant-radio-button-wrapper {
+  height: 40px;
+  line-height: 38px;
+  padding: 0 16px;
+  font-weight: 500;
 }
 
 .placeholders-inline {
@@ -227,32 +180,6 @@
 .ph-inline--mini {
   font-size: 0.7rem;
   padding: 1px 5px;
-}
-
-.vista-bloque {
-  margin: 0 0 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.vista-eti {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-.vista-radios {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-}
-
-:host ::ng-deep .vista-radios.ant-radio-group .ant-radio-button-wrapper {
-  height: 40px;
-  line-height: 38px;
-  padding: 0 16px;
-  font-weight: 500;
 }
 
 .field-hint {
@@ -340,40 +267,17 @@
   }
 }
 
-.placeholders {
-  margin: 12px 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 8px;
-  font-size: 0.8rem;
-  opacity: 0.95;
-}
-
-.placeholders > span {
-  width: 100%;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-@media (min-width: 500px) {
-  .placeholders > span {
-    width: auto;
-    margin-bottom: 0;
-  }
-}
-
-.app-hero a,
-.hero a {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  font-weight: 600;
-}
-
 .stats-row {
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
 }
 
+.app-hero a,
+.ce-hero a,
+.hero a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}

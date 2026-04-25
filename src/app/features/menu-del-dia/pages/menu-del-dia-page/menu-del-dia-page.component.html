@@ -1,8 +1,8 @@
-<div class="menu-page">
-  <div class="app-hero app-hero--emerald">
+<div class="page-container ce-page menu-page">
+  <div class="hero app-hero app-hero--indigo ce-hero">
     <div class="hero-text">
       <h1>Menú del día</h1>
-      <p>
+      <p class="subtitle ce-hero-sub">
         Rellena el <strong>asistente</strong> (entrada, plato, bebida) en texto claro. El correo a tus clientes
         se arma en automático, con un diseño adecuado. No hace falta saber HTML.
         También puedes <strong>guardar plantilla</strong> o editar en <a routerLink="/plantillas-correo">Plantillas de correo</a>.
@@ -16,186 +16,213 @@
     </div>
   </div>
 
-  <nz-alert
+  <div
     *ngIf="!comprobandoSmtp && !smtpListo"
-    nzType="warning"
-    nzShowIcon
-    nzMessage="Configura primero el correo (SMTP)"
-    nzDescription="Ve a Configuración de correo y guarda un servidor SMTP activo antes de enviar."
-    class="mb-alert"
-  ></nz-alert>
+    class="ce-status-banner is-empty ce-status-banner--stack"
+    role="alert"
+  >
+    <i nz-icon nzType="exclamation-circle"></i>
+    <span>
+      <strong>Configura primero el correo (SMTP)</strong><br />
+      Ve a
+      <a routerLink="/configuracion-email">Configuración de correo</a>
+      y guarda un servidor SMTP activo antes de enviar.
+    </span>
+  </div>
 
-  <nz-alert
+  <div
     *ngIf="cuerpoSinAsistente && vista === 'html'"
-    nzType="info"
-    nzShowIcon
-    class="mb-alert"
-    nzMessage="Vista avanzada (HTML sin asistente)"
-    nzDescription="La plantilla cargada no se creó con el asistente. Sigue en HTML, o elige 'Asistente' y confirma para pasar a texto en claro (se ofrece reemplazar el diseño).">
-  </nz-alert>
+    class="ce-status-banner is-info ce-status-banner--stack"
+    role="status"
+  >
+    <i nz-icon nzType="info-circle"></i>
+    <span>
+      <strong>Vista avanzada (HTML sin asistente)</strong><br />
+      La plantilla cargada no se creó con el asistente. Sigue en HTML, o elige «Asistente» y confirma para pasar
+      a texto en claro (se ofrece reemplazar el diseño).
+    </span>
+  </div>
 
-  <div class="layout-grid">
-    <nz-card [nzTitle]="tituloRedactarTpl" class="card-form">
-      <ng-template #tituloRedactarTpl>
-        <div class="menu-card-title">
-          <span class="menu-card-title-text">Redactar mensaje</span>
+  <div class="ce-grid menu-page__grid" [class.menu-page__grid--split]="!!ultimo">
+    <div class="ce-col">
+      <section class="ce-card menu-card-form">
+        <header class="ce-card-head menu-redactar-head">
+          <i nz-icon nzType="file-text"></i>
+          <h3>Redactar mensaje</h3>
           <nz-tag nzColor="success" class="menu-card-codigo">menu-del-dia</nz-tag>
-        </div>
-      </ng-template>
+        </header>
 
-      <p class="card-lead">
-        Misma plantilla <strong>menu-del-dia</strong> que en
-        <a routerLink="/plantillas-correo">Plantillas de correo</a>. Lo que indiques se guarda y envía por correo
-        a todos los clientes con email.
-      </p>
-
-      <nz-alert
-        *ngIf="!puedeEditarMenu"
-        nzType="info"
-        nzShowIcon
-        class="mb-alert"
-        nzMessage="Solo consulta"
-        nzDescription="Tu rol puede revisar el contenido pero no enviar ni modificar. Un administrador puede asignar el permiso «Menú del día: actualizar» en el módulo Permisos."
-      ></nz-alert>
-
-      <fieldset class="menu-form-fieldset" [disabled]="!puedeEditarMenu">
-      <div class="vista-bloque">
-        <span class="vista-eti">Cómo quieres editar</span>
-        <nz-radio-group [ngModel]="vista" (ngModelChange)="cambioVista($event)" class="vista-radios" nzSize="default">
-          <label nz-radio-button [nzValue]="'formulario'">Asistente (recomendado)</label>
-          <label nz-radio-button [nzValue]="'html'">Solo edición avanzada (HTML)</label>
-        </nz-radio-group>
-      </div>
-
-      <div class="placeholders-inline" ngNonBindable *ngIf="vista === 'formulario'">
-        <span class="placeholders-inline-label">Añadidos al enviar (no hace falta copiarlos):</span>
-        <code class="ph-inline">{{NombreCliente}}</code>
-        <code class="ph-inline">{{FechaHoy}}</code>
-        <code class="ph-inline">{{FechaHoyLarga}}</code>
-      </div>
-
-      <div class="field">
-        <label>Asunto del correo</label>
-        <input
-          nz-input
-          [(ngModel)]="asunto"
-          [attr.placeholder]="placeholderAsuntoEjemplo"
-        />
-        <p class="field-hint" ngNonBindable>Puedes dejar <code class="ph-inline ph-inline--mini">{{FechaHoy}}</code> en el asunto; se reemplaza al enviar.</p>
-      </div>
-
-      <ng-container *ngIf="vista === 'formulario'">
-        <div class="asistente">
-          <p class="asistente-intro">
-            Escribe el menú en palabras. El encabezado, el saludo a cada cliente y el pie del mensaje
-            se generan solos.
-          </p>
-          <div class="asistente-grid">
-            <div class="field">
-              <label>Entrada</label>
-              <textarea
-                nz-input
-                [(ngModel)]="menuSimple.entrada"
-                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-                [nzAutosize]="{ minRows: 2, maxRows: 5 }"
-                placeholder="Ej. Crema de verduras, ensalada César…"
-              ></textarea>
-            </div>
-            <div class="field">
-              <label>Plato fuerte</label>
-              <textarea
-                nz-input
-                [(ngModel)]="menuSimple.platoFuerte"
-                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-                [nzAutosize]="{ minRows: 2, maxRows: 5 }"
-                placeholder="Ej. Bandeja paisa, trucha al ajillo, opción vegetariana: …"
-              ></textarea>
-            </div>
-            <div class="field">
-              <label>Bebida</label>
-              <textarea
-                nz-input
-                [(ngModel)]="menuSimple.bebida"
-                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-                [nzAutosize]="{ minRows: 1, maxRows: 3 }"
-                placeholder="Ej. Limonada, jugo, agua…"
-              ></textarea>
-            </div>
-            <div class="field asistente-field--nota field--last">
-              <label>Nota u observación (opcional)</label>
-              <textarea
-                nz-input
-                [(ngModel)]="menuSimple.nota"
-                (ngModelChange)="actualizarCuerpoDesdeFormulario()"
-                [nzAutosize]="{ minRows: 1, maxRows: 3 }"
-                placeholder="Cambio de plato, horario, promoción del día, etc."
-              ></textarea>
-            </div>
+        <div class="ce-tip menu-lead-tip">
+          <i nz-icon nzType="branches"></i>
+          <div>
+            <p>
+              Misma plantilla <strong>menu-del-dia</strong> que en
+              <a routerLink="/plantillas-correo">Plantillas de correo</a>. Lo que indiques se guarda y envía
+              por correo a todos los clientes con email.
+            </p>
           </div>
         </div>
-      </ng-container>
 
-      <ng-container *ngIf="vista === 'html'">
-        <div class="field">
-          <label>Cuerpo HTML</label>
-          <p class="field-hint">Solo para quienes ya conocen HTML. Incluye los placeholders que necesites.</p>
-          <textarea
-            nz-input
-            [nzAutosize]="{ minRows: 16, maxRows: 28 }"
-            [(ngModel)]="cuerpoHtml"
-            class="html-area"
-          ></textarea>
-        </div>
-      </ng-container>
-      </fieldset>
-
-      <div class="actions actions-row">
-        <button
-          nz-button
-          nzType="primary"
-          nzSize="large"
-          [nzLoading]="enviando"
-          [disabled]="!puedeEditarMenu || comprobandoSmtp || !smtpListo"
-          (click)="confirmarYEnviar()"
+        <div
+          *ngIf="!puedeEditarMenu"
+          class="ce-status-banner is-inactive ce-status-banner--stack menu-inline-banner"
+          role="status"
         >
-          <i nz-icon nzType="send" nzTheme="outline"></i>
-          Enviar a todos los clientes
-        </button>
-        <div class="secundarias">
-          <button
-            nz-button
-            *ngIf="puedeEditarMenu"
-            [nzLoading]="guardandoPlantilla"
-            (click)="guardarComoPlantillaMenu()"
-            [disabled]="!asunto.trim() || !cuerpoHtml.trim()"
-            title="Almacena en la BD (código menu-del-dia) para reabrir o editar en Plantillas"
-          >
-            <i nz-icon nzType="save" nzTheme="outline"></i>
-            Guardar plantilla
-          </button>
-          <button
-            nz-button
-            (click)="recargarPlantillaDesdeServidor()"
-            [nzLoading]="cargandoPlantilla"
-            title="Carga el último copy guardado en el servidor en esta pantalla"
-          >
-            <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
-            Cargar plantilla
-          </button>
-          <button nz-button *ngIf="puedeEditarMenu" (click)="restaurarTextoDeEjemplo()">
-            <i nz-icon nzType="undo" nzTheme="outline"></i>
-            Vaciar menú (asistente)
-          </button>
+          <i nz-icon nzType="eye"></i>
+          <span>
+            <strong>Solo consulta</strong><br />
+            Tu rol puede revisar el contenido pero no enviar ni modificar. Un administrador puede asignar el
+            permiso «Menú del día: actualizar» en el módulo Permisos.
+          </span>
         </div>
-      </div>
-    </nz-card>
 
-    <nz-card nzTitle="Último envío" class="card-stats" *ngIf="ultimo">
-      <div class="stats-row">
-        <nz-statistic [nzValue]="ultimo.destinatarios" nzTitle="Con email"></nz-statistic>
-        <nz-statistic [nzValue]="ultimo.enviados" nzTitle="Enviados" [nzValueStyle]="{ color: '#10b981' }"></nz-statistic>
-        <nz-statistic [nzValue]="ultimo.fallidos" nzTitle="Fallidos" [nzValueStyle]="{ color: '#ef4444' }"></nz-statistic>
-      </div>
-    </nz-card>
+        <fieldset class="menu-form-fieldset" [disabled]="!puedeEditarMenu">
+          <div class="vista-bloque">
+            <span class="vista-eti">Cómo quieres editar</span>
+            <nz-radio-group [ngModel]="vista" (ngModelChange)="cambioVista($event)" class="vista-radios" nzSize="default">
+              <label nz-radio-button [nzValue]="'formulario'">Asistente (recomendado)</label>
+              <label nz-radio-button [nzValue]="'html'">Solo edición avanzada (HTML)</label>
+            </nz-radio-group>
+          </div>
+
+          <div class="placeholders-inline" ngNonBindable *ngIf="vista === 'formulario'">
+            <span class="placeholders-inline-label">Añadidos al enviar (no hace falta copiarlos):</span>
+            <code class="ph-inline">{{NombreCliente}}</code>
+            <code class="ph-inline">{{FechaHoy}}</code>
+            <code class="ph-inline">{{FechaHoyLarga}}</code>
+          </div>
+
+          <div class="field">
+            <label>Asunto del correo</label>
+            <input
+              nz-input
+              [(ngModel)]="asunto"
+              [attr.placeholder]="placeholderAsuntoEjemplo"
+            />
+            <p class="field-hint" ngNonBindable>
+              Puedes dejar <code class="ph-inline ph-inline--mini">{{FechaHoy}}</code> en el asunto; se reemplaza al enviar.
+            </p>
+          </div>
+
+          <ng-container *ngIf="vista === 'formulario'">
+            <div class="asistente">
+              <p class="asistente-intro">
+                Escribe el menú en palabras. El encabezado, el saludo a cada cliente y el pie del mensaje
+                se generan solos.
+              </p>
+              <div class="asistente-grid">
+                <div class="field">
+                  <label>Entrada</label>
+                  <textarea
+                    nz-input
+                    [(ngModel)]="menuSimple.entrada"
+                    (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                    [nzAutosize]="{ minRows: 2, maxRows: 5 }"
+                    placeholder="Ej. Crema de verduras, ensalada César…"
+                  ></textarea>
+                </div>
+                <div class="field">
+                  <label>Plato fuerte</label>
+                  <textarea
+                    nz-input
+                    [(ngModel)]="menuSimple.platoFuerte"
+                    (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                    [nzAutosize]="{ minRows: 2, maxRows: 5 }"
+                    placeholder="Ej. Bandeja paisa, trucha al ajillo, opción vegetariana: …"
+                  ></textarea>
+                </div>
+                <div class="field">
+                  <label>Bebida</label>
+                  <textarea
+                    nz-input
+                    [(ngModel)]="menuSimple.bebida"
+                    (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                    [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+                    placeholder="Ej. Limonada, jugo, agua…"
+                  ></textarea>
+                </div>
+                <div class="field asistente-field--nota field--last">
+                  <label>Nota u observación (opcional)</label>
+                  <textarea
+                    nz-input
+                    [(ngModel)]="menuSimple.nota"
+                    (ngModelChange)="actualizarCuerpoDesdeFormulario()"
+                    [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+                    placeholder="Cambio de plato, horario, promoción del día, etc."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="vista === 'html'">
+            <div class="field">
+              <label>Cuerpo HTML</label>
+              <p class="field-hint">Solo para quienes ya conocen HTML. Incluye los placeholders que necesites.</p>
+              <textarea
+                nz-input
+                [nzAutosize]="{ minRows: 16, maxRows: 28 }"
+                [(ngModel)]="cuerpoHtml"
+                class="html-area"
+              ></textarea>
+            </div>
+          </ng-container>
+        </fieldset>
+
+        <div class="actions actions-row">
+          <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            [nzLoading]="enviando"
+            [disabled]="!puedeEditarMenu || comprobandoSmtp || !smtpListo"
+            (click)="confirmarYEnviar()"
+          >
+            <i nz-icon nzType="send" nzTheme="outline"></i>
+            Enviar a todos los clientes
+          </button>
+          <div class="secundarias">
+            <button
+              nz-button
+              *ngIf="puedeEditarMenu"
+              [nzLoading]="guardandoPlantilla"
+              (click)="guardarComoPlantillaMenu()"
+              [disabled]="!asunto.trim() || !cuerpoHtml.trim()"
+              title="Almacena en la BD (código menu-del-dia) para reabrir o editar en Plantillas"
+            >
+              <i nz-icon nzType="save" nzTheme="outline"></i>
+              Guardar plantilla
+            </button>
+            <button
+              nz-button
+              (click)="recargarPlantillaDesdeServidor()"
+              [nzLoading]="cargandoPlantilla"
+              title="Carga el último copy guardado en el servidor en esta pantalla"
+            >
+              <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
+              Cargar plantilla
+            </button>
+            <button nz-button *ngIf="puedeEditarMenu" (click)="restaurarTextoDeEjemplo()">
+              <i nz-icon nzType="undo" nzTheme="outline"></i>
+              Vaciar menú (asistente)
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="ce-col" *ngIf="ultimo">
+      <section class="ce-card menu-card-stats">
+        <header class="ce-card-head">
+          <i nz-icon nzType="line-chart"></i>
+          <h3>Último envío</h3>
+        </header>
+        <div class="stats-row">
+          <nz-statistic [nzValue]="ultimo.destinatarios" nzTitle="Con email"></nz-statistic>
+          <nz-statistic [nzValue]="ultimo.enviados" nzTitle="Enviados" [nzValueStyle]="{ color: '#10b981' }"></nz-statistic>
+          <nz-statistic [nzValue]="ultimo.fallidos" nzTitle="Fallidos" [nzValueStyle]="{ color: '#ef4444' }"></nz-statistic>
+        </div>
+      </section>
+    </div>
   </div>
 </div>

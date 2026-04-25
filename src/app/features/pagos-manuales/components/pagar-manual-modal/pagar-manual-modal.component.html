@@ -1,27 +1,186 @@
-<div class="pagar-modal" *ngIf="!cargando">
-
-  <!-- Resumen del plan -->
-  <section class="resumen-card">
-    <div class="resumen-left">
-      <div class="resumen-icono">
-        <i nz-icon nzType="crown" nzTheme="fill"></i>
-      </div>
-      <div class="resumen-texto">
-        <span class="resumen-eyebrow">Plan seleccionado</span>
-        <h3 class="resumen-titulo">{{ plan.nombre }}</h3>
-        <span class="resumen-desc">{{ plan.descripcion }}</span>
-      </div>
+<!-- ===================== Resumen del plan (siempre visible salvo en estado terminal) ===================== -->
+<section class="resumen-card"
+         *ngIf="flujo !== 'wompi-aprobado' && flujo !== 'wompi-rechazado'">
+  <div class="resumen-left">
+    <div class="resumen-icono">
+      <i nz-icon nzType="crown" nzTheme="fill"></i>
     </div>
+    <div class="resumen-texto">
+      <span class="resumen-eyebrow">Plan seleccionado</span>
+      <h3 class="resumen-titulo">{{ plan.nombre }}</h3>
+      <span class="resumen-desc">{{ plan.descripcion }}</span>
+    </div>
+  </div>
 
-    <div class="resumen-right">
-      <span class="resumen-precio-usd">USD ${{ plan.precioMensualUSD }}<small>/mes</small></span>
-      <span class="resumen-precio-cop">≈ ${{ montoCOPFormateado }} COP</span>
-      <span class="resumen-tasa">
-        <i nz-icon nzType="swap" nzTheme="outline"></i>
-        Tasa USD→COP: ${{ tasaCambioFormateada }}
-      </span>
+  <div class="resumen-right">
+    <span class="resumen-precio-usd">USD ${{ plan.precioMensualUSD }}<small>/mes</small></span>
+    <span class="resumen-precio-cop">≈ ${{ montoCOPFormateado }} COP</span>
+    <span class="resumen-tasa">
+      <i nz-icon nzType="swap" nzTheme="outline"></i>
+      Tasa USD→COP: ${{ tasaCambioFormateada }}
+    </span>
+  </div>
+</section>
+
+<!-- ===================== PANTALLA: SELECCIÓN ===================== -->
+<div class="pagar-modal" *ngIf="flujo === 'seleccion'">
+  <section class="seccion">
+    <header class="seccion-header">
+      <h4>¿Cómo quieres pagar?</h4>
+      <span class="seccion-hint">Elige una de las dos opciones</span>
+    </header>
+
+    <div class="opciones-grid">
+      <button type="button" class="opcion-card opcion-online" (click)="elegirWompi()">
+        <div class="opcion-badge opcion-badge-recomendado">Recomendado</div>
+        <div class="opcion-icono">
+          <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
+        </div>
+        <h5 class="opcion-titulo">Pago en línea</h5>
+        <p class="opcion-desc">
+          Tarjeta, PSE, Nequi, Bancolombia QR, Daviplata.
+          <strong>Activación inmediata.</strong>
+        </p>
+        <div class="opcion-tags">
+          <span><i nz-icon nzType="credit-card" nzTheme="outline"></i> Visa/Mastercard</span>
+          <span><i nz-icon nzType="bank" nzTheme="outline"></i> PSE</span>
+          <span><i nz-icon nzType="mobile" nzTheme="outline"></i> Nequi</span>
+        </div>
+        <span class="opcion-cta">Continuar <i nz-icon nzType="arrow-right" nzTheme="outline"></i></span>
+      </button>
+
+      <button type="button" class="opcion-card opcion-manual" (click)="elegirManual()">
+        <div class="opcion-icono opcion-icono-manual">
+          <i nz-icon nzType="file-image" nzTheme="outline"></i>
+        </div>
+        <h5 class="opcion-titulo">Transferencia manual</h5>
+        <p class="opcion-desc">
+          Transfiere por tu app y sube el comprobante.
+          <strong>Aprobación en 24h.</strong>
+        </p>
+        <div class="opcion-tags">
+          <span><i nz-icon nzType="mobile" nzTheme="outline"></i> Nequi</span>
+          <span><i nz-icon nzType="bank" nzTheme="outline"></i> Bancolombia</span>
+        </div>
+        <span class="opcion-cta">Continuar <i nz-icon nzType="arrow-right" nzTheme="outline"></i></span>
+      </button>
     </div>
   </section>
+
+  <footer class="footer-sticky">
+    <div class="footer-monto">
+      <span class="footer-monto-label">Total a pagar</span>
+      <span class="footer-monto-valor">${{ montoCOPFormateado }} <small>COP</small></span>
+    </div>
+    <div class="footer-actions">
+      <button nz-button nzType="default" (click)="cancelar()">Cancelar</button>
+    </div>
+  </footer>
+</div>
+
+<!-- ===================== PANTALLA: WOMPI (widget abierto / cargando) ===================== -->
+<div class="pagar-modal" *ngIf="flujo === 'wompi'">
+  <div class="estado-card">
+    <div class="estado-icono estado-icono-info" *ngIf="!wompiError">
+      <i nz-icon [nzType]="cargando ? 'loading' : 'shopping-cart'" nzTheme="outline"></i>
+    </div>
+    <div class="estado-icono estado-icono-error" *ngIf="wompiError">
+      <i nz-icon nzType="close-circle" nzTheme="outline"></i>
+    </div>
+
+    <h4 class="estado-titulo" *ngIf="!wompiError && cargando">Preparando el pago…</h4>
+    <h4 class="estado-titulo" *ngIf="!wompiError && !cargando">Estamos abriendo Wompi</h4>
+    <h4 class="estado-titulo" *ngIf="wompiError">No pudimos abrir el pago</h4>
+
+    <p class="estado-desc" *ngIf="!wompiError && !cargando">
+      Si la ventana no abrió, revisa que tu navegador no esté bloqueando popups.
+    </p>
+    <p class="estado-desc estado-desc-error" *ngIf="wompiError">{{ wompiError }}</p>
+
+    <div class="estado-actions">
+      <button nz-button nzType="default" (click)="volverASeleccion()" [disabled]="cargando">
+        <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
+        Cambiar método
+      </button>
+      <button nz-button nzType="primary" *ngIf="wompiError" (click)="reintentarWompi()">
+        <i nz-icon nzType="reload" nzTheme="outline"></i>
+        Reintentar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: WOMPI PENDIENTE (esperando webhook) ===================== -->
+<div class="pagar-modal" *ngIf="flujo === 'wompi-pendiente'">
+  <div class="estado-card">
+    <div class="estado-icono estado-icono-info">
+      <i nz-icon nzType="loading" nzTheme="outline"></i>
+    </div>
+    <h4 class="estado-titulo">Confirmando tu pago…</h4>
+    <p class="estado-desc">
+      Estamos esperando la confirmación de Wompi. Esto suele tomar pocos segundos.
+      Si tarda, no te preocupes: te notificaremos por email cuando se acredite.
+    </p>
+    <div class="estado-actions">
+      <button nz-button nzType="default" (click)="cancelar()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: WOMPI APROBADO ===================== -->
+<div class="pagar-modal" *ngIf="flujo === 'wompi-aprobado'">
+  <div class="estado-card estado-card-success">
+    <div class="estado-icono estado-icono-success">
+      <i nz-icon nzType="check-circle" nzTheme="fill"></i>
+    </div>
+    <h4 class="estado-titulo">¡Pago aprobado!</h4>
+    <p class="estado-desc">
+      Tu plan <strong>{{ plan.nombre }}</strong> ya está activo. Disfruta de los beneficios.
+    </p>
+    <div class="estado-actions">
+      <button nz-button nzType="primary" (click)="cerrarConExito()">
+        <i nz-icon nzType="check" nzTheme="outline"></i>
+        Listo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: WOMPI RECHAZADO ===================== -->
+<div class="pagar-modal" *ngIf="flujo === 'wompi-rechazado'">
+  <div class="estado-card">
+    <div class="estado-icono estado-icono-error">
+      <i nz-icon nzType="close-circle" nzTheme="fill"></i>
+    </div>
+    <h4 class="estado-titulo">Pago no completado</h4>
+    <p class="estado-desc">
+      <ng-container *ngIf="wompiMotivoRechazo; else sinMotivo">
+        Motivo: <strong>{{ wompiMotivoRechazo }}</strong>
+      </ng-container>
+      <ng-template #sinMotivo>
+        El pago no fue aprobado. Puedes intentar nuevamente o usar transferencia manual.
+      </ng-template>
+    </p>
+    <div class="estado-actions">
+      <button nz-button nzType="default" (click)="volverASeleccion()">
+        <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
+        Probar otro método
+      </button>
+      <button nz-button nzType="primary" (click)="reintentarWompi()">
+        <i nz-icon nzType="reload" nzTheme="outline"></i>
+        Reintentar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: MANUAL (flujo original) ===================== -->
+<div class="pagar-modal" *ngIf="flujo === 'manual' && !cargando">
+
+  <button type="button" class="back-link" (click)="volverASeleccion()" [disabled]="enviando">
+    <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
+    Cambiar método de pago
+  </button>
 
   <!-- Stepper -->
   <nav class="stepper" aria-label="Progreso de la solicitud">
@@ -55,7 +214,6 @@
     </header>
 
     <div class="metodos-grid">
-      <!-- Nequi -->
       <button type="button"
               class="metodo-card"
               [class.activo]="metodoPago === 'Nequi'"
@@ -83,7 +241,6 @@
         </button>
       </button>
 
-      <!-- Bancolombia -->
       <button type="button"
               class="metodo-card"
               [class.activo]="metodoPago === 'Bancolombia'"
@@ -194,7 +351,8 @@
   </footer>
 </div>
 
-<div *ngIf="cargando" class="loading">
+<!-- ===================== Loading global (al cambiar a manual y aún no llegan datos) ===================== -->
+<div *ngIf="flujo === 'manual' && cargando" class="loading">
   <i nz-icon nzType="loading" nzTheme="outline"></i>
   Cargando datos de pago…
 </div>

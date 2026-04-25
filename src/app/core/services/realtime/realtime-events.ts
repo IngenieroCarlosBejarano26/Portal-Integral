@@ -48,6 +48,12 @@ export const RealtimeEvents = {
     /** Los permisos asignados a un rol cambiaron. Payload: `{ rolId: string }`.
      *  Los clientes con ese rol deben llamar `authService.refreshToken()`. */
     RolPermissionsChanged: 'rol:permissions-changed'
+  },
+  PagoWompi: {
+    /** Webhook de Wompi confirmo el pago. El plan se activo automaticamente. */
+    Approved: 'pago-wompi:approved',
+    /** Webhook de Wompi marco el pago como rechazado/anulado/error. */
+    Declined: 'pago-wompi:declined'
   }
 } as const;
 
@@ -60,4 +66,5 @@ export type RealtimeEventName =
   | typeof RealtimeEvents.Rol[keyof typeof RealtimeEvents.Rol]
   | typeof RealtimeEvents.Tenant[keyof typeof RealtimeEvents.Tenant]
   | typeof RealtimeEvents.Usuario[keyof typeof RealtimeEvents.Usuario]
-  | typeof RealtimeEvents.Permiso[keyof typeof RealtimeEvents.Permiso];
+  | typeof RealtimeEvents.Permiso[keyof typeof RealtimeEvents.Permiso]
+  | typeof RealtimeEvents.PagoWompi[keyof typeof RealtimeEvents.PagoWompi];

@@ -26,14 +26,15 @@ jobs:
         # Usa environment.prod.ts (configuration: production)
         run: npm run build -- --configuration production
 
+      # Usamos shibayan/swa-deploy en lugar de Azure/static-web-apps-deploy@v1
+      # porque la action oficial es un Docker action que descarga
+      # mcr.microsoft.com/appsvc/staticappsclient:stable y MCR ha venido
+      # devolviendo 403 Forbidden de forma intermitente. Esta alternativa usa
+      # el binario StaticSitesClient directamente (mismo que internamente usa
+      # la SWA CLI), sin pasar por Docker ni MCR. Cachea el binario entre runs.
       - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
+        uses: shibayan/swa-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: 'upload'
-          # Cuando skip_app_build=true, app_location debe apuntar a la carpeta YA compilada.
-          # output_location se ignora en ese modo.
-          app_location: 'dist/portal-integral/browser'
-          skip_app_build: true
+          deployment-token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          app-location: 'dist/portal-integral/browser'
 

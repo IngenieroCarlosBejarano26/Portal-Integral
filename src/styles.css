@@ -9,9 +9,11 @@
 
 :root {
   /* ---------- Colores primarios (paleta dual sofisticada) ---------- */
+  --app-content-max: 1200px;   /* Ancho único de módulos (alineado con .content-inner) */
   --primary:        #5B5BD6;   /* Indigo Real — premium, trust, authority */
   --primary-hover:  #4F46E5;   /* Hover más profundo */
   --primary-active: #4338CA;   /* Pressed estado */
+  --primary-400:    #7A7AE8;   /* Tinte claro: gradientes, acentos secundarios */
   --primary-soft:   #EEEEFB;   /* Background suave para hovers/badges */
   --primary-softer: #F5F5FE;   /* Background ultra suave (zebra rows, hint zones) */
 
@@ -124,15 +126,16 @@ html, body {
 
 /* ============================================
    PAGE CONTAINER - Reutilizable en todos los módulos
+   (márgenes horizontales: layout .content; ancho: .content-inner)
    ============================================ */
 .page-container {
-  height: 100vh;
-  padding: 28px 32px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
   background: transparent;
-  overflow: hidden;
   box-sizing: border-box;
   position: relative;
   animation: pageEnter 0.32s var(--ease) both;
@@ -202,6 +205,89 @@ html, body {
 
 .app-card:hover {
   box-shadow: var(--shadow-md);
+}
+
+/* ng-zorro Card — un solo lenguaje visual en tablas, formularios y paneles */
+.ant-card {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  background: var(--bg-card) !important;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.ant-card.ant-card-hoverable:hover,
+a.ant-card:hover,
+.ant-card:focus-within {
+  box-shadow: var(--shadow-md) !important;
+  border-color: var(--border-strong) !important;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid var(--border) !important;
+  min-height: 48px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.ant-card-body {
+  color: var(--text-strong);
+}
+
+/* Hero de módulo — variantes reutilizables (Plantillas, Menú, etc.) */
+.app-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  padding: 32px 36px 30px;
+  box-shadow: 0 20px 50px color-mix(in srgb, var(--primary) 20%, transparent),
+    0 4px 12px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 24px;
+}
+
+.app-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 60% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(255, 255, 255, 0.08), transparent 50%);
+  pointer-events: none;
+}
+
+.app-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-hero h1,
+.app-hero p,
+.app-hero .hero-text {
+  position: relative;
+  z-index: 1;
+}
+
+.app-hero--indigo {
+  background: linear-gradient(
+    128deg,
+    var(--primary-hover) 0%,
+    var(--primary) 42%,
+    var(--primary-400) 100%
+  );
+  color: #fff;
+}
+
+.app-hero--emerald {
+  background: linear-gradient(128deg, #047857 0%, #059669 38%, #10b981 68%, #34d399 100%);
+  color: #fff;
+}
+
+/* Operaciones / aprobaciones (teal, distinto del menú esmeralda) */
+.app-hero--teal {
+  background: linear-gradient(125deg, #0f766e 0%, #0d9488 45%, #14b8a6 100%);
+  color: #fff;
+  box-shadow: 0 20px 44px rgba(13, 148, 136, 0.28), 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 /* ============================================
@@ -545,7 +631,7 @@ html, body {
   }
 
   .page-container {
-    padding: 16px;
+    padding: 0;
   }
 
   .page-header {
@@ -556,7 +642,9 @@ html, body {
 }
 
 @media (max-width: 576px) {
-  .page-container { padding: 12px; }
+  .page-container {
+    padding: 0;
+  }
 }
 
 /* ============================================================

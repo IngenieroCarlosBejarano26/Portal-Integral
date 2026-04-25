@@ -29,7 +29,9 @@
   color: #fff;
 }
 
-.qr-header--ok { background: linear-gradient(135deg, #5B5BD6, #4338CA); }
+.qr-header--ok {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-active) 100%);
+}
 .qr-header--ko { background: linear-gradient(135deg, #94A3B8, #64748B); }
 
 .qr-header-icon {

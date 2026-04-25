@@ -1,14 +1,12 @@
-<div class="page">
-  <div class="hero">
-    <div class="hero-inner">
-      <div>
-        <h2><i nz-icon nzType="dollar" nzTheme="outline"></i> Solicitudes de pago pendientes</h2>
-        <p>Revisa las transferencias enviadas por los tenants y aprueba o rechaza.</p>
-      </div>
-      <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading" class="btn-hero">
-        <i nz-icon nzType="reload"></i> Refrescar
-      </button>
+<div class="page-container pagos-pendientes-page">
+  <div class="app-hero app-hero--teal pend-hero">
+    <div class="hero-text">
+      <h2><i nz-icon nzType="dollar" nzTheme="outline"></i> Solicitudes de pago pendientes</h2>
+      <p>Revisa las transferencias enviadas por los tenants y aprueba o rechaza.</p>
     </div>
+    <button nz-button nzType="default" (click)="recargar()" [nzLoading]="loading" class="btn-hero">
+      <i nz-icon nzType="reload"></i> Refrescar
+    </button>
   </div>
 
   <div class="table-wrap">

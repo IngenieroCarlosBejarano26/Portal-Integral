@@ -4,8 +4,50 @@
    ========================================================================= */
 
 .ce-page {
-  /* Hereda .page-container (height:100vh, overflow:hidden, padding 28px 32px) */
-  gap: 12px;
+  gap: 16px;
+}
+
+/* Hero alineado con Plantillas / Perfil */
+.ce-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.ce-hero .hero-text {
+  flex: 1;
+  min-width: min(100%, 240px);
+}
+
+.ce-hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.ce-hero-sub,
+.ce-hero .subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  max-width: 640px;
+}
+
+.ce-hero-actions {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.ce-hero-actions .ant-btn-primary {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Spin debe llenar el espacio restante para centrar el spinner correctamente */

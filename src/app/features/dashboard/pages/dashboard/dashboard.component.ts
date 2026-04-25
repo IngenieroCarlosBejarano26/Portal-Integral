@@ -56,7 +56,7 @@ private destroy$ = new Subject<void>();
   loading = false;
 
   modules: ModuleStat[] = [
-    { id: 'clientes', label: 'Clientes', value: 0, icon: 'usergroup-add', color: '#6366f1', path: '/clientes', permission: 'clientes:view' },
+    { id: 'clientes', label: 'Clientes', value: 0, icon: 'usergroup-add', color: '#5B5BD6', path: '/clientes', permission: 'clientes:view' },
     { id: 'empresas', label: 'Empresas', value: 0, icon: 'shop',          color: '#0ea5e9', path: '/empresas', permission: 'empresas:view' },
     { id: 'consumos', label: 'Consumos', value: 0, icon: 'bar-chart',     color: '#10b981', path: '/consumos', permission: 'consumos:view' },
     { id: 'valeras',  label: 'Valeras',  value: 0, icon: 'gift',          color: '#f59e0b', path: '/valeras',  permission: 'valeras:view' },

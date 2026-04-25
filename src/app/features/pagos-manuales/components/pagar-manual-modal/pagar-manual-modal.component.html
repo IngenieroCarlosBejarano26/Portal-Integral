@@ -100,7 +100,7 @@
     <div class="estado-actions">
       <button nz-button nzType="default" (click)="volverASeleccion()" [disabled]="cargando">
         <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
-        Cambiar método
+        {{ puedeVolverASeleccion ? 'Cambiar método' : 'Cerrar' }}
       </button>
       <button nz-button nzType="primary" *ngIf="wompiError" (click)="reintentarWompi()">
         <i nz-icon nzType="reload" nzTheme="outline"></i>
@@ -164,7 +164,7 @@
     <div class="estado-actions">
       <button nz-button nzType="default" (click)="volverASeleccion()">
         <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
-        Probar otro método
+        {{ puedeVolverASeleccion ? 'Probar otro método' : 'Cerrar' }}
       </button>
       <button nz-button nzType="primary" (click)="reintentarWompi()">
         <i nz-icon nzType="reload" nzTheme="outline"></i>
@@ -177,7 +177,8 @@
 <!-- ===================== PANTALLA: MANUAL (flujo original) ===================== -->
 <div class="pagar-modal" *ngIf="flujo === 'manual' && !cargando">
 
-  <button type="button" class="back-link" (click)="volverASeleccion()" [disabled]="enviando">
+  <button *ngIf="puedeVolverASeleccion"
+          type="button" class="back-link" (click)="volverASeleccion()" [disabled]="enviando">
     <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
     Cambiar método de pago
   </button>

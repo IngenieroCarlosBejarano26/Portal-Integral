@@ -48,6 +48,8 @@ export const routes: Routes = [
         loadChildren: () => import('./features/planes/planes.routes').then((m) => m.PLANES_ROUTES) },
       { path: 'pagos-manuales', canActivate: [permissionGuard], data: { permission: 'pagos-manuales:approve' },
         loadChildren: () => import('./features/pagos-manuales/pagos-manuales.routes').then((m) => m.PAGOS_MANUALES_ROUTES) },
+      { path: 'pagos-wompi', canActivate: [permissionGuard], data: { permission: 'pagos-manuales:create' },
+        loadChildren: () => import('./features/pagos-wompi/pagos-wompi.routes').then((m) => m.PAGOS_WOMPI_ROUTES) },
       { path: 'perfil', loadChildren: () => import('./features/perfil/perfil.routes').then((m) => m.PERFIL_ROUTES) },
     ]
   },

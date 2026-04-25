@@ -1,0 +1,63 @@
+<div class="seleccion-modal">
+  <p class="intro">
+    Elige el plan que deseas pagar. La activación es <strong>inmediata</strong> al
+    confirmarse el pago en Wompi.
+  </p>
+
+  <div *ngIf="loading" class="loading">
+    <i nz-icon nzType="loading" nzTheme="outline"></i>
+    Cargando planes…
+  </div>
+
+  <div *ngIf="!loading" class="planes-grid">
+    <div *ngFor="let plan of catalogo"
+         class="plan-card"
+         [class.actual]="esPlanActual(plan.planId)">
+      <div class="plan-card-header">
+        <h4 class="plan-nombre">
+          <i nz-icon nzType="crown" nzTheme="fill"></i>
+          {{ plan.nombre }}
+        </h4>
+        <nz-tag *ngIf="esPlanActual(plan.planId)" nzColor="green">Plan actual</nz-tag>
+      </div>
+
+      <p class="plan-desc">{{ plan.descripcion }}</p>
+
+      <ul class="plan-limites">
+        <li>
+          <i nz-icon nzType="usergroup-add" nzTheme="outline"></i>
+          {{ formatoLimite(plan.maxClientes) }} clientes
+        </li>
+        <li>
+          <i nz-icon nzType="gift" nzTheme="outline"></i>
+          {{ formatoLimite(plan.maxValeras) }} valeras
+        </li>
+        <li>
+          <i nz-icon nzType="team" nzTheme="outline"></i>
+          {{ formatoLimite(plan.maxUsuarios) }} usuarios
+        </li>
+      </ul>
+
+      <div class="plan-precio">{{ plan.precioMensualUSD | usdCop }}</div>
+
+      <button nz-button
+              [nzType]="esPlanActual(plan.planId) ? 'default' : 'primary'"
+              nzBlock
+              [disabled]="esPlanActual(plan.planId)"
+              (click)="elegir(plan)">
+        <ng-container *ngIf="esPlanActual(plan.planId); else pagar">
+          <i nz-icon nzType="check" nzTheme="outline"></i>
+          Plan vigente
+        </ng-container>
+        <ng-template #pagar>
+          <i nz-icon nzType="thunderbolt" nzTheme="fill"></i>
+          Pagar este plan
+        </ng-template>
+      </button>
+    </div>
+  </div>
+
+  <div class="acciones">
+    <button nz-button nzType="default" (click)="cancelar()">Cancelar</button>
+  </div>
+</div>

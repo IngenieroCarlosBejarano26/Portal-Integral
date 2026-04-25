@@ -90,6 +90,13 @@ export class WompiService {
       .pipe(map(r => r?.data ?? null));
   }
 
+  /** Lista los pagos Wompi del tenant logueado (historial de la pestaña Pagos en línea). */
+  listarMisPagos(): Observable<EstadoPagoWompi[]> {
+    return this.http
+      .get<ApiResponse<EstadoPagoWompi[]>>(`${this.base}/mis-pagos`)
+      .pipe(map(r => r?.data ?? []));
+  }
+
   /**
    * Carga el script del widget si no esta cargado y abre el checkout.
    * Resuelve cuando el usuario cierra el widget (con o sin pago).

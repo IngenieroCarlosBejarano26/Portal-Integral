@@ -16,7 +16,16 @@ import { WompiService, IniciarPagoWompiResponse } from '../../../../core/service
 import { RealtimeService } from '../../../../core/services/realtime/realtime.service';
 import { RealtimeEvents } from '../../../../core/services/realtime/realtime-events';
 
-interface ModalData { plan: PlanCatalogo; }
+/**
+ * Datos opcionales que el invocador puede pasar al abrir el modal.
+ * - `iniciarFlujo`: si se pasa 'wompi' o 'manual', el modal se salta la pantalla
+ *   de selección y arranca directo en ese flujo. Útil cuando ya estamos en una
+ *   pestaña dedicada (ej. "Pagos en línea") y la elección no aporta nada.
+ */
+interface ModalData {
+  plan: PlanCatalogo;
+  iniciarFlujo?: 'seleccion' | 'manual' | 'wompi';
+}
 
 /**
  * Estados del modal:
@@ -85,6 +94,15 @@ export class PagarManualModalComponent implements OnInit, OnDestroy {
       if (tipo === 'aprobado') this.marcarAprobado();
       else this.marcarRechazado(payload?.motivoRechazo ?? payload?.wompiStatus);
     });
+
+    // Si nos pidieron arrancar directamente en un flujo, lo disparamos.
+    // Útil cuando el modal se invoca desde la pestaña "Pagos en línea".
+    const inicial = this.data.iniciarFlujo;
+    if (inicial === 'wompi') {
+      this.elegirWompi();
+    } else if (inicial === 'manual') {
+      this.elegirManual();
+    }
   }
 
   ngOnDestroy(): void {
@@ -138,8 +156,23 @@ export class PagarManualModalComponent implements OnInit, OnDestroy {
 
   volverASeleccion(): void {
     if (this.enviando) return;
+    // Si el modal fue abierto en un flujo fijo (ej. desde la pestaña "Pagos en
+    // línea"), no hay selección previa a la que volver: cerramos el modal.
+    if (!this.puedeVolverASeleccion) {
+      this.cancelar();
+      return;
+    }
     this.flujo = 'seleccion';
     this.wompiError = null;
+  }
+
+  /**
+   * True si tiene sentido mostrar el link "volver a selección". Si el modal
+   * fue abierto con `iniciarFlujo`, no hay nada a qué volver dentro del modal:
+   * lo correcto es cerrarlo y que el usuario vea la página invocadora.
+   */
+  get puedeVolverASeleccion(): boolean {
+    return !this.data.iniciarFlujo;
   }
 
   // ============================================================================

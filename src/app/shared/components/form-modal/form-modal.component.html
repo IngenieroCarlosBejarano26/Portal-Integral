@@ -27,18 +27,21 @@
             style="width: 100%">
           </nz-input-number>
 
-          <!-- Currency (COP) -->
-          <nz-input-number
+          <!-- Currency (COP): input texto con miles es-CO en vivo (nz-input-number difiere formato y decimales) -->
+          <input
             *ngIf="field.type === 'currency'"
-            [formControlName]="field.key"
-            [nzPlaceHolder]="field.placeholder || '$ 0'"
-            [nzMin]="field.min ?? 0"
-            [nzMax]="field.max ?? null"
-            [nzStep]="1"
-            [nzFormatter]="currencyFormatter"
-            [nzParser]="currencyParser"
-            style="width: 100%">
-          </nz-input-number>
+            nz-input
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            [id]="'currency-' + field.key"
+            [attr.aria-label]="field.label"
+            [placeholder]="field.placeholder || '$ 0'"
+            [value]="currencyDisplayValue(field.key)"
+            (input)="onCurrencyInput(field.key, $event)"
+            (focus)="onCurrencyFocus($event)"
+            class="form-modal-currency-input"
+            style="width: 100%" />
 
           <!-- Textarea -->
           <textarea

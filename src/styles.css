@@ -243,10 +243,8 @@ a.ant-card:hover,
   overflow: hidden;
   border-radius: var(--radius-2xl);
   padding: 32px 36px 30px;
-  box-shadow: 0 20px 50px color-mix(in srgb, var(--primary) 20%, transparent),
-    0 4px 12px rgba(15, 23, 42, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 }
 
 .app-hero::after {
@@ -288,8 +286,7 @@ a.ant-card:hover,
 /* Operaciones / aprobaciones (teal, distinto del menú esmeralda) */
 .app-hero--teal {
   background: linear-gradient(125deg, #0f766e 0%, #0d9488 45%, #14b8a6 100%);
-  color: #fff;
-  box-shadow: 0 20px 44px rgba(13, 148, 136, 0.28), 0 4px 12px rgba(15, 23, 42, 0.06);
+  color: #fff; 
 }
 
 /* ============================================

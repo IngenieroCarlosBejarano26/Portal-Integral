@@ -98,6 +98,8 @@ export class FormModalComponent implements OnInit {
   fieldRows: FormField[][] = [];
   /** Campos realmente visibles según el modo (create/edit). */
   private visibleFields: FormField[] = [];
+  /** Texto mostrado en inputs COP (miles es-CO al teclear). */
+  private currencyText: Record<string, string> = {};
 
   ngOnInit(): void {
     this.visibleFields = this.filterByMode(this.data.fields);
@@ -125,6 +127,13 @@ export class FormModalComponent implements OnInit {
         // Los date pickers requieren un Date; el backend manda ISO string.
         const parsed = new Date(rawInitial);
         initial = isNaN(parsed.getTime()) ? null : parsed;
+      } else if (field.type === 'currency') {
+        if (rawInitial == null || rawInitial === '') {
+          initial = null;
+        } else {
+          const n = typeof rawInitial === 'number' ? rawInitial : Number(rawInitial);
+          initial = Number.isNaN(n) ? null : n;
+        }
       } else {
         initial = rawInitial ?? (field.type === 'date' || field.type === 'datetime' ? null : '');
       }
@@ -133,7 +142,62 @@ export class FormModalComponent implements OnInit {
     }
 
     this.form = this.fb.group(controls);
+    this.initCurrencyDisplays();
     this.fieldRows = this.computeFieldRows();
+  }
+
+  private initCurrencyDisplays(): void {
+    for (const f of this.visibleFields) {
+      if (f.type !== 'currency') continue;
+      const c = this.form.get(f.key);
+      const v = c?.value;
+      if (v == null || v === '' || (typeof v === 'number' && isNaN(v))) {
+        this.currencyText[f.key] = '';
+      } else {
+        this.currencyText[f.key] = this.formatCop(Number(v));
+      }
+    }
+  }
+
+  /** Salida en vivo es-CO: `$ 1.000.000` (sin decimales, COP entero). */
+  formatCop(n: number | null | undefined): string {
+    if (n == null || (typeof n === 'number' && isNaN(n))) return '';
+    return (
+      '$ ' +
+      Math.round(Number(n)).toLocaleString('es-CO', {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0
+      })
+    );
+  }
+
+  currencyDisplayValue(key: string): string {
+    return this.currencyText[key] ?? '';
+  }
+
+  onCurrencyInput(key: string, e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const c = this.form.get(key);
+    if (!c) return;
+
+    const digits = (input.value ?? '').replace(/\D/g, '');
+    if (digits === '') {
+      c.setValue(null, { emitEvent: true });
+      this.currencyText[key] = '';
+    } else {
+      if (digits.length > 15) return;
+      const n = parseInt(digits, 10);
+      if (Number.isNaN(n) || n < 0) return;
+      c.setValue(n, { emitEvent: true });
+      this.currencyText[key] = this.formatCop(n);
+    }
+    c.markAsDirty();
+    c.updateValueAndValidity();
+  }
+
+  onCurrencyFocus(e: Event): void {
+    const el = e.target as HTMLInputElement;
+    requestAnimationFrame(() => el?.select());
   }
 
   /**
@@ -191,58 +255,6 @@ export class FormModalComponent implements OnInit {
 
   trackByRow(index: number): number {
     return index;
-  }
-
-  /**
-   * Formatea monto (es-CO) mientras se edita: miles y hasta 2 decimales
-   * sin esperar a perder el foco.
-   */
-  readonly currencyFormatter = (value: number | null | undefined): string => {
-    if (value === null || value === undefined || isNaN(value as number)) return '';
-    return (
-      '$ ' +
-      Number(value).toLocaleString('es-CO', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      })
-    );
-  };
-
-  /**
-   * Interpreta el texto (es-CO: $, . miles, , decimales). Devuelve NaN mientras
-   * el valor es claramente incompleto, para no pisar el tecleo; así nz-input-number
-   * mantiene el display y al completar/continuar aplica el formato al instante.
-   */
-  readonly currencyParser = (value: string): number => {
-    return this.parseColombiaCurrencyToNumber(value);
-  };
-
-  /**
-   * Convierte cadena tecleada o ya formateada a número.
-   * NaN = dejar el valor mostrado tal cual (número incompleto o inválido).
-   */
-  private parseColombiaCurrencyToNumber(raw: string): number {
-    if (raw == null) return Number.NaN;
-    let s = raw.replace(/[$\s\u00A0]/g, '').trim();
-    if (s === '' || s === ',') return Number.NaN;
-    if (/,$/.test(s)) return Number.NaN; // p.ej. "1.234," aún no cerró decimales
-
-    const lastComma = s.lastIndexOf(',');
-    if (lastComma >= 0) {
-      const after = s.slice(lastComma + 1);
-      if (after.length > 2) return Number.NaN;
-      if (after.length === 0) return Number.NaN;
-      if (!/^\d+$/.test(after)) return Number.NaN;
-      const intPart = s.slice(0, lastComma).replace(/\./g, '');
-      const n = parseFloat((intPart || '0') + '.' + after);
-      return Number.isNaN(n) ? Number.NaN : n;
-    }
-
-    s = s.replace(/\./g, '');
-    if (s === '') return Number.NaN;
-    if (!/^\d+$/.test(s)) return Number.NaN;
-    const n = parseInt(s, 10);
-    return Number.isNaN(n) ? Number.NaN : n;
   }
 
   /** Devuelve disabledDate para nz-date-picker (hoy mínimo, no antes de otro campo). */
